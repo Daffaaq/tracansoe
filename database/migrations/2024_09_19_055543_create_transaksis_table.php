@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('status')->comment('downpayment, paid');
             $table->foreignId('promosi_id')->nullable()->constrained('promosis')->onDelete('set null');
             $table->double('total_harga');
+            $table->decimal('downpayment_amount', 15, 2)->nullable(); // Jumlah DP
+            $table->decimal('remaining_payment', 15, 2)->nullable(); // Sisa pembayaran
             $table->string('tracking_number')->unique();
             $table->timestamps();
         });

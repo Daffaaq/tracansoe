@@ -17,9 +17,11 @@ return new class extends Migration
             $table->string('nama_promosi');
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('status');
+            $table->string('status')->comment('upcoming, active, expired');
             $table->string('kode');
             $table->double('discount');
+            $table->string('image')->nullable();
+            $table->longText('description')->nullable();
             $table->timestamps();
         });
     }

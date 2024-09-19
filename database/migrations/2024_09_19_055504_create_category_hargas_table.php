@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->integer('qty');
-            $table->double('price');
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

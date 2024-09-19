@@ -10,7 +10,7 @@ class transaksi extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'status', 'promosi_id', 'total_harga', 'tracking_number'];
+    protected $fillable = ['uuid', 'status', 'promosi_id', 'total_harga', 'tracking_number', 'downpayment_amount', 'remaining_payment'];
 
     protected static function boot()
     {

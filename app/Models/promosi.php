@@ -17,7 +17,9 @@ class promosi extends Model
         'end_date',
         'status',
         'kode',
-        'discount'
+        'discount',
+        'image',
+        'description',
     ];
 
     // Jika Anda menggunakan tipe data tanggal, sebaiknya casting ke tipe date

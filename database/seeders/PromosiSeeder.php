@@ -20,7 +20,7 @@ class PromosiSeeder extends Seeder
                 'nama_promosi' => 'Diskon Kemerdekaan',
                 'start_date' => '2024-08-01',
                 'end_date' => '2024-08-31',
-                'status' => 'active',
+                'status' => 'expired',
                 'kode' => 'MERDEKA2024',
                 'discount' => 0.20, // Diskon 20%
                 'created_at' => now(),

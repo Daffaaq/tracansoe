@@ -10,7 +10,7 @@ class category_harga extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'qty', 'price', 'category_id'];
+    protected $fillable = ['uuid', 'qty','category_id'];
 
     protected static function boot()
     {

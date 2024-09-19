@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('nama_kategori');
+            $table->double('price');
+            $table->longText('description');
+            $table->integer('estimation');
             $table->timestamps();
         });
     }
