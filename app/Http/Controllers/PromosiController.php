@@ -51,7 +51,7 @@ class PromosiController extends Controller
         ]);
 
         // Cek apakah ada promosi lain dengan rentang tanggal yang persis sama
-        $existingPromosiExact = Promosi::where('start_date', $request->start_date)
+        $existingPromosiExact = promosi::where('start_date', $request->start_date)
             ->where('end_date', $request->end_date)
             ->first();
 
@@ -59,13 +59,13 @@ class PromosiController extends Controller
             return redirect()->back()->withErrors(['error' => 'Promosi dengan rentang tanggal tersebut sudah ada.']);
         }
 
-        $cekkode = Promosi::where('kode', $request->kode)->first();
+        $cekkode = promosi::where('kode', $request->kode)->first();
 
         if ($cekkode) {
             return redirect()->back()->withErrors(['error' => 'Promosi dengan kode tersebut sudah ada.']);
         }
 
-        $existingPromosi = Promosi::where(function ($query) use ($request) {
+        $existingPromosi = promosi::where(function ($query) use ($request) {
             $query->whereBetween('start_date', [$request->start_date, $request->end_date])
                 ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
                 ->orWhere(function ($query) use ($request) {
@@ -98,7 +98,7 @@ class PromosiController extends Controller
         } else {
             $status = 'expired';
         }
-        Promosi::create([
+        promosi::create([
             'nama_promosi' => $request->nama_promosi,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
@@ -117,7 +117,7 @@ class PromosiController extends Controller
      */
     public function show(string $uuid)
     {
-        $promosi = Promosi::where('uuid', $uuid)->firstOrFail();
+        $promosi = promosi::where('uuid', $uuid)->firstOrFail();
         return view('Promosi.show', compact('promosi'));
     }
 
@@ -126,7 +126,7 @@ class PromosiController extends Controller
      */
     public function edit(string $uuid)
     {
-        $promosi = Promosi::where('uuid', $uuid)->firstOrFail();
+        $promosi = promosi::where('uuid', $uuid)->firstOrFail();
         // dd($promosi);
         return view('Promosi.edit', compact('promosi'));
     }
@@ -145,9 +145,9 @@ class PromosiController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi gambar
         ]);
 
-        $promosi = Promosi::where('uuid', $uuid)->firstOrFail();
+        $promosi = promosi::where('uuid', $uuid)->firstOrFail();
 
-        $existingPromosiExact = Promosi::where('start_date', $request->start_date)
+        $existingPromosiExact = promosi::where('start_date', $request->start_date)
             ->where('end_date', $request->end_date)
             ->where('id', '!=', $promosi->id) // Mengecualikan promosi yang sedang di-update
             ->first();
@@ -156,14 +156,14 @@ class PromosiController extends Controller
             return redirect()->back()->withErrors(['error' => 'Promosi dengan rentang tanggal tersebut sudah ada.']);
         }
 
-        $cekkode = Promosi::where('kode', $request->kode)->where('id', '!=', $promosi->id)->first();
+        $cekkode = promosi::where('kode', $request->kode)->where('id', '!=', $promosi->id)->first();
 
         if ($cekkode) {
             return redirect()->back()->withErrors(['error' => 'Promosi dengan kode tersebut sudah ada.']);
         }
 
         // Cek apakah ada promosi lain dengan rentang tanggal yang tumpang tindih, kecuali promosi ini sendiri
-        $existingPromosi = Promosi::where(function ($query) use ($request) {
+        $existingPromosi = promosi::where(function ($query) use ($request) {
             $query->whereBetween('start_date', [$request->start_date, $request->end_date])
                 ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
                 ->orWhere(function ($query) use ($request) {
@@ -223,7 +223,7 @@ class PromosiController extends Controller
      */
     public function destroy(string $uuid)
     {
-        $promosi = Promosi::where('uuid', $uuid)->firstOrFail();
+        $promosi = promosi::where('uuid', $uuid)->firstOrFail();
 
         // Hapus gambar dari folder jika ada
         if ($promosi->image && file_exists(public_path('images/promosi/' . $promosi->image))) {

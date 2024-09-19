@@ -100,6 +100,12 @@
                                 </a>
                             </li>
                         @endif
+                        <li class="sidebar-item {{ request()->routeIs('kategori.index') ? 'active' : '' }}">
+                            <a href="{{ route('kategori.index') }}" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Kategori</span>
+                            </a>
+                        </li>
                         {{-- @dd(auth()->user()->role) --}}
                         @if (auth()->user()->role == 'karyawan')
                             <li class="sidebar-item">

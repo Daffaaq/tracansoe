@@ -38,78 +38,43 @@
                     @endif
                     <div class="card-body">
                         <!-- Perhatikan untuk file upload, tambahkan enctype -->
-                        <form method="POST" action="{{ route('promosi.store') }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('kategori.store') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="nama_promosi">Nama Promosi</label>
+                                        <label class="col-lg-3 col-form-label" for="nama_kategori">Nama Kategori</label>
                                         <div class="col-lg-9">
-                                            <input type="text" id="nama_promosi" class="form-control" name="nama_promosi"
-                                                value="{{ old('nama_promosi') }}" placeholder="Nama Promosi">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="start_date">Tanggal Mulai</label>
-                                        <div class="col-lg-9">
-                                            <input type="date" id="start_date" class="form-control" name="start_date"
-                                                value="{{ old('start_date') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="end_date">Tanggal Berakhir</label>
-                                        <div class="col-lg-9">
-                                            <input type="date" id="end_date" class="form-control" name="end_date"
-                                                value="{{ old('end_date') }}">
+                                            <input type="text" id="nama_kategori" class="form-control"
+                                                name="nama_kategori" value="{{ old('nama_kategori') }}"
+                                                placeholder="Nama Kategori">
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="kode">Kode Promosi</label>
+                                        <label class="col-lg-3 col-form-label" for="price">Harga</label>
                                         <div class="col-lg-9">
-                                            <input type="text" id="kode" class="form-control" name="kode"
-                                                value="{{ old('kode') }}" placeholder="Kode Promosi">
+                                            <input type="text" id="price" class="form-control numeric-only"
+                                                name="price" value="{{ old('price') }}" placeholder="Harga"
+                                                inputmode="numeric">
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="discount">Diskon (%)</label>
+                                        <label class="col-lg-3 col-form-label" for="estimation">Estimasi Selesai</label>
                                         <div class="col-lg-9">
-                                            <input type="number" id="discount" class="form-control" name="discount"
-                                                value="{{ old('discount') }}" placeholder="Diskon" min="0" max="100" step="0.01">
+                                            <input type="text" id="estimation" class="form-control numeric-only"
+                                                name="estimation" placeholder="3" inputmode="numeric"
+                                                value="{{ old('estimation') }}">
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="image">Gambar</label>
-                                        <div class="col-lg-9">
-                                            <input type="file" id="image" class="form-control" name="image" accept="image/*">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- <div class="col-md-12">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="description">Deskripsi</label>
-                                        <div class="col-lg-9">
-                                            <textarea id="description" class="form-control" name="description" rows="4"
-                                                placeholder="Deskripsi Promosi">{{ old('description') }}</textarea>
-                                        </div>
-                                    </div>
-                                </div> --}}
                             </div>
+
                             <style>
                                 .form-group {
                                     display: flex;
@@ -132,9 +97,10 @@
                                 <label class="form-label" for="description">Deskripsi</label>
                                 <textarea id="description" class="form-control" name="description" rows="4" placeholder="Deskripsi Promosi">{{ old('description') }}</textarea>
                             </div>
+
                             <div class="row mt-3">
                                 <div class="col-12 d-flex justify-content-end">
-                                    <a href="{{ route('promosi.index') }}" class="btn btn-primary rounded-pill me-1 mb-1">
+                                    <a href="{{ route('kategori.index') }}" class="btn btn-primary rounded-pill me-1 mb-1">
                                         Batal
                                     </a>
                                     <button type="submit" class="btn btn-success rounded-pill me-1 mb-1">Submit</button>
@@ -146,7 +112,7 @@
                 </div>
             </div>
         </div>
-        
+
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <ul class="mb-0">
@@ -158,4 +124,24 @@
             </div>
         @endif
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var numericInputs = document.querySelectorAll('.numeric-only');
+
+            numericInputs.forEach(function(input) {
+                input.addEventListener('input', function(e) {
+                    // Remove any non-numeric characters
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+
+                input.addEventListener('keypress', function(e) {
+                    // Prevent non-numeric key presses
+                    if (e.which < 48 || e.which > 57) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
