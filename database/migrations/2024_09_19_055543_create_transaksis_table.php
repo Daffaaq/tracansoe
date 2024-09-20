@@ -22,8 +22,8 @@ return new class extends Migration
             $table->foreignId('promosi_id')->nullable()->constrained('promosis')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->double('total_harga');
-            $table->decimal('downpayment_amount', 15, 2)->nullable(); // Jumlah DP
-            $table->decimal('remaining_payment', 15, 2)->nullable(); // Sisa pembayaran
+            $table->double('downpayment_amount')->nullable(); // Jumlah DP
+            $table->double('remaining_payment')->nullable(); // Sisa pembayaran
             $table->string('tracking_number')->unique();
             $table->timestamps();
         });

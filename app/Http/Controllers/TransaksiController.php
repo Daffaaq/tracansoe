@@ -11,6 +11,7 @@ use App\Models\transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\Facades\DataTables;
 
 class TransaksiController extends Controller
 {
@@ -19,7 +20,19 @@ class TransaksiController extends Controller
      */
     public function index()
     {
-        //
+        return view('transaksi.index');
+    }
+
+    public function list(Request $request)
+    {
+        if ($request->ajax()) {
+            $dataPromosi = transaksi::select("uuid", "nama_customer", "notelp_customer", "tracking_number", "total_harga")->get();
+            // dd($dataPromosi);
+            return DataTables::of($dataPromosi)
+                ->addIndexColumn()
+                ->make(true);
+        }
+        return response()->json(['message' => 'Method not allowed'], 405);
     }
 
     /**
@@ -43,14 +56,23 @@ class TransaksiController extends Controller
                 'nama_promosi' => $promosi->nama_promosi,
                 'discount' => $promosi->discount // Discount should be a decimal (e.g., 0.10 for 10%)
             ]);
+        } elseif ($promosi && $promosi->isUpcoming()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode promosi Masih Upcoming Rilis.'
+            ]);
+        } elseif ($promosi && $promosi->isExpired()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode promosi Sudah Expired.'
+            ]);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Kode promosi tidak valid atau sudah expired.'
+                'message' => 'Kode promosi tidak valid.'
             ]);
         }
     }
-
 
 
     /**
@@ -58,6 +80,26 @@ class TransaksiController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate(
+            [
+                'nama_customer' => 'required|string|max:255',
+                'email_customer' => 'required|email|max:255',
+                'notelp_customer' => 'required|string|max:15',
+                'alamat_customer' => 'required|string|max:255',
+                'plus_services.*' => 'exists:plus_services,id', // Pastikan ID service valid
+                'promosi_kode' => 'nullable|string|exists:promosis,kode', // Promosi kode opsional
+            ],
+            [
+                'nama_customer.required' => 'Nama customer wajib diisi.',
+                'email_customer.required' => 'Email customer wajib diisi.',
+                'email_customer.email' => 'Format email tidak valid.',
+                'notelp_customer.required' => 'Nomor telepon wajib diisi.',
+                'alamat_customer.required' => 'Alamat wajib diisi.',
+                'status.required' => 'Status pembayaran harus dipilih.',
+                'plus_services.*.exists' => 'Layanan tambahan tidak valid.',
+                'promosi_kode.exists' => 'Kode promosi tidak ditemukan.',
+            ]
+        );
         DB::beginTransaction(); // Mulai transaksi database
 
         try {
@@ -90,20 +132,14 @@ class TransaksiController extends Controller
                 $promosi = Promosi::where('kode', $request->promosi_kode)->first();
 
                 if (!$promosi) {
-                    return response()->json([
-                        'message' => 'Kode promosi tidak valid.'
-                    ], 400);
+                    return redirect()->route('transaksi.index')->with('error', 'Kode promosi tidak valid.');
                 }
 
                 // Cek status promosi
                 if ($promosi->status === 'upcoming') {
-                    return response()->json([
-                        'message' => 'Kode belum bisa digunakan untuk tanggal sekarang.'
-                    ], 400);
+                    return redirect()->route('transaksi.index')->with('error', 'Kode belum bisa digunakan untuk tanggal sekarang.');
                 } elseif ($promosi->status === 'expired' || now()->greaterThan($promosi->end_date)) {
-                    return response()->json([
-                        'message' => 'Kode promosi sudah expired.'
-                    ], 400);
+                    return redirect()->route('transaksi.index')->with('error', 'Kode promosi sudah expired.');
                 } elseif ($promosi->isActive()) {
                     // Terapkan diskon jika promosi aktif
                     $totalHarga -= ($totalHarga * ($promosi->discount)); // Terapkan diskon
@@ -116,6 +152,8 @@ class TransaksiController extends Controller
                 $remainingPayment = $totalHarga - $request->downpayment_amount; // Sisa pembayaran
             }
 
+            $downpaymentAmount = round($request->downpayment_amount, 0); // Hapus desimal
+            $remainingPayment = round($remainingPayment, 0); // Hapus desimal
             // Simpan transaksi utama
             $transaksi = Transaksi::create([
                 'nama_customer' => $request->nama_customer,
@@ -126,8 +164,8 @@ class TransaksiController extends Controller
                 'promosi_id' => $promosi->id ?? null, // Simpan ID promosi jika ada
                 'user_id' => auth()->id(), // ID pegawai yang login
                 'total_harga' => $totalHarga, // Total harga hasil perhitungan
-                'downpayment_amount' => $request->downpayment_amount ?? null, // Jumlah DP (jika ada)
-                'remaining_payment' => $remainingPayment, // Sisa pembayaran otomatis dihitung
+                'downpayment_amount' => $downpaymentAmount ?? 0, // Jumlah DP (jika ada)
+                'remaining_payment' => $remainingPayment ?? 0, // Sisa pembayaran otomatis dihitung
                 'tracking_number' => $this->generateTrackingNumber(),
             ]);
             // dd($request->category_hargas);
@@ -161,23 +199,38 @@ class TransaksiController extends Controller
 
             DB::commit(); // Commit transaksi jika semuanya sukses
 
-            return response()->json([
-                'message' => 'Transaksi berhasil disimpan',
-                'transaksi' => $transaksi
-            ], 201);
+            return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan transaksi jika ada error
 
-            return response()->json([
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ], 500);
+            // Ganti response JSON dengan redirect dan pesan error
+            return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
 
     private function generateTrackingNumber()
     {
-        return 'TRX-' . strtoupper(uniqid());
+        do {
+            // Daftar karakter pemisah yang diizinkan
+            $separators = ['*', '#', '/', '|', '^', '$', '&', '?', '~', '@', '!', '%', '(', ')', '{', '}', '[', ']', ':', ';', ',', '.', '/'];
+
+            // Pilih satu pemisah secara acak
+            $separator = $separators[array_rand($separators)];
+
+            // Hasilkan nomor tracking dengan pemisah acak
+            $trackingNumber = 'TRX-' . bin2hex(random_bytes(5)) . $separator . bin2hex(random_bytes(2));
+
+            // Periksa di database apakah nomor ini sudah ada
+        } while ($this->trackingNumberExists($trackingNumber));
+
+        return $trackingNumber;
+    }
+
+    // Fungsi untuk memeriksa apakah nomor tracking sudah ada
+    private function trackingNumberExists($trackingNumber)
+    {
+        return transaksi::where('tracking_number', $trackingNumber)->exists();
     }
     /**
      * Display the specified resource.

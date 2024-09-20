@@ -40,6 +40,16 @@ class promosi extends Model
         $today = now();
         return $this->status === 'active' && $this->start_date <= $today && $this->end_date >= $today;
     }
+    public function isUpcoming()
+    {
+        $today = now();
+        return $this->status === 'upcoming' && $this->start_date > $today;
+    }
+    public function isExpired()
+    {
+        $today = now();
+        return $this->status === 'expired' || $this->end_date < $today;
+    }
 
     protected static function boot()
     {

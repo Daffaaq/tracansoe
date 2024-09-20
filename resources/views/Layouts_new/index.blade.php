@@ -92,22 +92,32 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
-                            <li class="sidebar-item {{ request()->routeIs('promosi.index','promosi.create','promosi.edit','promosi.show') ? 'active' : '' }}">
-                                <a href="{{ route('promosi.index') }}" class="sidebar-link">
-                                    <i class="bi bi-grid-fill"></i>
-                                    <span>Promosi</span>
-                                </a>
-                            </li>
-                        <li class="sidebar-item {{ request()->routeIs('kategori.index','kategori.create','kategori.show','kategori.edit') ? 'active' : '' }}">
+                        <li
+                            class="sidebar-item {{ request()->routeIs('promosi.index', 'promosi.create', 'promosi.edit', 'promosi.show') ? 'active' : '' }}">
+                            <a href="{{ route('promosi.index') }}" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Promosi</span>
+                            </a>
+                        </li>
+                        <li
+                            class="sidebar-item {{ request()->routeIs('kategori.index', 'kategori.create', 'kategori.show', 'kategori.edit') ? 'active' : '' }}">
                             <a href="{{ route('kategori.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Kategori</span>
                             </a>
                         </li>
-                        <li class="sidebar-item {{ request()->routeIs('plus-service.index','plus-service.create','plus-service.edit') ? 'active' : '' }}">
+                        <li
+                            class="sidebar-item {{ request()->routeIs('plus-service.index', 'plus-service.create', 'plus-service.edit') ? 'active' : '' }}">
                             <a href="{{ route('plus-service.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Plus Service</span>
+                            </a>
+                        </li>
+                        <li
+                            class="sidebar-item {{ request()->routeIs('transaksi.index', 'transaksi.create', 'transaksi.edit') ? 'active' : '' }}">
+                            <a href="{{ route('transaksi.index') }}" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Transaksi</span>
                             </a>
                         </li>
                         {{-- @dd(auth()->user()->role) --}}

@@ -48,7 +48,7 @@
                                         <div class="col-lg-9">
                                             <input type="text" id="nama_customer" class="form-control"
                                                 name="nama_customer" value="{{ old('nama_customer') }}"
-                                                placeholder="Nama Customer" required>
+                                                placeholder="Nama Customer">
                                         </div>
                                     </div>
                                 </div>
@@ -60,7 +60,7 @@
                                         <div class="col-lg-9">
                                             <input type="email" id="email_customer" class="form-control"
                                                 name="email_customer" value="{{ old('email_customer') }}"
-                                                placeholder="Email Customer" required>
+                                                placeholder="Email Customer">
                                         </div>
                                     </div>
                                 </div>
@@ -72,7 +72,7 @@
                                         <div class="col-lg-9">
                                             <input type="text" id="notelp_customer" class="form-control"
                                                 name="notelp_customer" value="{{ old('notelp_customer') }}"
-                                                placeholder="No. Telepon Customer" required>
+                                                placeholder="No. Telepon Customer">
                                         </div>
                                     </div>
                                 </div>
@@ -84,7 +84,7 @@
                                         <div class="col-lg-9">
                                             <input type="text" id="alamat_customer" class="form-control"
                                                 name="alamat_customer" value="{{ old('alamat_customer') }}"
-                                                placeholder="Alamat Customer" required>
+                                                placeholder="Alamat Customer">
                                         </div>
                                     </div>
                                 </div>
@@ -94,7 +94,7 @@
                                     <div class="form-group row align-items-center">
                                         <label class="col-lg-3 col-form-label" for="status">Status Pembayaran</label>
                                         <div class="col-lg-9">
-                                            <select id="status" class="form-control" name="status" required>
+                                            <select id="status" class="form-control" name="status">
                                                 <option value="" {{ old('status') == '' ? 'selected' : '' }}>pilih
                                                 </option>
                                                 <option value="downpayment"
@@ -376,8 +376,13 @@
                 // Hitung remaining payment jika downpayment
                 if (statusSelect.value === 'downpayment') {
                     const downpayment = parseFloat(downpaymentAmountInput.value || 0);
-                    remainingPaymentInput.value = totalHarga - downpayment;
+                    remainingPaymentInput.value = formatPrice(totalHarga - downpayment);
                 }
+            }
+
+            function formatPrice(value) {
+                // Jika harga bulat, tampilkan tanpa desimal
+                return (value % 1 === 0) ? value : value.toFixed(2);
             }
 
             function toggleDownpaymentSection() {

@@ -60,5 +60,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/transaksi/create', [TransaksiController::class, 'create'])->name('transaksi.create');
         Route::post('/transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
         Route::get('/validate-promosi', [TransaksiController::class, 'validatePromosi']);
+        Route::post('/transaksi/list', [TransaksiController::class, 'list'])->name('transaksi.list');
     });
 });
