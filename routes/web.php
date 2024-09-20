@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PlusServiceController;
 use App\Http\Controllers\PromosiController;
+use App\Http\Controllers\TransaksiController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -53,5 +54,11 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/plus-service/update/{uuid}', [PlusServiceController::class, 'update'])->name('plus-service.update');
         Route::delete('/plus-service/delete/{uuid}', [PlusServiceController::class, 'destroy'])->name('plus-service.destroy');
         Route::post('/plus-service/list', [PlusServiceController::class, 'list'])->name('plus-service.list');
+    });
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
+        Route::get('/transaksi/create', [TransaksiController::class, 'create'])->name('transaksi.create');
+        Route::post('/transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
+        Route::get('/validate-promosi', [TransaksiController::class, 'validatePromosi']);
     });
 });

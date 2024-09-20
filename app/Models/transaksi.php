@@ -10,7 +10,7 @@ class transaksi extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'status', 'promosi_id', 'total_harga', 'tracking_number', 'downpayment_amount', 'remaining_payment'];
+    protected $fillable = ['uuid', 'status', 'nama_customer', 'email_customer', 'notelp_customer', 'alamat_customer', 'promosi_id', 'total_harga', 'tracking_number', 'downpayment_amount', 'remaining_payment'];
 
     protected static function boot()
     {
@@ -32,14 +32,18 @@ class transaksi extends Model
     {
         return $this->belongsTo(promosi::class);
     }
+    public function karyawan()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function categoryHargas()
     {
-        return $this->belongsToMany(category_harga::class, 'transaksi_category_harga');
+        return $this->belongsToMany(category_harga::class, 'transaksi_category_harga')->withPivot('uuid', 'qty');
     }
 
     public function plusServices()
     {
-        return $this->belongsToMany(plus_service::class, 'transaksi_plus_service');
+        return $this->belongsToMany(plus_service::class, 'transaksi_plus_service')->withPivot('uuid');
     }
 }
