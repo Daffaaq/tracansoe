@@ -27,10 +27,13 @@
         @endif
 
         <div class="card-body">
-            <div class="d-flex justify-content-end mb-3">
-                <a href="{{ url('/dashboard/promosi/create') }}" class="btn btn-primary" style="margin-right: 5px;">Tambah
-                    Promosi</a>
-            </div>
+            @if (auth()->user()->role == 'superadmin')
+                <div class="d-flex justify-content-end mb-3">
+                    <a href="{{ url('/dashboard/promosi/create') }}" class="btn btn-primary"
+                        style="margin-right: 5px;">Tambah
+                        Promosi</a>
+                </div>
+            @endif
             <div class="table-responsive">
                 <table class="table table-bordered" id="periodeTable" width="100%" cellspacing="0">
                     <thead>
@@ -136,20 +139,25 @@
                         name: 'uuid',
                         orderable: false,
                         searchable: false,
-                        render: function(data) {
-                            return `
-                        <a href="/dashboard/promosi/show/${data}" class="btn icon btn-sm btn-info">
+                        render: function(data, type, row) {
+                            let actionButtons = `<a href="/dashboard/promosi/show/${data}" class="btn icon btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/dashboard/promosi/edit/${data}" class="btn icon btn-sm btn-warning">
+                             </a>`;
+
+                            // Cek apakah user memiliki role superadmin
+                            @if (auth()->user()->role == 'superadmin')
+                                actionButtons += `<a href="/dashboard/promosi/edit/${data}" class="btn icon btn-sm btn-warning">
                                 <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
+                              </a>
+                              <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
                                 <i class="bi bi-trash"></i>
-                            </button>
-                    `;
+                              </button>`;
+                            @endif
+
+                            return actionButtons;
                         }
                     }
+
                 ],
                 autoWidth: false,
                 drawCallback: function(settings) {

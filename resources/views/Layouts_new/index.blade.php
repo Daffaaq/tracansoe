@@ -92,14 +92,12 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
-                        @if (auth()->user()->role == 'superadmin')
                             <li class="sidebar-item {{ request()->routeIs('promosi.index','promosi.create','promosi.edit','promosi.show') ? 'active' : '' }}">
                                 <a href="{{ route('promosi.index') }}" class="sidebar-link">
                                     <i class="bi bi-grid-fill"></i>
                                     <span>Promosi</span>
                                 </a>
                             </li>
-                        @endif
                         <li class="sidebar-item {{ request()->routeIs('kategori.index','kategori.create','kategori.show','kategori.edit') ? 'active' : '' }}">
                             <a href="{{ route('kategori.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>

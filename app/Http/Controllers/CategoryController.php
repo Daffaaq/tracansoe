@@ -30,6 +30,9 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menambah kategori.');
+        }
         return view('categories.create');
     }
 
@@ -38,6 +41,9 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menyimpan kategori.');
+        }
         $request->validate([
             'nama_kategori' => 'required|string',
             'price' => 'required|numeric',
@@ -70,6 +76,9 @@ class CategoryController extends Controller
      */
     public function edit(string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk mengedit kategori.');
+        }
         $category = category::where('uuid', $uuid)->firstOrFail();
         return view('categories.edit', compact('category'));
     }
@@ -79,6 +88,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk memperbarui kategori.');
+        }
         $request->validate([
             'nama_kategori' => 'required|string',
             'price' => 'required|numeric',
@@ -103,6 +115,9 @@ class CategoryController extends Controller
      */
     public function destroy(string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menghapus kategori.');
+        }
         $category = category::where('uuid', $uuid)->firstOrFail();
 
         // Hapus data kategori

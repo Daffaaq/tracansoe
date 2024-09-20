@@ -28,8 +28,11 @@
 
         <div class="card-body">
             <div class="d-flex justify-content-end mb-3">
-                <a href="{{ url('/dashboard/kategori/create') }}" class="btn btn-primary" style="margin-right: 5px;">Tambah
-                    Kategori</a>
+                @if (auth()->user()->role == 'superadmin')
+                    <a href="{{ url('/dashboard/kategori/create') }}" class="btn btn-primary"
+                        style="margin-right: 5px;">Tambah
+                        Kategori</a>
+                @endif
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered" id="periodeTable" width="100%" cellspacing="0">
@@ -113,18 +116,24 @@
                         name: 'uuid',
                         orderable: false,
                         searchable: false,
-                        render: function(data) {
-                            return `
-                        <a href="/dashboard/kategori/show/${data}" class="btn icon btn-sm btn-info">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                            <a href="/dashboard/kategori/edit/${data}" class="btn icon btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                    `;
+                        render: function(data, type, row) {
+                            let actionButtons = `
+            <a href="/dashboard/kategori/show/${data}" class="btn icon btn-sm btn-info">
+                <i class="bi bi-eye"></i>
+            </a>
+        `;
+
+                            @if (auth()->user()->role == 'superadmin')
+                                actionButtons += `
+                <a href="/dashboard/kategori/edit/${data}" class="btn icon btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
+                    <i class="bi bi-trash"></i>
+                </button>`;
+                            @endif
+
+                            return actionButtons;
                         }
                     }
                 ],

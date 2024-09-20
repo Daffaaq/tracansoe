@@ -28,9 +28,11 @@
 
         <div class="card-body">
             <div class="d-flex justify-content-end mb-3">
-                <a href="{{ url('/dashboard/plus-service/create') }}" class="btn btn-primary"
-                    style="margin-right: 5px;">Tambah
-                    Plus Service</a>
+                @if (auth()->user()->role == 'superadmin')
+                    <a href="{{ url('/dashboard/plus-service/create') }}" class="btn btn-primary"
+                        style="margin-right: 5px;">Tambah
+                        Plus Service</a>
+                @endif
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered" id="periodeTable" width="100%" cellspacing="0">
@@ -39,7 +41,9 @@
                             <th>No</th>
                             <th>Nama Plus Service</th>
                             <th>Harga</th>
-                            <th>Action</th>
+                            @if (auth()->user()->role == 'superadmin')
+                                <th>Action</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -106,17 +110,23 @@
                         name: 'uuid',
                         orderable: false,
                         searchable: false,
-                        render: function(data) {
-                            return `
-                            <a href="/dashboard/plus-service/edit/${data}" class="btn icon btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                    `;
+                        render: function(data, type, row) {
+                            let actionButtons = ``;
+
+                            @if (auth()->user()->role == 'superadmin')
+                                actionButtons += `
+                <a href="/dashboard/plus-service/edit/${data}" class="btn icon btn-sm btn-warning">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
+                    <i class="bi bi-trash"></i>
+                </button>`;
+                            @endif
+
+                            return actionButtons;
                         }
                     }
+
                 ],
                 autoWidth: false,
                 drawCallback: function(settings) {

@@ -33,6 +33,9 @@ class PlusServiceController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk membuat plus service.');
+        }
         return view('plus_services.create');
     }
 
@@ -41,6 +44,9 @@ class PlusServiceController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk menyimpan plus service.');
+        }
         $request->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
@@ -69,6 +75,9 @@ class PlusServiceController extends Controller
      */
     public function edit(string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk mengedit plus service.');
+        }
         $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
         return view('plus_services.edit', compact('plusService'));
     }
@@ -78,6 +87,9 @@ class PlusServiceController extends Controller
      */
     public function update(Request $request, string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk memperbarui plus service.');
+        }
         $request->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
@@ -98,6 +110,9 @@ class PlusServiceController extends Controller
      */
     public function destroy(string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk menghapus plus service.');
+        }
         $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
 
         // Hapus data plus service

@@ -33,6 +33,11 @@ class PromosiController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->role != 'superadmin') {
+            // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
+            return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk membuat promosi.');
+        }
+
         return view('Promosi.create');
     }
 
@@ -41,6 +46,10 @@ class PromosiController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'superadmin') {
+            // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
+            return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk membuat promosi.');
+        }
         $request->validate([
             'nama_promosi' => 'required|string',
             'start_date' => 'required|date',
@@ -126,6 +135,10 @@ class PromosiController extends Controller
      */
     public function edit(string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
+            return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk mengubah promosi.');
+        }
         $promosi = promosi::where('uuid', $uuid)->firstOrFail();
         // dd($promosi);
         return view('Promosi.edit', compact('promosi'));
@@ -136,6 +149,10 @@ class PromosiController extends Controller
      */
     public function update(Request $request, string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
+            return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk mengubah promosi.');
+        }
         $request->validate([
             'nama_promosi' => 'required|string',
             'start_date' => 'required|date',
@@ -223,6 +240,10 @@ class PromosiController extends Controller
      */
     public function destroy(string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
+            return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk menghapus promosi.');
+        }
         $promosi = promosi::where('uuid', $uuid)->firstOrFail();
 
         // Hapus gambar dari folder jika ada
