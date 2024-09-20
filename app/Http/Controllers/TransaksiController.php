@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\category;
+use App\Models\category_harga;
 use App\Models\plus_service;
 use App\Models\promosi;
+use App\Models\status;
 use App\Models\transaksi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 class TransaksiController extends Controller
@@ -63,9 +66,12 @@ class TransaksiController extends Controller
 
             // Ambil dan hitung total harga dari kategori
             foreach ($request->category_hargas as $category_harga) {
+                // Ambil data category berdasarkan ID
                 $category = category::find($category_harga['id']);
+
                 if ($category) {
-                    $totalHarga += $category->price * $category_harga['qty']; // harga * qty
+                    // Hitung total harga menggunakan qty dari request
+                    $totalHarga += $category->price * $category_harga['qty'];
                 }
             }
 
@@ -124,10 +130,11 @@ class TransaksiController extends Controller
                 'remaining_payment' => $remainingPayment, // Sisa pembayaran otomatis dihitung
                 'tracking_number' => $this->generateTrackingNumber(),
             ]);
-
+            // dd($request->category_hargas);
             // Simpan kategori harga yang dipilih dalam transaksi
             foreach ($request->category_hargas as $category_harga) {
                 $transaksi->categoryHargas()->attach($category_harga['id'], [
+                    'uuid' => (string) Str::uuid(),
                     'qty' => $category_harga['qty']
                 ]);
             }
@@ -135,9 +142,22 @@ class TransaksiController extends Controller
             // Simpan plus services yang dipilih
             if ($request->has('plus_services')) {
                 foreach ($request->plus_services as $plus_service_id) {
-                    $transaksi->plusServices()->attach($plus_service_id, []);
+                    $transaksi->plusServices()->attach($plus_service_id, [
+                        'uuid' => (string) Str::uuid()
+                    ]);
                 }
             }
+
+            // Cek apakah status "Pending" sudah ada
+            $status = Status::firstOrCreate([
+                'name' => 'Pending'
+            ]);
+
+            // Simpan status tracking yang pertama kali
+            $transaksi->trackingStatuses()->create([
+                'status_id' => $status->id,
+                'description' => 'Sudah diterima, belum diproses', // Deskripsi default
+            ]);
 
             DB::commit(); // Commit transaksi jika semuanya sukses
 
@@ -153,7 +173,6 @@ class TransaksiController extends Controller
             ], 500);
         }
     }
-
 
 
     private function generateTrackingNumber()

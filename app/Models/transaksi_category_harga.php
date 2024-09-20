@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 class transaksi_category_harga extends Model
 {
     use HasFactory;
-    protected $fillable = ['uuid', 'transaksi_id', 'category_harga_id'];
+    protected $fillable = ['uuid', 'qty', 'transaksi_id', 'category_harga_id'];
 
     protected static function boot()
     {
@@ -20,6 +20,7 @@ class transaksi_category_harga extends Model
         });
     }
 
+
     public function transaksi()
     {
         return $this->belongsTo(transaksi::class);
@@ -27,6 +28,6 @@ class transaksi_category_harga extends Model
 
     public function category_harga()
     {
-        return $this->belongsTo(category_harga::class);
+        return $this->belongsTo(category::class);
     }
 }

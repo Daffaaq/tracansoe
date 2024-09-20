@@ -39,11 +39,12 @@ class transaksi extends Model
 
     public function categoryHargas()
     {
-        return $this->belongsToMany(category_harga::class, 'transaksi_category_harga')->withPivot('uuid', 'qty');
+        return $this->belongsToMany(category::class, 'transaksi_category_hargas')->withPivot('qty');
     }
+
 
     public function plusServices()
     {
-        return $this->belongsToMany(plus_service::class, 'transaksi_plus_service')->withPivot('uuid');
+        return $this->belongsToMany(plus_service::class, 'transaksi_plus_services')->withPivot('uuid');
     }
 }

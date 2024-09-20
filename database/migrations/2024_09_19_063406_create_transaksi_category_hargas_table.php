@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('transaksi_category_hargas', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->integer('qty');
             $table->foreignId('transaksi_id')->constrained('transaksis')->onDelete('cascade');
-            $table->foreignId('category_harga_id')->constrained('category_hargas')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->timestamps();
         });
     }

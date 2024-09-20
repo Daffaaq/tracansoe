@@ -10,7 +10,7 @@ class category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'nama_kategori', 'price','description','estimation'];
+    protected $fillable = ['uuid', 'nama_kategori', 'price', 'description', 'estimation'];
 
     protected static function boot()
     {
@@ -21,9 +21,8 @@ class category extends Model
         });
     }
 
-    // Relasi Many-to-One dengan category_hargas
-    public function categoryHargas()
+    public function transaksis()
     {
-        return $this->hasMany(category_harga::class);
+        return $this->belongsToMany(transaksi::class, 'transaksi_category_harga');
     }
 }

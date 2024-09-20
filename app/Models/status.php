@@ -10,7 +10,7 @@ class status extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'name', 'description'];
+    protected $fillable = ['uuid', 'name'];
 
     protected static function boot()
     {
