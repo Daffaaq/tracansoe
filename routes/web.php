@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PlusServiceController;
 use App\Http\Controllers\PromosiController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -43,5 +44,14 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/kategori/update/{uuid}', [CategoryController::class, 'update'])->name('kategori.update');
         Route::delete('/kategori/delete/{uuid}', [CategoryController::class, 'destroy'])->name('kategori.destroy');
         Route::post('/kategori/list', [CategoryController::class, 'list'])->name('kategori.list');
+    });
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/plus-service', [PlusServiceController::class, 'index'])->name('plus-service.index');
+        Route::get('/plus-service/create', [PlusServiceController::class, 'create'])->name('plus-service.create');
+        Route::post('/plus-service/store', [PlusServiceController::class, 'store'])->name('plus-service.store');
+        Route::get('/plus-service/edit/{uuid}', [PlusServiceController::class, 'edit'])->name('plus-service.edit');
+        Route::put('/plus-service/update/{uuid}', [PlusServiceController::class, 'update'])->name('plus-service.update');
+        Route::delete('/plus-service/delete/{uuid}', [PlusServiceController::class, 'destroy'])->name('plus-service.destroy');
+        Route::post('/plus-service/list', [PlusServiceController::class, 'list'])->name('plus-service.list');
     });
 });
