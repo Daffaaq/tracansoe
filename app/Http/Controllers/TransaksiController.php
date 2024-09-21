@@ -9,6 +9,7 @@ use App\Models\promosi;
 use App\Models\status;
 use App\Models\transaksi;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -26,7 +27,7 @@ class TransaksiController extends Controller
     public function list(Request $request)
     {
         if ($request->ajax()) {
-            $dataPromosi = transaksi::select("uuid", "nama_customer", "notelp_customer", "tracking_number", "total_harga")->get();
+            $dataPromosi = transaksi::select("uuid", "nama_customer", "tanggal_transaksi", "tracking_number", "total_harga", "status")->get();
             // dd($dataPromosi);
             return DataTables::of($dataPromosi)
                 ->addIndexColumn()
@@ -167,6 +168,8 @@ class TransaksiController extends Controller
                 'downpayment_amount' => $downpaymentAmount ?? 0, // Jumlah DP (jika ada)
                 'remaining_payment' => $remainingPayment ?? 0, // Sisa pembayaran otomatis dihitung
                 'tracking_number' => $this->generateTrackingNumber(),
+                'tanggal_transaksi' => Carbon::now()->toDateString(), // Tanggal saat ini
+                'jam_transaksi' => Carbon::now()->toTimeString(), // Jam saat ini
             ]);
             // dd($request->category_hargas);
             // Simpan kategori harga yang dipilih dalam transaksi
@@ -195,6 +198,8 @@ class TransaksiController extends Controller
             $transaksi->trackingStatuses()->create([
                 'status_id' => $status->id,
                 'description' => 'Sudah diterima, belum diproses', // Deskripsi default
+                'tanggal_status'=> Carbon::now()->toDateString(),
+                'jam_status' => Carbon::now()->toTimeString()
             ]);
 
             DB::commit(); // Commit transaksi jika semuanya sukses
@@ -235,9 +240,20 @@ class TransaksiController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($uuid)
     {
-        //
+        try {
+            // Cari transaksi berdasarkan UUID, sertakan relasi promosi
+            $transaksi = Transaksi::with(['categoryHargas', 'plusServices', 'trackingStatuses.status', 'promosi'])
+                ->where('uuid', $uuid)
+                ->firstOrFail();
+
+            // Kirim data transaksi ke view
+            return view('transaksi.show', compact('transaksi'));
+        } catch (\Exception $e) {
+            // Jika terjadi kesalahan, arahkan kembali dengan pesan error
+            return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
+        }
     }
 
     /**

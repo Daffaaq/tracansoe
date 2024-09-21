@@ -10,7 +10,7 @@ class tracking_status extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'transaksi_id', 'status_id','description'];
+    protected $fillable = ['uuid', 'transaksi_id', 'status_id','description', 'tanggal_status', 'jam_status'];
 
     protected static function boot()
     {

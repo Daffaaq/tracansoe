@@ -17,6 +17,7 @@
     <link href="{{ asset('assets/compiled/css/iconly.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/extensions/summernote/summernote-lite.css') }}">
     <link rel="stylesheet" href="{{ asset('/assets/compiled/css/form-editor-summernote.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         hr {
             border: none;

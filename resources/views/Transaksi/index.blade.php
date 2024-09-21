@@ -39,11 +39,12 @@
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>Tanggal Transaksi</th>
                             <th>Nama Customer</th>
-                            <th>No Telp Customer</th>
                             <th>Kode Ticket Customer</th>
                             <th>Total Harga</th>
                             <th>Action</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,12 +99,12 @@
                         searchable: false
                     },
                     {
-                        data: 'nama_customer',
-                        name: 'nama_customer'
+                        data: 'tanggal_transaksi',
+                        name: 'tanggal_transaksi',
                     },
                     {
-                        data: 'notelp_customer',
-                        name: 'notelp_customer',
+                        data: 'nama_customer',
+                        name: 'nama_customer'
                     },
                     {
                         data: 'tracking_number',
@@ -119,7 +120,7 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            let actionButtons = `<a href="/dashboard/promosi/show/${data}" class="btn icon btn-sm btn-info">
+                            let actionButtons = `<a href="/dashboard/transaksi/show/${data}" class="btn icon btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                              </a>`;
 
@@ -134,6 +135,20 @@
                             @endif
 
                             return actionButtons;
+                        }
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
+                        render: function(data, type, row) {
+                            console.log(data);
+                            if (data === 'downpayment') {
+                                return '<span class="badge bg-warning"><i class="fas fa-clock fa-sm"></i></span>';
+                            } else if (data === 'paid') {
+                                return '<span class="badge bg-success"><i class="fas fa-check-circle fa-sm"></i></span>';
+                            } else {
+                                return '<span class="badge bg-secondary"><i class="fas fa-question-circle fa-sm"></i></span>';
+                            }
                         }
                     }
 

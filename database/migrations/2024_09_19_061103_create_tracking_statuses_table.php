@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('transaksi_id')->constrained('transaksis')->onDelete('cascade'); // Hubungkan ke transaksi
             $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');     // Hubungkan ke status
             $table->longText('description')->nullable();
+            $table->date('tanggal_status');
+            $table->time('jam_status');
             $table->timestamps();
         });
     }

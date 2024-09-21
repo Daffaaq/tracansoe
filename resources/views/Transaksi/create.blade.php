@@ -249,13 +249,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-
-        <div class="diskon alert alert-danger alert-dismissible fade show" role="alert" style="display: none">
-            <ul class="mb-0">
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
     </section>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -279,7 +274,6 @@
             const downpaymentAmountInput = document.getElementById('downpayment_amount');
             const remainingPaymentInput = document.getElementById('remaining_payment');
             const totalHargaInput = document.getElementById('total_harga');
-            const alertContainer = document.querySelector('.diskon');
 
             let totalHarga = 0;
 
@@ -297,6 +291,14 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
+                                // Tampilkan SweetAlert jika kode promosi valid
+                                Swal.fire({
+                                    title: 'Kode Promosi Valid!',
+                                    text: `Nama Promosi: ${data.nama_promosi}\nDiskon: ${(data.discount * 100)}%`,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+
                                 // Tampilkan nama promosi dan diskon yang diambil dari server
                                 namaPromosiInput.value = data.nama_promosi;
                                 discountInput.value = (data.discount * 100) + '%';
@@ -308,29 +310,44 @@
                                 // Recalculate total with discount
                                 calculateTotalWithDiscount(data.discount);
 
-                                // Hapus alert jika ada
-                                alertContainer.style.display = 'none';
                             } else {
+                                // Tampilkan SweetAlert jika kode promosi tidak valid
+                                Swal.fire({
+                                    title: 'Kode Promosi Tidak Valid',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'Coba Lagi'
+                                });
+
                                 // Jika kode tidak valid, sembunyikan bagian promosi
                                 promosiSection.style.display = 'none';
                                 discountSection.style.display = 'none';
                                 calculateTotalWithDiscount(0); // Tanpa diskon
 
-                                // Tampilkan pesan error di alert container
-                                alertContainer.style.display = 'block';
-                                alertContainer.innerHTML =
-                                    `<ul class="mb-0"><li>${data.message}</li></ul>`;
-                                alertContainer.appendChild(closeButton); // Re-append the close button
                             }
                         })
                         .catch(error => {
                             console.error('Error:', error);
+                            // Tampilkan SweetAlert jika ada error pada request
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
                         });
                 } else {
                     // Jika input kosong, sembunyikan section promosi
                     promosiSection.style.display = 'none';
                     discountSection.style.display = 'none';
                     calculateTotalWithDiscount(0); // Tanpa diskon
+                    // Tampilkan SweetAlert jika input kosong
+                    Swal.fire({
+                        title: 'Kode Promosi Kosong',
+                        text: 'Silakan masukkan kode promosi terlebih dahulu.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
                 }
             });
 
@@ -354,10 +371,16 @@
 
                 // Tampilkan hasil ke input total harga
                 totalHargaInput.value = totalHarga; // Tampilkan dua angka desimal
+
+                // Jika status pembayaran adalah downpayment, hitung sisa pembayaran
+                if (statusSelect.value === 'downpayment') {
+                    const downpayment = parseFloat(downpaymentAmountInput.value || 0);
+                    remainingPaymentInput.value = formatPrice(totalHarga - downpayment);
+                }
             }
 
             function calculateTotal() {
-                totalHarga = 0;
+                let totalHarga = 0;
 
                 // Hitung harga kategori
                 document.querySelectorAll('.category-checkbox:checked').forEach(function(category) {
@@ -371,6 +394,10 @@
                     totalHarga += parseFloat(service.getAttribute('data-price'));
                 });
 
+                // Terapkan diskon jika ada
+                const discount = parseFloat(discountInput.value.replace('%', '')) / 100 || 0;
+                totalHarga = totalHarga - (totalHarga * discount);
+
                 totalHargaInput.value = totalHarga;
 
                 // Hitung remaining payment jika downpayment
@@ -379,6 +406,7 @@
                     remainingPaymentInput.value = formatPrice(totalHarga - downpayment);
                 }
             }
+
 
             function formatPrice(value) {
                 // Jika harga bulat, tampilkan tanpa desimal

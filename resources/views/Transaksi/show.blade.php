@@ -1,0 +1,299 @@
+@extends('Layouts_new.index')
+
+@section('breadcrumbs')
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('transaksi.index') }}">Daftar Transaksi</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Detail Transaksi</li>
+        </ol>
+    </nav>
+@endsection
+
+@section('content')
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Detail Transaksi #{{ $transaksi->tracking_number }}</h6>
+        </div>
+
+        @if (session('error'))
+            <div class="alert alert-danger" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="alert alert-success" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <div class="card-body">
+            <h5 class="font-weight-bold text-secondary mb-3">Informasi Customer</h5>
+
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Nama Customer:</div>
+                <div class="col-md-9">{{ $transaksi->nama_customer }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Email Customer:</div>
+                <div class="col-md-9">{{ $transaksi->email_customer }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Nomor Telepon:</div>
+                <div class="col-md-9">{{ $transaksi->notelp_customer }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Alamat:</div>
+                <div class="col-md-9">{{ $transaksi->alamat_customer }}</div>
+            </div>
+
+            <!-- Tampilkan informasi promo -->
+            @if ($transaksi->promosi)
+                <h5 class="font-weight-bold text-secondary mb-3 mt-4">Informasi Promosi</h5>
+
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Kode Promosi:</div>
+                    <div class="col-md-9">{{ $transaksi->promosi->kode }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Diskon:</div>
+                    <div class="col-md-9">{{ $transaksi->promosi->discount * 100 }}%</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Deskripsi Promosi:</div>
+                    <div class="col-md-9">{{ $transaksi->promosi->description }}</div>
+                </div>
+            @endif
+
+            <h5 class="font-weight-bold text-secondary mb-3 mt-4">Detail Transaksi</h5>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Total Harga:</div>
+                <div class="col-md-9">Rp{{ number_format($transaksi->total_harga, 0, ',', '.') }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Status Pembayaran:</div>
+                <div class="col-md-9">
+                    @if ($transaksi->status == 'paid')
+                        <span class="badge bg-success">Paid</span>
+                    @elseif ($transaksi->status == 'downpayment')
+                        <span class="badge bg-warning">Downpayment</span>
+                    @else
+                        <span class="badge bg-secondary">Unknown</span>
+                    @endif
+                </div>
+            </div>
+
+            <!-- Jika statusnya Downpayment -->
+            @if ($transaksi->status == 'downpayment')
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Jumlah Downpayment:</div>
+                    <div class="col-md-9">Rp{{ number_format($transaksi->downpayment_amount, 0, ',', '.') }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Sisa Pembayaran:</div>
+                    <div class="col-md-9">Rp{{ number_format($transaksi->remaining_payment, 0, ',', '.') }}</div>
+                </div>
+            @endif
+
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Tanggal Transaksi:</div>
+                <div class="col-md-9">{{ \Carbon\Carbon::parse($transaksi->tanggal_transaksi)->format('d-m-Y') }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Jam Transaksi:</div>
+                <div class="col-md-9">{{ \Carbon\Carbon::parse($transaksi->jam_transaksi)->format('H:i:s') }}</div>
+            </div>
+
+            <h5 class="font-weight-bold text-secondary mb-3 mt-4">
+                Kategori Harga yang Dipilih
+                <button class="btn btn-link p-0" type="button" id="toggleKategoriHarga">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </h5>
+            <div id="kategoriHargaSection" class="collapse-section">
+                <ul class="list-group mb-3">
+                    @php
+                        $totalKategoriHarga = 0;
+                    @endphp
+                    @foreach ($transaksi->categoryHargas as $categoryHarga)
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ $categoryHarga->nama_kategori }}
+                            <span>{{ $categoryHarga->pivot->qty }} x
+                                Rp{{ number_format($categoryHarga->price, 0, ',', '.') }}</span>
+                        </li>
+                        @php
+                            $totalKategoriHarga += $categoryHarga->pivot->qty * $categoryHarga->price;
+                        @endphp
+                    @endforeach
+                    <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                        style="background-color: gold; color: black;">
+                        Total Kategori Harga
+                        <span style="color: black;">Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}</span>
+                    </li>
+                </ul>
+            </div>
+
+            <h5 class="font-weight-bold text-secondary mb-3">
+                Layanan Tambahan
+                <button class="btn btn-link p-0" type="button" id="toggleLayananTambahan">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </h5>
+            <div id="layananTambahanSection" class="collapse-section">
+                @if ($transaksi->plusServices->isEmpty())
+                    <p class="text-muted">Tidak ada layanan tambahan yang dipilih.</p>
+                @else
+                    <ul class="list-group mb-3">
+                        @php
+                            $totalPlusServices = 0;
+                        @endphp
+                        @foreach ($transaksi->plusServices as $plusService)
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ $plusService->name }}
+                                <span>Rp{{ number_format($plusService->price, 0, ',', '.') }}</span>
+                            </li>
+                            @php
+                                $totalPlusServices += $plusService->price;
+                            @endphp
+                        @endforeach
+                        <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                            style="background-color: gold; color: black;">
+                            Total Layanan Tambahan
+                            <span style="color: black;">Rp{{ number_format($totalPlusServices, 0, ',', '.') }}</span>
+                        </li>
+                    </ul>
+                @endif
+            </div>
+
+            <script>
+                // Function to toggle visibility of an element
+                function toggleCollapse(sectionId, toggleButton) {
+                    const section = document.getElementById(sectionId);
+                    const icon = toggleButton.querySelector('i');
+
+                    // Toggle the visibility of the section
+                    if (section.style.display === "none" || section.style.display === "") {
+                        section.style.display = "block";
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    } else {
+                        section.style.display = "none";
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    }
+                }
+
+                // Add event listener to the buttons
+                document.getElementById('toggleKategoriHarga').addEventListener('click', function() {
+                    toggleCollapse('kategoriHargaSection', this);
+                });
+
+                document.getElementById('toggleLayananTambahan').addEventListener('click', function() {
+                    toggleCollapse('layananTambahanSection', this);
+                });
+
+                // By default, hide the sections
+                document.getElementById('kategoriHargaSection').style.display = "none";
+                document.getElementById('layananTambahanSection').style.display = "none";
+            </script>
+
+            <!-- Total Keseluruhan -->
+            <h5 class="font-weight-bold text-secondary mb-3 mt-4">Total Keseluruhan</h5>
+            <ul class="list-group mb-3">
+                @php
+                    $totalKeseluruhan = $totalKategoriHarga + $totalPlusServices;
+
+                    // Terapkan diskon jika ada promosi
+                    if ($transaksi->promosi) {
+                        $diskon = $transaksi->promosi->discount * $totalKeseluruhan;
+                        $totalSetelahDiskon = $totalKeseluruhan - $diskon;
+                    } else {
+                        $diskon = 0;
+                        $totalSetelahDiskon = $totalKeseluruhan;
+                    }
+                @endphp
+
+                <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
+                    Subtotal
+                    <span>Rp{{ number_format($totalKeseluruhan, 0, ',', '.') }}</span>
+                </li>
+
+                @if ($diskon > 0)
+                    <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
+                        Diskon ({{ $transaksi->promosi->discount * 100 }}%)
+                        <span>- Rp{{ number_format($diskon, 0, ',', '.') }}</span>
+                    </li>
+                @endif
+
+                <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                    style="background-color: gold; color: black;">
+                    Total Setelah Diskon
+                    <span style="color: black;">Rp{{ number_format($totalSetelahDiskon, 0, ',', '.') }}</span>
+                </li>
+
+                <!-- Tampilkan detail downpayment jika statusnya adalah 'downpayment' -->
+                @if ($transaksi->status == 'downpayment')
+                    <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                        style="background-color: #fdfd96; color: #ff4500;">
+                        Downpayment
+                        <span>Rp{{ number_format($transaksi->downpayment_amount, 0, ',', '.') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                        style="background-color: #ffe4b5; color: #4b0082;">
+                        Sisa Pembayaran
+                        <span>Rp{{ number_format($transaksi->remaining_payment, 0, ',', '.') }}</span>
+                    </li>
+                @endif
+            </ul>
+
+
+            <h5 class="font-weight-bold text-secondary mb-3 mt-4">Status Tracking</h5>
+            @if ($transaksi->trackingStatuses->isEmpty())
+                <p class="text-muted">Belum ada status tracking.</p>
+            @else
+                <ul class="list-group mb-3">
+                    @foreach ($transaksi->trackingStatuses as $trackingStatus)
+                        <li class="list-group-item d-flex justify-content-between align-items-center"
+                            style="border-left: 5px solid #0056b3; margin-bottom: 10px; background-color: #f1f3f5; padding: 15px;">
+
+                            <!-- Sebelah Kiri: Status -->
+                            <div style="flex: 1;">
+                                <strong class="text-primary" style="font-size: 1.1rem; color: #0056b3;">
+                                    {{ $trackingStatus->status->name }}
+                                </strong>
+                            </div>
+
+                            <!-- Tengah: Deskripsi -->
+                            <div style="flex: 2; text-align: center;">
+                                <span style="color: #343a40;">{{ $trackingStatus->description }}</span>
+                            </div>
+
+                            <!-- Kanan: Tanggal dan Jam dengan Ikon, disejajarkan vertikal -->
+                            <div
+                                style="flex: 1; text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+                                <!-- Tanggal Icon -->
+                                <span title="Tanggal" style="margin-bottom: 5px; display: flex; align-items: center;">
+                                    <i class="fas fa-calendar-alt" style="color: #495057; margin-right: 5px;"></i>
+                                    <span style="color: #495057;">
+                                        {{ \Carbon\Carbon::parse($trackingStatus->tanggal_status)->format('d-m-Y') }}
+                                    </span>
+                                </span>
+                                <!-- Jam Icon, tanpa detik -->
+                                <span title="Waktu" style="display: flex; align-items: center;">
+                                    <i class="fas fa-clock" style="color: #495057; margin-right: 5px;"></i>
+                                    <span style="color: #495057;">
+                                        {{ \Carbon\Carbon::parse($trackingStatus->jam_status)->format('H:i') }}
+                                    </span>
+                                </span>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+
+            <div class="d-flex justify-content-end">
+                <a href="{{ route('transaksi.index') }}" class="btn btn-secondary mr-2">Kembali</a>
+            </div>
+        </div>
+    </div>
+@endsection

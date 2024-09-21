@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('email_customer');
             $table->string('notelp_customer');
             $table->string('alamat_customer');
+            $table->date('tanggal_transaksi');
+            $table->time('jam_transaksi');
             $table->string('status')->comment('downpayment, paid');
             $table->foreignId('promosi_id')->nullable()->constrained('promosis')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
