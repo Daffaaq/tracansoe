@@ -38,7 +38,8 @@
                     @endif
                     <div class="card-body">
                         <!-- Form for editing the category -->
-                        <form method="POST" action="{{ route('kategori.update', $category->uuid) }}" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('kategori.update', $category->uuid) }}"
+                            enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="row">
@@ -47,30 +48,9 @@
                                         <label class="col-lg-3 col-form-label" for="nama_kategori">Nama Kategori</label>
                                         <div class="col-lg-9">
                                             <input type="text" id="nama_kategori" class="form-control"
-                                                name="nama_kategori" value="{{ old('nama_kategori', $category->nama_kategori) }}"
+                                                name="nama_kategori"
+                                                value="{{ old('nama_kategori', $category->nama_kategori) }}"
                                                 placeholder="Nama Kategori">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="price">Harga</label>
-                                        <div class="col-lg-9">
-                                            <input type="text" id="price" class="form-control numeric-only"
-                                                name="price" value="{{ old('price', $category->price) }}" placeholder="Harga"
-                                                inputmode="numeric">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="estimation">Estimasi Selesai</label>
-                                        <div class="col-lg-9">
-                                            <input type="text" id="estimation" class="form-control numeric-only"
-                                                name="estimation" placeholder="3" inputmode="numeric"
-                                                value="{{ old('estimation', $category->estimation) }}">
                                         </div>
                                     </div>
                                 </div>
@@ -98,6 +78,59 @@
                                 <label class="form-label" for="description">Deskripsi</label>
                                 <textarea id="description" class="form-control" name="description" rows="4" placeholder="Deskripsi Kategori">{{ old('description', $category->description) }}</textarea>
                             </div>
+
+                            <!-- Subkategori jika ada -->
+                            @if ($category->subKriteria->isNotEmpty())
+                                <h5 class="font-weight-bold text-secondary mb-3 mt-4">Sub-Kategori</h5>
+                                @foreach ($category->subKriteria as $subCategory)
+                                    <div class="sub-category-container">
+                                        <div class="row mb-2">
+                                            <input type="hidden" name="subKriteria[{{ $subCategory->id }}][id]"
+                                                value="{{ $subCategory->id }}">
+                                            <div class="col-md-6">
+                                                <div class="form-group row align-items-center">
+                                                    <label class="col-lg-3 col-form-label"
+                                                        for="sub_nama_kategori_{{ $subCategory->id }}">Nama
+                                                        Sub-Kategori</label>
+                                                    <div class="col-lg-9">
+                                                        <input type="text" id="sub_nama_kategori_{{ $subCategory->id }}"
+                                                            class="form-control"
+                                                            name="subKriteria[{{ $subCategory->id }}][nama_kategori]"
+                                                            value="{{ $subCategory->nama_kategori }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group row align-items-center">
+                                                    <label class="col-lg-3 col-form-label"
+                                                        for="sub_price_{{ $subCategory->id }}">Harga</label>
+                                                    <div class="col-lg-9">
+                                                        <input type="text" id="sub_price_{{ $subCategory->id }}"
+                                                            class="form-control numeric-only"
+                                                            name="subKriteria[{{ $subCategory->id }}][price]"
+                                                            value="{{ $subCategory->price }}" inputmode="numeric">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <div class="form-group row align-items-center">
+                                                    <label class="col-lg-3 col-form-label"
+                                                        for="sub_estimation_{{ $subCategory->id }}">Estimasi
+                                                        Selesai</label>
+                                                    <div class="col-lg-9">
+                                                        <input type="text" id="sub_estimation_{{ $subCategory->id }}"
+                                                            class="form-control numeric-only"
+                                                            name="subKriteria[{{ $subCategory->id }}][estimation]"
+                                                            value="{{ $subCategory->estimation }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
 
                             <div class="row mt-3">
                                 <div class="col-12 d-flex justify-content-end">

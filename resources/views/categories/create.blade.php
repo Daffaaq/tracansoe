@@ -40,41 +40,6 @@
                         <!-- Perhatikan untuk file upload, tambahkan enctype -->
                         <form method="POST" action="{{ route('kategori.store') }}" enctype="multipart/form-data">
                             @csrf
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="nama_kategori">Nama Kategori</label>
-                                        <div class="col-lg-9">
-                                            <input type="text" id="nama_kategori" class="form-control"
-                                                name="nama_kategori" value="{{ old('nama_kategori') }}"
-                                                placeholder="Nama Kategori">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="price">Harga</label>
-                                        <div class="col-lg-9">
-                                            <input type="text" id="price" class="form-control numeric-only"
-                                                name="price" value="{{ old('price') }}" placeholder="Harga"
-                                                inputmode="numeric">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="estimation">Estimasi Selesai</label>
-                                        <div class="col-lg-9">
-                                            <input type="text" id="estimation" class="form-control numeric-only"
-                                                name="estimation" placeholder="3" inputmode="numeric"
-                                                value="{{ old('estimation') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <style>
                                 .form-group {
                                     display: flex;
@@ -92,7 +57,18 @@
                                     flex: 1;
                                     min-height: 100px;
                                 }
+
+                                #nama_kategori {
+                                    flex: 1;
+                                }
                             </style>
+                            <div class="form-group">
+                                <label class="form-label" for="nama_kategori">Nama Kategori</label>
+                                <input type="text" id="nama_kategori" class="form-control" name="nama_kategori"
+                                    value="{{ old('nama_kategori') }}" placeholder="Nama Kategori">
+                            </div>
+
+
                             <div class="form-group">
                                 <label class="form-label" for="description">Deskripsi</label>
                                 <textarea id="description" class="form-control" name="description" rows="4" placeholder="Deskripsi Promosi">{{ old('description') }}</textarea>

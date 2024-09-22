@@ -44,6 +44,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/kategori/edit/{uuid}', [CategoryController::class, 'edit'])->name('kategori.edit');
         Route::put('/kategori/update/{uuid}', [CategoryController::class, 'update'])->name('kategori.update');
         Route::delete('/kategori/delete/{uuid}', [CategoryController::class, 'destroy'])->name('kategori.destroy');
+        Route::delete('/kategori/delete-subkategori/{uuid}', [CategoryController::class, 'deleteSubCategory'])->name('kategori.deleteSubKategori');
+        // Route untuk menampilkan form tambah sub-kategori
+        Route::get('/kategori/subkategori/{uuid}', [CategoryController::class, 'tambahSubKategori'])->name('kategori.tambahSubKategori');
+        Route::get('/kategori/showsub/{uuid}', [CategoryController::class, 'showSubCategory'])->name('kategori.detailSubKategori');
+
+        // Route untuk menyimpan sub-kategori
+        Route::post('/kategorisubkategori/{uuid}', [CategoryController::class, 'storeSubCategory'])->name('kategori.storeSubCategory');
+
         Route::post('/kategori/list', [CategoryController::class, 'list'])->name('kategori.list');
     });
     Route::prefix('dashboard')->group(function () {
@@ -60,6 +68,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/transaksi/create', [TransaksiController::class, 'create'])->name('transaksi.create');
         Route::post('/transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
         Route::get('/transaksi/show/{uuid}', [TransaksiController::class, 'show'])->name('transaksi.show');
+        Route::get('/transaksi/{uuid}/proses', [TransaksiController::class, 'proses'])->name('transaksi.proses');
+        Route::get('/transaksi/{uuid}/finish', [TransaksiController::class, 'finish'])->name('transaksi.finish');
+        Route::get('/transaksi/{uuid}/revisi', [TransaksiController::class, 'revisi'])->name('transaksi.revisi');
+        Route::get('/transaksi/{uuid}/cetak-pdf', [TransaksiController::class, 'cetak_pdf'])->name('transaksi.cetak_pdf');
         Route::get('/validate-promosi', [TransaksiController::class, 'validatePromosi']);
         Route::post('/transaksi/list', [TransaksiController::class, 'list'])->name('transaksi.list');
     });

@@ -10,7 +10,7 @@ class category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'nama_kategori', 'price', 'description', 'estimation'];
+    protected $fillable = ['uuid', 'nama_kategori', 'price', 'description', 'estimation', 'parent_id'];
 
     protected static function boot()
     {
@@ -24,5 +24,14 @@ class category extends Model
     public function transaksis()
     {
         return $this->belongsToMany(transaksi::class, 'transaksi_category_harga');
+    }
+
+    public function subKriteria()
+    {
+        return $this->hasMany(category::class, 'parent_id', 'id');
+    }
+    public function parent()
+    {
+        return $this->belongsTo(category::class, 'parent_id', 'id');
     }
 }

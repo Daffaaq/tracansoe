@@ -15,9 +15,11 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('nama_kategori');
-            $table->double('price');
+            $table->double('price')->nullable();
             $table->longText('description');
-            $table->integer('estimation');
+            $table->integer('estimation')->nullable();
+            $table->unsignedBigInteger('parent_id')->nullable(); // Nullable parent_id for subcategories
+            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade'); // Self-referencing foreign key
             $table->timestamps();
         });
     }

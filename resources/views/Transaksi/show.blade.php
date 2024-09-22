@@ -104,7 +104,7 @@
                 <div class="col-md-9">{{ \Carbon\Carbon::parse($transaksi->jam_transaksi)->format('H:i:s') }}</div>
             </div>
 
-            <h5 class="font-weight-bold text-secondary mb-3 mt-4">
+            {{-- <h5 class="font-weight-bold text-secondary mb-3 mt-4">
                 Kategori Harga yang Dipilih
                 <button class="btn btn-link p-0" type="button" id="toggleKategoriHarga">
                     <i class="fas fa-chevron-down"></i>
@@ -131,7 +131,56 @@
                         <span style="color: black;">Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}</span>
                     </li>
                 </ul>
+            </div> --}}
+
+            <h5 class="font-weight-bold text-secondary mb-3 mt-4">
+                Kategori Harga yang Dipilih
+                <button class="btn btn-link p-0" type="button" id="toggleKategoriHarga">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </h5>
+
+            <div id="kategoriHargaSection" class="collapse-section">
+                @php
+                    $totalKategoriHarga = 0;
+                @endphp
+
+                <!-- Loop untuk kategori induk -->
+                @foreach ($categories->where('parent_id', null) as $categoryInduk)
+                    <div class="mb-4">
+                        <!-- Tampilkan kategori induk dengan styling lebih menonjol -->
+                        <h5 class="mt-3 mb-3 font-weight-bold text-primary">{{ $categoryInduk->nama_kategori }}</h5>
+
+                        <!-- Loop sub-kategori yang terkait dengan kategori induk -->
+                        <ul class="list-group">
+                            @foreach ($transaksi->categoryHargas->where('parent_id', $categoryInduk->id) as $subCategory)
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>{{ $subCategory->nama_kategori }}</span>
+                                    <span>{{ $subCategory->pivot->qty }} x
+                                        Rp{{ number_format($subCategory->price, 0, ',', '.') }}</span>
+                                </li>
+                                @php
+                                    $totalKategoriHarga += $subCategory->pivot->qty * $subCategory->price;
+                                @endphp
+                            @endforeach
+                        </ul>
+                    </div>
+                @endforeach
+
+                <!-- Total Kategori Harga -->
+                <div class="mt-4">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                            style="background-color: gold; color: black;">
+                            Total Kategori Harga
+                            <span style="color: black;">Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <br>
             </div>
+
+
 
             <h5 class="font-weight-bold text-secondary mb-3">
                 Layanan Tambahan
@@ -213,9 +262,10 @@
                     }
                 @endphp
 
-                <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
+                <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                    style="background-color: gold; color: black;">
                     Subtotal
-                    <span>Rp{{ number_format($totalKeseluruhan, 0, ',', '.') }}</span>
+                    <span style="color: black;">Rp{{ number_format($totalKeseluruhan, 0, ',', '.') }}</span>
                 </li>
 
                 @if ($diskon > 0)
@@ -223,13 +273,13 @@
                         Diskon ({{ $transaksi->promosi->discount * 100 }}%)
                         <span>- Rp{{ number_format($diskon, 0, ',', '.') }}</span>
                     </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                        style="background-color: gold; color: black;">
+                        Total Setelah Diskon
+                        <span style="color: black;">Rp{{ number_format($totalSetelahDiskon, 0, ',', '.') }}</span>
+                    </li>
                 @endif
 
-                <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
-                    style="background-color: gold; color: black;">
-                    Total Setelah Diskon
-                    <span style="color: black;">Rp{{ number_format($totalSetelahDiskon, 0, ',', '.') }}</span>
-                </li>
 
                 <!-- Tampilkan detail downpayment jika statusnya adalah 'downpayment' -->
                 @if ($transaksi->status == 'downpayment')
@@ -273,15 +323,15 @@
                                 style="flex: 1; text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
                                 <!-- Tanggal Icon -->
                                 <span title="Tanggal" style="margin-bottom: 5px; display: flex; align-items: center;">
-                                    <i class="fas fa-calendar-alt" style="color: #495057; margin-right: 5px;"></i>
-                                    <span style="color: #495057;">
+                                    <i class="fas fa-calendar-alt" style="color: #2b0e5c; margin-right: 5px;"></i>
+                                    <span style="color: #2b0e5c;">
                                         {{ \Carbon\Carbon::parse($trackingStatus->tanggal_status)->format('d-m-Y') }}
                                     </span>
                                 </span>
                                 <!-- Jam Icon, tanpa detik -->
                                 <span title="Waktu" style="display: flex; align-items: center;">
-                                    <i class="fas fa-clock" style="color: #495057; margin-right: 5px;"></i>
-                                    <span style="color: #495057;">
+                                    <i class="fas fa-clock" style="color: #2b0e5c; margin-right: 5px;"></i>
+                                    <span style="color: #2b0e5c;">
                                         {{ \Carbon\Carbon::parse($trackingStatus->jam_status)->format('H:i') }}
                                     </span>
                                 </span>
@@ -290,8 +340,28 @@
                     @endforeach
                 </ul>
             @endif
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    @if ($transaksi->trackingStatuses->last()->status->name == 'Pending')
+                        <a href="{{ route('transaksi.proses', $transaksi->uuid) }}" class="btn btn-primary">Ubah ke
+                            Proses</a>
+                    @elseif ($transaksi->trackingStatuses->last()->status->name == 'Proses')
+                        <a href="{{ route('transaksi.finish', $transaksi->uuid) }}" class="btn btn-success">Ubah ke
+                            Finish</a>
+                        <a href="{{ route('transaksi.revisi', $transaksi->uuid) }}" class="btn btn-warning">Revisi ke
+                            Status Sebelumnya</a>
+                    @elseif ($transaksi->trackingStatuses->last()->status->name == 'Finish')
+                        <a href="{{ route('transaksi.revisi', $transaksi->uuid) }}" class="btn btn-warning">Revisi ke
+                            Status Sebelumnya</a>
+                    @else
+                        <button class="btn btn-secondary" disabled>Status tidak dapat diubah</button>
+                    @endif
+                </div>
+            </div>
 
             <div class="d-flex justify-content-end">
+                <a href="{{ route('transaksi.cetak_pdf', $transaksi->uuid) }}" target="_blank"
+                    class="btn btn-danger">Cetak PDF</a>
                 <a href="{{ route('transaksi.index') }}" class="btn btn-secondary mr-2">Kembali</a>
             </div>
         </div>

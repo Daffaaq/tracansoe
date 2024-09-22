@@ -11,13 +11,15 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        return view('categories.index');
+        $data = category::all();
+        // dd($data);
+        return view('categories.index', compact('data'));
     }
 
     public function list(Request $request)
     {
         if ($request->ajax()) {
-            $dataCategory = category::select("uuid", "nama_kategori", "price", "estimation")->get();
+            $dataCategory = category::select("id", "uuid", "nama_kategori")->whereNull('parent_id')->get();
             return DataTables::of($dataCategory)
                 ->addIndexColumn()
                 ->make(true);
@@ -41,25 +43,94 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // Cek apakah user adalah superadmin
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menyimpan kategori.');
         }
+
+        // Validasi data input
+        $request->validate([
+            'nama_kategori' => 'required|string',
+            'description' => 'required|string',
+        ]);
+
+        // Simpan Kategori Induk (parent_id = null)
+        category::create([
+            'uuid' => Str::uuid(),
+            'nama_kategori' => $request->nama_kategori,
+            'price' => null, // Price is null for category induk
+            'description' => $request->description,
+            'estimation' => null,
+            'parent_id' => null, // Kategori induk
+        ]);
+
+        return redirect()->route('kategori.index')->with('success', 'Kategori Induk berhasil ditambahkan.');
+    }
+
+    public function tambahSubKategori($uuid)
+    {
+
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk mengedit kategori.');
+        }
+        $category = category::where('uuid', $uuid)->firstOrFail();
+        return view('categories.create-subcategory', compact('category'));
+    }
+    public function storeSubCategory(Request $request, $uuid)
+    {
+        // Cek apakah user adalah superadmin
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menyimpan sub-kategori.');
+        }
+
+        // Cari kategori induk berdasarkan UUID
+        $category = category::where('uuid', $uuid)->firstOrFail();
+
+        // Validasi data input tanpa memerlukan validasi parent_id
         $request->validate([
             'nama_kategori' => 'required|string',
             'price' => 'required|numeric',
             'description' => 'required|string',
             'estimation' => 'required|integer',
+            'parent_id' => 'exists:categories,id',
         ]);
 
-        category::create([
-            'uuid' => Str::uuid(),
+        // Simpan Sub-Kategori (parent_id mengacu ke Kategori Induk)
+        $subCategory = category::create([
             'nama_kategori' => $request->nama_kategori,
-            'price' => $request->price,
+            'price' => $request->price, // Harga untuk sub-kategori
             'description' => $request->description,
             'estimation' => $request->estimation,
+            'parent_id' => $category->id, // Mengacu ke Kategori Induk
         ]);
 
-        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
+        return redirect()->route('kategori.index')->with('success', 'Sub-Kategori berhasil ditambahkan.');
+    }
+
+
+    public function showSubCategory($uuid)
+    {
+
+        $category = category::where('uuid', $uuid)->with('subKriteria')->firstOrFail();
+        return view('categories.show-subcategory', compact('category'));
+    }
+
+    public function deleteSubCategory(string $uuid)
+    {
+        if (auth()->user()->role != 'superadmin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki akses untuk menghapus sub-kategori.'
+            ]);
+        }
+
+        $category = category::where('uuid', $uuid)->with('subKriteria')->firstOrFail();
+        $category->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sub-Kategori berhasil dihapus.'
+        ]);
     }
 
     /**
@@ -91,24 +162,42 @@ class CategoryController extends Controller
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk memperbarui kategori.');
         }
-        $request->validate([
-            'nama_kategori' => 'required|string',
-            'price' => 'required|numeric',
-            'description' => 'required|string',
-            'estimation' => 'required|integer',
-        ]);
 
         $category = category::where('uuid', $uuid)->firstOrFail();
 
-        $category->update([
-            'nama_kategori' => $request->nama_kategori,
-            'price' => $request->price,
-            'description' => $request->description,
-            'estimation' => $request->estimation,
-        ]);
+        // Update Kategori Induk
+        if ($category->parent_id === null) {
+            $request->validate([
+                'nama_kategori' => 'required|string',
+                'description' => 'required|string',
+            ]);
 
-        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil diperbarui.');
+            $category->update([
+                'nama_kategori' => $request->nama_kategori,
+                'description' => $request->description,
+            ]);
+        }
+
+        // Update Sub-Kategori
+        if ($request->has('subKriteria')) {
+            foreach ($request->subKriteria as $subKategoriData) {
+                // Pastikan bahwa data id ada
+                if (isset($subKategoriData['id'])) {
+                    $subKategori = category::findOrFail($subKategoriData['id']);
+                    $subKategori->update([
+                        'nama_kategori' => $subKategoriData['nama_kategori'],
+                        'price' => $subKategoriData['price'],
+                        'estimation' => $subKategoriData['estimation'],
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('kategori.index')->with('success', 'Kategori dan Sub-Kategori berhasil diperbarui.');
     }
+
+
+
 
     /**
      * Remove the specified resource from storage.

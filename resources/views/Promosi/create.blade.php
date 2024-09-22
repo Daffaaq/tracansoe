@@ -100,15 +100,6 @@
                                     </div>
                                 </div>
 
-                                {{-- <div class="col-md-12">
-                                    <div class="form-group row align-items-center">
-                                        <label class="col-lg-3 col-form-label" for="description">Deskripsi</label>
-                                        <div class="col-lg-9">
-                                            <textarea id="description" class="form-control" name="description" rows="4"
-                                                placeholder="Deskripsi Promosi">{{ old('description') }}</textarea>
-                                        </div>
-                                    </div>
-                                </div> --}}
                             </div>
                             <style>
                                 .form-group {

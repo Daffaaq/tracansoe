@@ -40,8 +40,7 @@
                         <tr>
                             <th>No</th>
                             <th>Nama Kategori</th>
-                            <th>Harga</th>
-                            <th>Estimasi Selesai</th>
+                            <th>Sub Category</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -101,14 +100,38 @@
                         name: 'nama_kategori'
                     },
                     {
-                        data: 'price',
-                        name: 'price'
-                    },
-                    {
-                        data: 'estimation',
-                        name: 'estimation',
-                        render: function(data) {
-                            return `${data} Hari`;
+                        data: 'uuid',
+                        name: 'uuid',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row) {
+                            console.log(data, type, row);
+                            if (type === 'display') {
+                                var addsubcategory = `
+                                    <a href="/dashboard/kategori/subkategori/${data}" class="btn icon btn-sm btn-info">
+                                        <i class="bi bi-plus"></i>
+                                    </a>
+                                `;
+                                var showsubcategory = `
+                                    <a href="/dashboard/kategori/showsub/${data}" class="btn icon btn-sm btn-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                `;
+                                var arrayData = {!! json_encode($data->toArray()) !!};
+                                console.log(arrayData);
+                                var hasSubKriteria = false;
+
+                                arrayData.forEach(function(item) {
+                                    if (item.parent_id === row.id) {
+                                        hasSubKriteria = true;
+                                    }
+                                });
+                                // console.log(hasSubKriteria);
+                                return addsubcategory + (hasSubKriteria ? ' ' + showsubcategory :
+                                    '');
+                            } else {
+                                return data;
+                            }
                         }
                     },
                     {
@@ -118,19 +141,19 @@
                         searchable: false,
                         render: function(data, type, row) {
                             let actionButtons = `
-            <a href="/dashboard/kategori/show/${data}" class="btn icon btn-sm btn-info">
-                <i class="bi bi-eye"></i>
-            </a>
-        `;
+                                <a href="/dashboard/kategori/show/${data}" class="btn icon btn-sm btn-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            `;
 
                             @if (auth()->user()->role == 'superadmin')
                                 actionButtons += `
-                <a href="/dashboard/kategori/edit/${data}" class="btn icon btn-sm btn-warning">
-                    <i class="bi bi-pencil"></i>
-                </a>
-                <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
-                    <i class="bi bi-trash"></i>
-                </button>`;
+                                <a href="/dashboard/kategori/edit/${data}" class="btn icon btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>`;
                             @endif
 
                             return actionButtons;

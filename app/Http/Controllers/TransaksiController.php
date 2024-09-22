@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Yajra\DataTables\Facades\DataTables;
 
 class TransaksiController extends Controller
@@ -198,7 +199,7 @@ class TransaksiController extends Controller
             $transaksi->trackingStatuses()->create([
                 'status_id' => $status->id,
                 'description' => 'Sudah diterima, belum diproses', // Deskripsi default
-                'tanggal_status'=> Carbon::now()->toDateString(),
+                'tanggal_status' => Carbon::now()->toDateString(),
                 'jam_status' => Carbon::now()->toTimeString()
             ]);
 
@@ -232,6 +233,151 @@ class TransaksiController extends Controller
         return $trackingNumber;
     }
 
+    public function proses(Request $request, string $uuid)
+    {
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
+            // Cari transaksi berdasarkan UUID
+            $transaksi = Transaksi::where('uuid', $uuid)->first();
+
+            if (!$transaksi) {
+                return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
+            }
+
+            // Cek apakah status terakhir transaksi adalah "Pending"
+            $lastTrackingStatus = $transaksi->trackingStatuses()->latest()->first();
+
+            if ($lastTrackingStatus->status->name !== 'Pending') {
+                return redirect()->route('transaksi.index')->with('error', 'Transaksi harus berstatus "Pending" untuk dapat diproses.');
+            }
+
+            // Cek apakah status "Proses" sudah ada atau buat baru
+            $status = Status::firstOrCreate([
+                'name' => 'Proses'
+            ]);
+
+            // Simpan status tracking yang baru
+            $transaksi->trackingStatuses()->create([
+                'status_id' => $status->id,
+                'description' => 'Sudah diterima, sepatu sedang diproses', // Deskripsi
+                'tanggal_status' => Carbon::now()->toDateString(),
+                'jam_status' => Carbon::now()->toTimeString()
+            ]);
+
+            // Commit transaksi
+            DB::commit();
+
+            return redirect()->route('transaksi.index')->with('success', 'Status transaksi berhasil diperbarui ke "Proses".');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Batalkan jika terjadi error
+
+            return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function finish(Request $request, string $uuid)
+    {
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
+            // Cari transaksi berdasarkan UUID
+            $transaksi = Transaksi::where('uuid', $uuid)->first();
+
+            if (!$transaksi) {
+                return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
+            }
+
+            // Cek apakah status terakhir transaksi adalah "Proses"
+            $lastTrackingStatus = $transaksi->trackingStatuses()->latest()->first();
+
+            if ($lastTrackingStatus->status->name !== 'Proses') {
+                return redirect()->route('transaksi.index')->with('error', 'Transaksi harus berstatus "Proses" untuk dapat diselesaikan.');
+            }
+
+            // Cek apakah status "Finish" sudah ada atau buat baru
+            $status = Status::firstOrCreate([
+                'name' => 'Finish'
+            ]);
+
+            // Simpan status tracking yang baru
+            $transaksi->trackingStatuses()->create([
+                'status_id' => $status->id,
+                'description' => 'Sepatu sudah selesai pencucian', // Deskripsi
+                'tanggal_status' => Carbon::now()->toDateString(),
+                'jam_status' => Carbon::now()->toTimeString()
+            ]);
+
+            // Commit transaksi
+            DB::commit();
+
+            return redirect()->route('transaksi.index')->with('success', 'Status transaksi berhasil diperbarui ke "Finish".');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Batalkan jika terjadi error
+
+            return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function revisi(Request $request, string $uuid)
+    {
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
+            // Cari transaksi berdasarkan UUID
+            $transaksi = Transaksi::where('uuid', $uuid)->first();
+
+            if (!$transaksi) {
+                return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
+            }
+
+            // Ambil status terakhir dan status sebelum terakhir
+            $lastTrackingStatus = $transaksi->trackingStatuses()->latest()->first();
+            $previousTrackingStatus = $transaksi->trackingStatuses()->latest()->skip(1)->first();
+
+            // Jika tidak ada status sebelumnya, batalkan revisi
+            if (!$previousTrackingStatus) {
+                return redirect()->route('transaksi.index')->with('error', 'Tidak ada status sebelumnya untuk direvisi.');
+            }
+
+            // Hapus status terakhir
+            $lastTrackingStatus->delete();
+
+            // Commit transaksi
+            DB::commit();
+
+            return redirect()->route('transaksi.index')->with('success', 'Status terakhir berhasil dihapus dan status dikembalikan ke: ' . $previousTrackingStatus->status->name);
+        } catch (\Exception $e) {
+            DB::rollBack(); // Batalkan jika terjadi error
+
+            return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+
+    public function cetak_pdf($uuid)
+    {
+        // Cari transaksi berdasarkan UUID
+        $transaksi = Transaksi::with(['categoryHargas', 'plusServices', 'trackingStatuses.status', 'promosi'])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
+
+        // Ambil semua kategori dari database untuk diakses sebagai kategori induk dan sub-kategori
+        $categories = Category::all();
+
+        // Load view untuk PDF, dan kirimkan data transaksi serta kategori ke view
+        $pdf = PDF::loadView('transaksi.cetak_pdf', compact('transaksi', 'categories'));
+
+        // Set orientasi landscape dan ukuran kertas jika perlu
+        return $pdf->setPaper('a4', 'portrait')->stream('transaksi_' . $transaksi->tracking_number . '.pdf');
+    }
+
+
+
+
     // Fungsi untuk memeriksa apakah nomor tracking sudah ada
     private function trackingNumberExists($trackingNumber)
     {
@@ -247,9 +393,11 @@ class TransaksiController extends Controller
             $transaksi = Transaksi::with(['categoryHargas', 'plusServices', 'trackingStatuses.status', 'promosi'])
                 ->where('uuid', $uuid)
                 ->firstOrFail();
+            // Ambil semua kategori dari database
+            $categories = Category::all();
 
-            // Kirim data transaksi ke view
-            return view('transaksi.show', compact('transaksi'));
+            // Kirim data transaksi dan kategori ke view
+            return view('transaksi.show', compact('transaksi', 'categories'));
         } catch (\Exception $e) {
             // Jika terjadi kesalahan, arahkan kembali dengan pesan error
             return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
