@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\AdviceController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PlusServiceController;
 use App\Http\Controllers\PromosiController;
+use App\Http\Controllers\TrackController;
 use App\Http\Controllers\TransaksiController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -18,9 +21,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::get('/', [LandingPageController::class, 'landingPage'])->name('landingPage');
+Route::post('/track-order', [TrackController::class, 'tracking'])->name('tracking');
+Route::post('/advice', [AdviceController::class, 'postAdvice'])->name('advice');
 
 Auth::routes();
 

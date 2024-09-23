@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\promosi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class PromosiController extends Controller
@@ -91,9 +92,10 @@ class PromosiController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imagePath = 'images/promosi/' . $imageName; // Simpan path relatif gambar
             $image->move(public_path('images/promosi'), $imageName);
         } else {
-            $imageName = null; // Jika tidak ada gambar, biarkan null
+            $imagePath = null; // Jika tidak ada gambar, biarkan null
         }
         // Konversi diskon dari persentase ke desimal
         $discountInDecimal = $request->discount / 100;
@@ -114,7 +116,7 @@ class PromosiController extends Controller
             'kode' => $request->kode,
             'status' => $status,
             'discount' => $discountInDecimal,
-            'image' => $imageName,
+            'image' => $imagePath,
             'description' => $request->description,
         ]);
 
@@ -150,9 +152,9 @@ class PromosiController extends Controller
     public function update(Request $request, string $uuid)
     {
         if (auth()->user()->role != 'superadmin') {
-            // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
             return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk mengubah promosi.');
         }
+
         $request->validate([
             'nama_promosi' => 'required|string',
             'start_date' => 'required|date',
@@ -162,76 +164,95 @@ class PromosiController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi gambar
         ]);
 
-        $promosi = promosi::where('uuid', $uuid)->firstOrFail();
+        DB::beginTransaction(); // Mulai transaksi
 
-        $existingPromosiExact = promosi::where('start_date', $request->start_date)
-            ->where('end_date', $request->end_date)
-            ->where('id', '!=', $promosi->id) // Mengecualikan promosi yang sedang di-update
-            ->first();
+        try {
+            $promosi = promosi::where('uuid', $uuid)->firstOrFail();
 
-        if ($existingPromosiExact) {
-            return redirect()->back()->withErrors(['error' => 'Promosi dengan rentang tanggal tersebut sudah ada.']);
-        }
+            $existingPromosiExact = promosi::where('start_date', $request->start_date)
+                ->where('end_date', $request->end_date)
+                ->where('id', '!=', $promosi->id)
+                ->first();
+            // dd($existingPromosiExact);
 
-        $cekkode = promosi::where('kode', $request->kode)->where('id', '!=', $promosi->id)->first();
-
-        if ($cekkode) {
-            return redirect()->back()->withErrors(['error' => 'Promosi dengan kode tersebut sudah ada.']);
-        }
-
-        // Cek apakah ada promosi lain dengan rentang tanggal yang tumpang tindih, kecuali promosi ini sendiri
-        $existingPromosi = promosi::where(function ($query) use ($request) {
-            $query->whereBetween('start_date', [$request->start_date, $request->end_date])
-                ->orWhereBetween('end_date', [$request->start_date, $request->end_date])
-                ->orWhere(function ($query) use ($request) {
-                    $query->where('start_date', '<=', $request->start_date)
-                        ->where('end_date', '>=', $request->end_date);
-                });
-        })
-            ->where('id', '!=', $promosi->id) // Mengecualikan promosi yang sedang di-update
-            ->first();
-
-        if ($existingPromosi) {
-            return redirect()->back()->withErrors(['error' => 'Rentang tanggal promosi sudah ada, harap memilih rentang tanggal yang berbeda.']);
-        }
-
-        // Jika ada file gambar baru yang diunggah
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($promosi->image && file_exists(public_path('images/promosi/' . $promosi->image))) {
-                unlink(public_path('images/promosi/' . $promosi->image));
+            if ($existingPromosiExact) {
+                return redirect()->back()->withErrors(['error' => 'Promosi dengan rentang tanggal tersebut sudah ada.']);
             }
 
-            $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/promosi'), $imageName);
-        } else {
-            $imageName = $promosi->image; // Jika tidak ada gambar baru, simpan gambar lama
-        }
-        $discountInDecimal = $request->discount / 100;
+            $cekkode = promosi::where('kode', $request->kode)->where('id', '!=', $promosi->id)->first();
+            if ($cekkode) {
+                return redirect()->back()->withErrors(['error' => 'Promosi dengan kode tersebut sudah ada.']);
+            }
 
-        // Tentukan status promosi berdasarkan tanggal mulai dan berakhir
-        $today = now();
-        if ($request->start_date > $today) {
-            $status = 'upcoming';
-        } elseif ($request->start_date <= $today && $request->end_date >= $today) {
-            $status = 'active';
-        } else {
-            $status = 'expired';
-        }
-        // dd($status);
-        $promosi->update([
-            'nama_promosi' => $request->nama_promosi,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'kode' => $request->kode,
-            'discount' => $discountInDecimal,
-            'status' => $status,
-            'image' => $imageName,
-            'description' => $request->description,
-        ]);
+            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
+            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
 
-        return redirect()->route('promosi.index')->with('success', 'Promosi berhasil diperbarui.');
+            $existingPromosi = promosi::where(function ($query) use ($startDate, $endDate, $promosi) {
+                $query->where(function ($query) use ($startDate, $endDate) {
+                    $query->where('start_date', '>=', $startDate)
+                        ->where('start_date', '<=', $endDate);
+                })->orWhere(function ($query) use ($startDate, $endDate) {
+                    $query->where('end_date', '>=', $startDate)
+                        ->where('end_date', '<=', $endDate);
+                })->orWhere(function ($query) use ($startDate, $endDate) {
+                    $query->where('start_date', '<=', $startDate)
+                        ->where('end_date', '>=', $endDate);
+                });
+            })
+                ->where('id', '!==', $promosi->id)
+                ->first();
+
+            // dd($existingPromosi);
+            if ($existingPromosi) {
+                return redirect()->back()->withErrors(['error' => 'Rentang tanggal promosi sudah ada, harap memilih rentang tanggal yang berbeda.']);
+            }
+
+
+            // Jika ada file gambar baru yang diunggah
+            if ($request->hasFile('image')) {
+                if (!empty($promosi->image) && file_exists(public_path($promosi->image))) {
+                    unlink(public_path($promosi->image)); // Hapus gambar lama
+                }
+
+                $image = $request->file('image');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = 'images/promosi/' . $imageName; // Path gambar baru
+                $image->move(public_path('images/promosi'), $imageName);
+            } else {
+                $imagePath = $promosi->image; // Jika tidak ada gambar baru
+            }
+
+            $discountInDecimal = $request->discount / 100;
+
+            // Tentukan status promosi berdasarkan tanggal
+            $today = now();
+            if ($request->start_date > $today) {
+                $status = 'upcoming';
+            } elseif ($request->start_date <= $today && $request->end_date >= $today) {
+                $status = 'active';
+            } else {
+                $status = 'expired';
+            }
+
+            // Update data promosi
+            $promosi->update([
+                'nama_promosi' => $request->nama_promosi,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'kode' => $request->kode,
+                'discount' => $discountInDecimal,
+                'status' => $status,
+                'image' => $imagePath,
+                'description' => $request->description,
+            ]);
+
+            DB::commit(); // Commit transaksi jika semua berjalan baik
+
+            return redirect()->route('promosi.index')->with('success', 'Promosi berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Rollback transaksi jika terjadi kesalahan
+            return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui promosi.'])->withInput();
+        }
     }
 
 

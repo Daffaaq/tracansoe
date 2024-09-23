@@ -48,6 +48,17 @@ class PromosiSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'uuid' => Str::uuid(),
+                'nama_promosi' => 'Diskon Hari Tani',
+                'start_date' => '2024-09-22',
+                'end_date' => '2025-09-30',
+                'status' => 'upcoming',
+                'kode' => 'TANIJAYA2024',
+                'discount' => 0.50, // Diskon 50%
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }
