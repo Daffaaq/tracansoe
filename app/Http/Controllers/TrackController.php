@@ -30,7 +30,14 @@ class TrackController extends Controller
         // Jika tidak ada transaksi, kembalikan pesan error dalam bentuk JSON
         if (!$transaksi) {
             return response()->json([
-                'error' => 'Kode pesanan tidak ditemukan. Pastikan Anda memasukkan kode yang benar.'
+                'error' => 'Kode pesanan '. $trackingCode. ' tidak ditemukan. Pastikan Anda memasukkan kode yang benar.'
+            ], 404); // Kode HTTP 404 untuk not found
+        }
+        
+
+        if($transaksi->status_pickup == 'picked_up'){
+            return response()->json([
+                'error' => 'Kode Pesanan ' . $trackingCode. ' Pesanan ini sudah diambil.'
             ], 404); // Kode HTTP 404 untuk not found
         }
 

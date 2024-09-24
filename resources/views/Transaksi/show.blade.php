@@ -15,6 +15,15 @@
             <h6 class="m-0 font-weight-bold text-primary">Detail Transaksi #{{ $transaksi->tracking_number }}</h6>
         </div>
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         @if (session('error'))
             <div class="alert alert-danger" role="alert">
                 {{ session('error') }}
@@ -104,6 +113,44 @@
                 <div class="col-md-9">{{ \Carbon\Carbon::parse($transaksi->jam_transaksi)->format('H:i:s') }}</div>
             </div>
 
+            <!-- Tampilkan status pickup saat ini -->
+            <h5 class="font-weight-bold text-secondary mb-3 mt-4">Status Pickup</h5>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Status Pickup:</div>
+                <div class="col-md-9">
+                    @if ($transaksi->status_pickup == 'not_picked_up')
+                        <span class="badge bg-warning">Belum diambil</span>
+                    @elseif ($transaksi->status_pickup == 'picked_up')
+                        <span class="badge bg-success">Sudah diambil</span>
+                    @endif
+                </div>
+            </div>
+
+            @if ($transaksi->status_pickup == 'picked_up')
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Tanggal Pengambilan:</div>
+                    <div class="col-md-9">{{ \Carbon\Carbon::parse($transaksi->tanggal_pickup)->format('d-m-Y') }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-3 font-weight-bold">Jam Pengambilan:</div>
+                    <div class="col-md-9">{{ \Carbon\Carbon::parse($transaksi->jam_pickup)->format('H:i:s') }}</div>
+                </div>
+            @endif
+
+            <!-- Form untuk update status pickup -->
+            @if ($transaksi->status_pickup == 'not_picked_up')
+                <div class="row mb-4">
+                    <div class="col-md-3 font-weight-bold">Ubah Status Pickup:</div>
+                    <div class="col-md-9">
+                        <form action="{{ route('transaksi.updatePickup', $transaksi->id) }}" method="POST">
+                            @csrf
+                            <button class="btn btn-link p-0" type="submit" title="Tandai Sudah Diambil">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endif
             {{-- <h5 class="font-weight-bold text-secondary mb-3 mt-4">
                 Kategori Harga yang Dipilih
                 <button class="btn btn-link p-0" type="button" id="toggleKategoriHarga">
@@ -147,51 +194,59 @@
 
                 <!-- Loop untuk kategori induk -->
                 @foreach ($categories->where('parent_id', null) as $categoryInduk)
-                    <div class="mb-4">
-                        <!-- Tampilkan kategori induk dengan styling lebih menonjol -->
-                        <h5 class="mt-3 mb-3 font-weight-bold text-primary">{{ $categoryInduk->nama_kategori }}</h5>
+                    @php
+                        // Ambil subkategori yang dipilih dalam transaksi berdasarkan kategori induk
+                        $selectedSubCategories = $transaksi->categoryHargas->where('parent_id', $categoryInduk->id);
+                    @endphp
 
-                        <!-- Loop sub-kategori yang terkait dengan kategori induk -->
-                        <ul class="list-group">
-                            @foreach ($transaksi->categoryHargas->where('parent_id', $categoryInduk->id) as $subCategory)
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>{{ $subCategory->nama_kategori }}</span>
-                                    <span>{{ $subCategory->pivot->qty }} x
-                                        Rp{{ number_format($subCategory->price, 0, ',', '.') }}</span>
-                                </li>
-                                @php
-                                    $totalKategoriHarga += $subCategory->pivot->qty * $subCategory->price;
-                                @endphp
-                            @endforeach
-                        </ul>
-                    </div>
+                    <!-- Hanya tampilkan kategori induk jika ada subkategori yang dipilih -->
+                    @if ($selectedSubCategories->isNotEmpty())
+                        <div class="mb-4">
+                            <!-- Tampilkan kategori induk dengan styling lebih menonjol -->
+                            <h5 class="mt-3 mb-3 font-weight-bold text-primary">{{ $categoryInduk->nama_kategori }}</h5>
+
+                            <!-- Loop sub-kategori yang terkait dengan kategori induk -->
+                            <ul class="list-group">
+                                @foreach ($selectedSubCategories as $subCategory)
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>{{ $subCategory->nama_kategori }}</span>
+                                        <span>{{ $subCategory->pivot->qty }} x
+                                            Rp{{ number_format($subCategory->price, 0, ',', '.') }}</span>
+                                    </li>
+                                    @php
+                                        $totalKategoriHarga += $subCategory->pivot->qty * $subCategory->price;
+                                    @endphp
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                 @endforeach
 
                 <!-- Total Kategori Harga -->
-                <div class="mt-4">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
-                            style="background-color: gold; color: black;">
-                            Total Kategori Harga
-                            <span style="color: black;">Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}</span>
-                        </li>
-                    </ul>
-                </div>
+                @if ($totalKategoriHarga > 0)
+                    <div class="mt-4">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                                style="background-color: gold; color: black;">
+                                Total Kategori Harga
+                                <span style="color: black;">Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                @endif
                 <br>
             </div>
 
 
 
-            <h5 class="font-weight-bold text-secondary mb-3">
-                Layanan Tambahan
-                <button class="btn btn-link p-0" type="button" id="toggleLayananTambahan">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
-            </h5>
-            <div id="layananTambahanSection" class="collapse-section">
-                @if ($transaksi->plusServices->isEmpty())
-                    <p class="text-muted">Tidak ada layanan tambahan yang dipilih.</p>
-                @else
+            @if ($transaksi->plusServices->isNotEmpty())
+                <h5 class="font-weight-bold text-secondary mb-3">
+                    Layanan Tambahan
+                    <button class="btn btn-link p-0" type="button" id="toggleLayananTambahan">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </h5>
+                <div id="layananTambahanSection" class="collapse-section">
                     <ul class="list-group mb-3">
                         @php
                             $totalPlusServices = 0;
@@ -211,8 +266,8 @@
                             <span style="color: black;">Rp{{ number_format($totalPlusServices, 0, ',', '.') }}</span>
                         </li>
                     </ul>
-                @endif
-            </div>
+                </div>
+            @endif
 
             <script>
                 // Function to toggle visibility of an element
@@ -250,7 +305,11 @@
             <h5 class="font-weight-bold text-secondary mb-3 mt-4">Total Keseluruhan</h5>
             <ul class="list-group mb-3">
                 @php
-                    $totalKeseluruhan = $totalKategoriHarga + $totalPlusServices;
+                    if ($transaksi->plusServices->isEmpty()) {
+                        $totalKeseluruhan = $totalKategoriHarga;
+                    } else {
+                        $totalKeseluruhan = $totalKategoriHarga + $totalPlusServices;
+                    }
 
                     // Terapkan diskon jika ada promosi
                     if ($transaksi->promosi) {
@@ -293,6 +352,29 @@
                         Sisa Pembayaran
                         <span>Rp{{ number_format($transaksi->remaining_payment, 0, ',', '.') }}</span>
                     </li>
+
+                    <!-- Form untuk pelunasan -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 font-weight-bold">Pelunasan:</div>
+                        <div class="col-md-9">
+                            <form action="{{ route('transaksi.pelunasan', $transaksi->id) }}" method="POST">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="pelunasan_amount" class="font-weight-bold text-dark">Jumlah
+                                        Pelunasan</label>
+                                    <input type="number" name="pelunasan_amount" id="pelunasan_amount"
+                                        class="form-control" placeholder="Masukkan jumlah pelunasan" required>
+                                </div>
+
+                                <div class="form-group d-flex justify-content-between align-items-center">
+                                    <button class="btn btn-primary" type="submit">Bayar Pelunasan</button>
+                                    @error('pelunasan_amount')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 @endif
             </ul>
 
@@ -351,8 +433,10 @@
                         <a href="{{ route('transaksi.revisi', $transaksi->uuid) }}" class="btn btn-warning">Revisi ke
                             Status Sebelumnya</a>
                     @elseif ($transaksi->trackingStatuses->last()->status->name == 'Finish')
-                        <a href="{{ route('transaksi.revisi', $transaksi->uuid) }}" class="btn btn-warning">Revisi ke
-                            Status Sebelumnya</a>
+                        @if ($transaksi->status_pickup == 'not_picked_up')
+                            <a href="{{ route('transaksi.revisi', $transaksi->uuid) }}" class="btn btn-warning">Revisi ke
+                                Status Sebelumnya</a>
+                        @endif
                     @else
                         <button class="btn btn-secondary" disabled>Status tidak dapat diubah</button>
                     @endif
@@ -361,7 +445,8 @@
 
             <div class="d-flex justify-content-end">
                 <a href="{{ route('transaksi.cetak_pdf', $transaksi->uuid) }}" target="_blank"
-                    class="btn btn-danger">Cetak PDF</a>
+                    class="btn btn-danger">Cetak
+                    PDF</a>
                 <a href="{{ route('transaksi.index') }}" class="btn btn-secondary mr-2">Kembali</a>
             </div>
         </div>

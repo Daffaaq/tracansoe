@@ -36,6 +36,15 @@
                         </div>
                     @endif
                     <div class="card-body">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <!-- Form Transaksi -->
                         <form method="POST" action="{{ route('transaksi.store') }}" enctype="multipart/form-data">
                             @csrf
@@ -97,11 +106,24 @@
                                 <div class="col-md-6" id="downpayment-section" style="display: none;">
                                     <div class="form-group">
                                         <label for="downpayment_amount" class="form-label">Jumlah DP</label>
-                                        <input type="text" id="downpayment_amount" class="form-control numeric-only"
-                                            name="downpayment_amount" value="{{ old('downpayment_amount') }}"
-                                            placeholder="Jumlah DP" inputmode="numeric">
+                                        <div class="input-group">
+                                            <input type="text" id="downpayment_amount" class="form-control numeric-only"
+                                                name="downpayment_amount" value="{{ old('downpayment_amount') }}"
+                                                placeholder="Jumlah DP" inputmode="numeric" style="max-width: 300px;">
+                                            <button type="button" id="confirm_dp_btn" class="btn btn-primary btn-sm ms-2"
+                                                style="display: none;">
+                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                            </button>
+                                            <button type="button" id="edit_dp_btn" class="btn btn-secondary btn-sm ms-2"
+                                                style="display: none;">
+                                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                        <small class="text-muted">Jumlah Downpayment harus 40% dari total harga</small>
                                     </div>
                                 </div>
+
+
 
                                 <!-- Remaining Payment -->
                                 <div class="col-md-6" id="remaining-payment-section" style="display: none;">
@@ -245,6 +267,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var numericInputs = document.querySelectorAll('.numeric-only');
+            var confirmDpBtn = document.getElementById('confirm_dp_btn');
+            var editDpBtn = document.getElementById('edit_dp_btn');
 
             numericInputs.forEach(function(input) {
                 input.addEventListener('input', function(e) {
@@ -365,7 +389,9 @@
                 // Jika status pembayaran adalah downpayment, hitung sisa pembayaran
                 if (statusSelect.value === 'downpayment') {
                     const downpayment = parseFloat(downpaymentAmountInput.value || 0);
+
                     remainingPaymentInput.value = formatPrice(totalHarga - downpayment);
+                    // remainingPaymentInput.value = formatPrice(totalHarga - downpayment);
                 }
             }
 
@@ -407,9 +433,11 @@
                 if (statusSelect.value === 'downpayment') {
                     downpaymentSection.style.display = 'block';
                     remainingPaymentSection.style.display = 'block';
+                    confirmDpBtn.style.display = 'inline-block';
                 } else {
                     downpaymentSection.style.display = 'none';
                     remainingPaymentSection.style.display = 'none';
+                    confirmDpBtn.style.display = 'none';
                 }
             }
 
@@ -450,6 +478,70 @@
             statusSelect.addEventListener('change', function() {
                 toggleDownpaymentSection();
                 calculateTotal();
+            });
+
+            // Fungsi untuk konfirmasi downpayment
+            confirmDpBtn.addEventListener('click', function() {
+                const downpayment = parseFloat(downpaymentAmountInput.value || 0);
+                const totalHarga = parseFloat(totalHargaInput.value || 0);
+                const minimalDownpayment = totalHarga * 0.40; // Minimal 35%
+
+                if (downpayment < minimalDownpayment) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: `Minimal downpayment adalah 40% dari total harga. Minimal DP: Rp${minimalDownpayment}`,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Konfirmasi Downpayment',
+                        text: `Anda yakin ingin mengunci downpayment sebesar Rp${downpayment}?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Kunci!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Kunci input downpayment
+                            downpaymentAmountInput.readOnly = true;
+                            confirmDpBtn.style.display = 'none'; // Sembunyikan tombol konfirmasi
+                            editDpBtn.style.display =
+                                'block'; // Tampilkan tombol untuk ubah downpayment
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: 'Downpayment telah dikunci.',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Fungsi untuk mengedit downpayment
+            editDpBtn.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Ubah Downpayment',
+                    text: 'Apakah Anda yakin ingin mengubah downpayment?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Ubah!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Buka kembali input downpayment
+                        downpaymentAmountInput.readOnly = false;
+                        confirmDpBtn.style.display = 'block'; // Tampilkan kembali tombol konfirmasi
+                        editDpBtn.style.display = 'none'; // Sembunyikan tombol ubah
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Sekarang Anda dapat mengubah downpayment.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
             });
 
             // Inisialisasi pada load halaman

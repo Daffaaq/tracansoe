@@ -26,6 +26,13 @@ return new class extends Migration
             $table->double('total_harga');
             $table->double('downpayment_amount')->nullable(); // Jumlah DP
             $table->double('remaining_payment')->nullable(); // Sisa pembayaran
+            $table->double('pelunasan_amount')->nullable(); // Sisa pembayaran
+            $table->date('tanggal_pelunasan')->nullable();
+            $table->time('jam_pelunasan')->nullable();
+            $table->string('status_downpayment')->comment('pending', 'completed')->nullable();
+            $table->enum('status_pickup', ['not_picked_up', 'picked_up'])->nullable();
+            $table->date('tanggal_pickup')->nullable();
+            $table->time('jam_pickup')->nullable();
             $table->string('tracking_number')->unique();
             $table->timestamps();
         });

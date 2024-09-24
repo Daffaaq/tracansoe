@@ -51,6 +51,7 @@ class TransaksiController extends Controller
     {
         $kode = $request->query('kode');
         $promosi = Promosi::where('kode', $kode)->first();
+        // dd($promosi->isActive());
 
         if ($promosi && $promosi->isActive()) {
             return response()->json([
@@ -76,12 +77,63 @@ class TransaksiController extends Controller
         }
     }
 
+    public function pelunasan(Request $request, $id)
+    {
+        $request->validate([
+            'pelunasan_amount' => 'required|numeric|min:0',
+        ], [
+            'pelunasan_amount.required' => 'Jumlah pelunasan harus diisi.',
+            'pelunasan_amount.numeric' => 'Jumlah pelunasan harus berupa angka.',
+            'pelunasan_amount.min' => 'Jumlah pelunasan tidak boleh kurang dari 0.'
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Ambil transaksi berdasarkan ID
+            $transaksi = Transaksi::findOrFail($id);
+
+            // Pastikan transaksi masih memiliki sisa pembayaran
+            if ($transaksi->remaining_payment <= 0) {
+                return redirect()->back()->withErrors(['error' => 'Transaksi sudah lunas.']);
+            }
+
+            // Jumlah pelunasan
+            $pelunasanAmount = round($request->pelunasan_amount, 0);
+
+            // Validasi apakah pelunasan sesuai dengan sisa pembayaran
+            if ($pelunasanAmount != $transaksi->remaining_payment) {
+                return redirect()->back()->withErrors(['error' => 'Jumlah pelunasan harus sesuai dengan sisa pembayaran: Rp ' . number_format($transaksi->remaining_payment, 0, ',', '.')]);
+            }
+
+            // Jika pelunasan sesuai, update status transaksi menjadi paid
+            $transaksi->update([
+                'remaining_payment' => 0, // Sisa pembayaran jadi 0
+                'status_downpayment' => 'paid', // Downpayment lunas
+                'status' => 'paid', // Transaksi lunas
+                'pelunasan_amount' => $pelunasanAmount,
+                'tanggal_pelunasan' => Carbon::now()->toDateString(), // Tanggal saat ini
+                'jam_pelunasan' => Carbon::now()->toTimeString(), // Jam saat ini
+            ]);
+
+            DB::commit(); // Commit transaksi jika semua berhasil
+
+            return redirect()->route('transaksi.show', $transaksi->uuid)->with('success', 'Pelunasan berhasil disimpan. Transaksi sudah lunas.');
+        } catch (\Exception $e) {
+            DB::rollBack(); // Batalkan transaksi jika ada error
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate(
             [
                 'nama_customer' => 'required|string|max:255',
@@ -148,13 +200,25 @@ class TransaksiController extends Controller
                 }
             }
 
+            $minimalDownpaymentPercentage = 0.40;
+            $minimalDownpayment = $totalHarga * $minimalDownpaymentPercentage;
+            $downpaymentAmount = round($request->downpayment_amount, 0); // Hapus desimal
+            // dd($downpaymentAmount);
+            // dd($minimalDownpayment, $downpaymentAmount);
+
+
             // Hitung remaining_payment jika statusnya adalah downpayment
             $remainingPayment = 0;
             if ($request->status === 'downpayment') {
+                if ($downpaymentAmount < $minimalDownpayment) {
+                    return redirect()->route('transaksi.create')->with('error', 'Minimal downpayment adalah 35% dari total harga.');
+                }
                 $remainingPayment = $totalHarga - $request->downpayment_amount; // Sisa pembayaran
+                $statusDownpayment = 'pending';
+                $pelunasanAmount = 0;
             }
 
-            $downpaymentAmount = round($request->downpayment_amount, 0); // Hapus desimal
+
             $remainingPayment = round($remainingPayment, 0); // Hapus desimal
             // Simpan transaksi utama
             $transaksi = Transaksi::create([
@@ -168,6 +232,9 @@ class TransaksiController extends Controller
                 'total_harga' => $totalHarga, // Total harga hasil perhitungan
                 'downpayment_amount' => $downpaymentAmount ?? 0, // Jumlah DP (jika ada)
                 'remaining_payment' => $remainingPayment ?? 0, // Sisa pembayaran otomatis dihitung
+                'status_downpayment' => $statusDownpayment ?? null,
+                'pelunasan_amount' => $pelunasanAmount ?? 0,
+                'status_pickup' => 'not_picked_up',
                 'tracking_number' => $this->generateTrackingNumber(),
                 'tanggal_transaksi' => Carbon::now()->toDateString(), // Tanggal saat ini
                 'jam_transaksi' => Carbon::now()->toTimeString(), // Jam saat ini
@@ -214,6 +281,47 @@ class TransaksiController extends Controller
         }
     }
 
+    public function updateStatusPickup(Request $request, $id)
+    {
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
+            // Validasi bahwa transaksi ada
+            $transaksi = Transaksi::findOrFail($id);
+
+            // Pastikan transaksi tidak dalam status "downpayment"
+            if ($transaksi->status === 'downpayment') {
+                return redirect()->route('transaksi.show', $transaksi->uuid)->with('error', 'Transaksi harus berstatus "Paid" untuk dapat diproses.');
+            }
+
+            // Dapatkan status tracking terakhir
+            $lastTrackingStatus = $transaksi->trackingStatuses()->latest()->first();
+
+            // Pastikan status terakhir adalah "Finish"
+            if ($lastTrackingStatus && $lastTrackingStatus->status->name !== 'Finish') {
+                return redirect()->route('transaksi.show', $transaksi->uuid)->with('error', 'Transaksi harus berstatus "Finish" untuk dapat diproses.');
+            }
+
+            // Update status pickup menjadi 'picked_up'
+            $transaksi->update([
+                'status_pickup' => 'picked_up', // Hardcode nilai 'picked_up' tanpa input pengguna
+                'tanggal_pickup' => Carbon::now()->toDateString(), // Tanggal saat ini
+                'jam_pickup' => Carbon::now()->toTimeString(), // Jam saat ini
+            ]);
+
+            // Commit transaksi
+            DB::commit();
+
+            // Redirect kembali ke halaman detail transaksi dengan pesan sukses
+            return redirect()->route('transaksi.show', $transaksi->uuid)->with('success', 'Status pickup berhasil diubah menjadi picked up.');
+        } catch (\Exception $e) {
+            // Rollback jika terjadi error
+            DB::rollBack();
+            return redirect()->route('transaksi.show', $transaksi->uuid)->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
 
     private function generateTrackingNumber()
     {
@@ -235,47 +343,43 @@ class TransaksiController extends Controller
 
     public function proses(Request $request, string $uuid)
     {
-        // Mulai transaksi database
         DB::beginTransaction();
 
         try {
             // Cari transaksi berdasarkan UUID
             $transaksi = Transaksi::where('uuid', $uuid)->first();
-
             if (!$transaksi) {
                 return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
             }
 
             // Cek apakah status terakhir transaksi adalah "Pending"
             $lastTrackingStatus = $transaksi->trackingStatuses()->latest()->first();
-
             if ($lastTrackingStatus->status->name !== 'Pending') {
                 return redirect()->route('transaksi.index')->with('error', 'Transaksi harus berstatus "Pending" untuk dapat diproses.');
             }
 
-            // Cek apakah status "Proses" sudah ada atau buat baru
-            $status = Status::firstOrCreate([
-                'name' => 'Proses'
-            ]);
+            // Hardcode nilai deskripsi dan status
+            $status = Status::firstOrCreate(['name' => 'Proses']);
+            $validDescription = 'Sudah diterima, sepatu sedang diproses';
 
-            // Simpan status tracking yang baru
+            // Simpan status tracking baru tanpa melibatkan input user
             $transaksi->trackingStatuses()->create([
                 'status_id' => $status->id,
-                'description' => 'Sudah diterima, sepatu sedang diproses', // Deskripsi
+                'description' => $validDescription, // Hardcoded di server
                 'tanggal_status' => Carbon::now()->toDateString(),
                 'jam_status' => Carbon::now()->toTimeString()
             ]);
 
-            // Commit transaksi
             DB::commit();
-
-            return redirect()->route('transaksi.index')->with('success', 'Status transaksi berhasil diperbarui ke "Proses".');
+            return redirect()->route('transaksi.show', $uuid)->with('success', 'Status transaksi berhasil diperbarui ke "Proses".');
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan jika terjadi error
-
-            return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            DB::rollBack();
+            return redirect()->route('transaksi.show', $uuid)->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+
+
 
     public function finish(Request $request, string $uuid)
     {
@@ -297,15 +401,22 @@ class TransaksiController extends Controller
                 return redirect()->route('transaksi.index')->with('error', 'Transaksi harus berstatus "Proses" untuk dapat diselesaikan.');
             }
 
-            // Cek apakah status "Finish" sudah ada atau buat baru
-            $status = Status::firstOrCreate([
-                'name' => 'Finish'
-            ]);
+            // Validasi status name harus 'Finish'
+            $validStatusName = 'Finish';
+            $status = Status::firstOrCreate(['name' => $validStatusName]);
 
-            // Simpan status tracking yang baru
+            if ($status->name !== $validStatusName) {
+                DB::rollBack(); // Batalkan transaksi
+                return redirect()->route('transaksi.index')->with('error', 'Status harus bernama "Finish".');
+            }
+
+            // Hardcode description: deskripsi yang valid harus 'Sepatu sudah selesai pencucian'
+            $validDescription = 'Sepatu sudah selesai pencucian';
+
+            // Simpan status tracking yang baru tanpa mengambil input dari pengguna
             $transaksi->trackingStatuses()->create([
                 'status_id' => $status->id,
-                'description' => 'Sepatu sudah selesai pencucian', // Deskripsi
+                'description' => $validDescription, // Deskripsi yang sudah di-hardcode
                 'tanggal_status' => Carbon::now()->toDateString(),
                 'jam_status' => Carbon::now()->toTimeString()
             ]);
@@ -313,13 +424,15 @@ class TransaksiController extends Controller
             // Commit transaksi
             DB::commit();
 
-            return redirect()->route('transaksi.index')->with('success', 'Status transaksi berhasil diperbarui ke "Finish".');
+            return redirect()->route('transaksi.show', $uuid)->with('success', 'Status transaksi berhasil diperbarui ke "Finish".');
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan jika terjadi error
 
-            return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->route('transaksi.show', $uuid)->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+
 
     public function revisi(Request $request, string $uuid)
     {
@@ -349,11 +462,11 @@ class TransaksiController extends Controller
             // Commit transaksi
             DB::commit();
 
-            return redirect()->route('transaksi.index')->with('success', 'Status terakhir berhasil dihapus dan status dikembalikan ke: ' . $previousTrackingStatus->status->name);
+            return redirect()->route('transaksi.show', $uuid)->with('success', 'Status terakhir berhasil dihapus dan status dikembalikan ke: ' . $previousTrackingStatus->status->name);
         } catch (\Exception $e) {
             DB::rollBack(); // Batalkan jika terjadi error
 
-            return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->route('transaksi.show', $uuid)->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -368,12 +481,16 @@ class TransaksiController extends Controller
         // Ambil semua kategori dari database untuk diakses sebagai kategori induk dan sub-kategori
         $categories = Category::all();
 
+        // Sanitize the tracking number to remove invalid characters
+        $safeTrackingNumber = preg_replace('/[\/\\\]/', '_', $transaksi->tracking_number);
+
         // Load view untuk PDF, dan kirimkan data transaksi serta kategori ke view
         $pdf = PDF::loadView('transaksi.cetak_pdf', compact('transaksi', 'categories'));
 
         // Set orientasi landscape dan ukuran kertas jika perlu
-        return $pdf->setPaper('a4', 'portrait')->stream('transaksi_' . $transaksi->tracking_number . '.pdf');
+        return $pdf->setPaper('b4', 'portrait')->stream('transaksi_' . $safeTrackingNumber . '.pdf');
     }
+
 
 
 

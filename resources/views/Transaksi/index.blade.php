@@ -27,13 +27,10 @@
         @endif
 
         <div class="card-body">
-            @if (auth()->user()->role == 'superadmin')
-                <div class="d-flex justify-content-end mb-3">
-                    <a href="{{ url('/dashboard/transaksi/create') }}" class="btn btn-primary"
-                        style="margin-right: 5px;">Tambah
-                        Transaksi</a>
-                </div>
-            @endif
+            <div class="d-flex justify-content-end mb-3">
+                <a href="{{ url('/dashboard/transaksi/create') }}" class="btn btn-primary" style="margin-right: 5px;">Tambah
+                    Transaksi</a>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered" id="periodeTable" width="100%" cellspacing="0">
                     <thead>

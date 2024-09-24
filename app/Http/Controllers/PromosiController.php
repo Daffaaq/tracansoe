@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\promosi;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -184,29 +185,37 @@ class PromosiController extends Controller
                 return redirect()->back()->withErrors(['error' => 'Promosi dengan kode tersebut sudah ada.']);
             }
 
-            $startDate = \Carbon\Carbon::parse($request->start_date)->startOfDay();
-            $endDate = \Carbon\Carbon::parse($request->end_date)->endOfDay();
+            $startDate = Carbon::parse($request->start_date)->format('Y-m-d');
+            $endDate = Carbon::parse($request->end_date)->format('Y-m-d');
 
-            $existingPromosi = promosi::where(function ($query) use ($startDate, $endDate, $promosi) {
-                $query->where(function ($query) use ($startDate, $endDate) {
-                    $query->where('start_date', '>=', $startDate)
-                        ->where('start_date', '<=', $endDate);
-                })->orWhere(function ($query) use ($startDate, $endDate) {
-                    $query->where('end_date', '>=', $startDate)
-                        ->where('end_date', '<=', $endDate);
-                })->orWhere(function ($query) use ($startDate, $endDate) {
-                    $query->where('start_date', '<=', $startDate)
-                        ->where('end_date', '>=', $endDate);
-                });
-            })
-                ->where('id', '!==', $promosi->id)
-                ->first();
+            // dd($startDate, $endDate);
 
-            // dd($existingPromosi);
-            if ($existingPromosi) {
-                return redirect()->back()->withErrors(['error' => 'Rentang tanggal promosi sudah ada, harap memilih rentang tanggal yang berbeda.']);
+            $existingStartDate = Carbon::parse($promosi->start_date)->format('Y-m-d');
+            $existingEndDate = Carbon::parse($promosi->end_date)->format('Y-m-d');
+
+            // Cek apakah ada perubahan pada tanggal start atau end
+            $datesChanged = ($existingStartDate !== $startDate || $existingEndDate !== $endDate);
+
+
+            if ($datesChanged) {
+                // Jika tanggal diubah, lakukan pengecekan tumpang tindih
+                $existingPromosi = Promosi::where(function ($query) use ($startDate, $endDate) {
+                    $query->where(function ($query) use ($startDate, $endDate) {
+                        // Cek apakah rentang tanggal baru bertumpang tindih dengan rentang tanggal promosi lain
+                        $query->where('start_date', '<=', $endDate) // Start date dari promosi yang ada <= end date baru
+                            ->where('end_date', '>=', $startDate); // End date dari promosi yang ada >= start date baru
+                    });
+                    // dd($query->toSql());
+
+                })
+                    ->where('uuid', '!=', $promosi->uuid) // Pastikan untuk mengecualikan promosi yang sedang di-update
+                    ->first();
+
+                // Jika ada promosi lain yang tumpang tindih, tampilkan error
+                if ($existingPromosi) {
+                    return redirect()->back()->withErrors(['error' => 'Rentang tanggal promosi sudah ada, harap memilih rentang tanggal yang berbeda.']);
+                }
             }
-
 
             // Jika ada file gambar baru yang diunggah
             if ($request->hasFile('image')) {

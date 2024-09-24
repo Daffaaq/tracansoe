@@ -37,19 +37,38 @@ class promosi extends Model
     // Fungsi untuk memeriksa apakah promosi masih aktif berdasarkan tanggal
     public function isActive()
     {
-        $today = now();
-        return $this->status === 'active' && $this->start_date <= $today && $this->end_date >= $today;
+        $today = now()->toDateString(); // Mengambil tanggal hari ini (tanpa jam)
+        $startDate = $this->start_date->toDateString(); // Mengambil tanggal dari `start_date` (tanpa jam)
+        $endDate = $this->end_date->toDateString(); // Mengambil tanggal dari `end_date` (tanpa jam)
+
+        // Debugging, bisa dihapus jika tidak diperlukan
+        // dd($today, $startDate, $endDate);
+
+        return $this->status === 'active' && $startDate <= $today && $endDate >= $today;
     }
+
     public function isUpcoming()
     {
-        $today = now();
-        return $this->status === 'upcoming' && $this->start_date > $today;
+        $today = now()->toDateString(); // Mengambil tanggal hari ini (tanpa jam)
+        $startDate = $this->start_date->toDateString(); // Mengambil tanggal dari `start_date` (tanpa jam)
+
+        // Debugging, bisa dihapus jika tidak diperlukan
+        // dd($today, $startDate);
+
+        return $this->status === 'upcoming' && $startDate > $today;
     }
+
     public function isExpired()
     {
-        $today = now();
-        return $this->status === 'expired' || $this->end_date < $today;
+        $today = now()->toDateString(); // Mengambil tanggal hari ini (tanpa jam)
+        $endDate = $this->end_date->toDateString(); // Mengambil tanggal dari `end_date` (tanpa jam)
+
+        // Debugging, bisa dihapus setelah memastikan
+        // dd($endDate, $today);
+
+        return $this->status === 'expired' || $endDate < $today;
     }
+
 
     protected static function boot()
     {

@@ -159,36 +159,51 @@
 
                     <!-- Loop untuk kategori induk -->
                     @foreach ($categories->where('parent_id', null) as $categoryInduk)
-                        <!-- Tampilkan kategori induk -->
-                        <tr>
-                            <td colspan="4" style="padding: 10px; background-color: #f0f0f0; font-weight: bold;">
-                                {{ $categoryInduk->nama_kategori }}</td>
-                        </tr>
+                        @php
+                            // Ambil subkategori yang dipilih dalam transaksi berdasarkan kategori induk
+                            $selectedSubCategories = $transaksi->categoryHargas->where('parent_id', $categoryInduk->id);
+                        @endphp
 
-                        <!-- Loop untuk sub-kategori yang terkait dengan kategori induk -->
-                        @foreach ($transaksi->categoryHargas->where('parent_id', $categoryInduk->id) as $subCategory)
-                            <tr style="border-bottom: 1px solid #ddd;">
-                                <td style="padding: 10px;">{{ $subCategory->nama_kategori }}</td>
-                                <td style="padding: 10px; text-align: center;">{{ $subCategory->pivot->qty }}</td>
-                                <td style="padding: 10px; text-align: right;">
-                                    Rp{{ number_format($subCategory->price, 0, ',', '.') }}</td>
-                                <td style="padding: 10px; text-align: right;">
-                                    Rp{{ number_format($subCategory->pivot->qty * $subCategory->price, 0, ',', '.') }}
+                        <!-- Hanya tampilkan kategori induk jika ada subkategori yang dipilih -->
+                        @if ($selectedSubCategories->isNotEmpty())
+                            <!-- Tampilkan kategori induk -->
+                            <tr>
+                                <td colspan="4"
+                                    style="padding: 10px; background-color: #f0f0f0; font-weight: bold; text-align: center; vertical-align: middle;">
+                                    {{ $categoryInduk->nama_kategori }}
                                 </td>
                             </tr>
-                            @php
-                                $totalKategoriHarga += $subCategory->pivot->qty * $subCategory->price;
-                            @endphp
-                        @endforeach
+
+                            <!-- Loop untuk sub-kategori yang terkait dengan kategori induk -->
+                            @foreach ($selectedSubCategories as $subCategory)
+                                <tr style="border-bottom: 1px solid #ddd;">
+                                    <td style="padding: 10px;">{{ $subCategory->nama_kategori }}</td>
+                                    <td style="padding: 10px; text-align: center;">{{ $subCategory->pivot->qty }}</td>
+                                    <td style="padding: 10px; text-align: right;">
+                                        Rp{{ number_format($subCategory->price, 0, ',', '.') }}
+                                    </td>
+                                    <td style="padding: 10px; text-align: right;">
+                                        Rp{{ number_format($subCategory->pivot->qty * $subCategory->price, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                @php
+                                    $totalKategoriHarga += $subCategory->pivot->qty * $subCategory->price;
+                                @endphp
+                            @endforeach
+                        @endif
                     @endforeach
 
                     <!-- Total Kategori Harga -->
-                    <tr style="background-color: #ffeb3b; font-weight: bold;">
-                        <td colspan="3" style="padding: 10px;">Total Kategori Harga</td>
-                        <td style="padding: 10px; text-align: right;">
-                            Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}</td>
-                    </tr>
+                    @if ($totalKategoriHarga > 0)
+                        <tr style="background-color: #ffeb3b; font-weight: bold;">
+                            <td colspan="3" style="padding: 10px;">Total Kategori Harga</td>
+                            <td style="padding: 10px; text-align: right;">
+                                Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}
+                            </td>
+                        </tr>
+                    @endif
                 </tbody>
+
             </table>
         </div>
 
@@ -235,12 +250,18 @@
                     <th>Total Kategori Harga</th>
                     <td>Rp{{ number_format($totalKategoriHarga, 0, ',', '.') }}</td>
                 </tr>
-                <tr>
-                    <th>Total Layanan Tambahan</th>
-                    <td>Rp{{ number_format($totalPlusServices, 0, ',', '.') }}</td>
-                </tr>
+                @if ($transaksi->plusServices->isNotEmpty())
+                    <tr>
+                        <th>Total Layanan Tambahan</th>
+                        <td>Rp{{ number_format($totalPlusServices, 0, ',', '.') }}</td>
+                    </tr>
+                @endif
                 @php
-                    $totalKeseluruhan = $totalKategoriHarga + $totalPlusServices;
+                    if ($transaksi->plusServices->isEmpty()) {
+                        $totalKeseluruhan = $totalKategoriHarga;
+                    } else {
+                        $totalKeseluruhan = $totalKategoriHarga + $totalPlusServices;
+                    }
                 @endphp
                 <tr>
                     <th>Sub Total</th>
@@ -248,7 +269,11 @@
                 </tr>
 
                 @php
-                    $totalKeseluruhan = $totalKategoriHarga + $totalPlusServices;
+                    if ($transaksi->plusServices->isEmpty()) {
+                        $totalKeseluruhan = $totalKategoriHarga;
+                    } else {
+                        $totalKeseluruhan = $totalKategoriHarga + $totalPlusServices;
+                    }
                     $diskon = 0;
                     if ($transaksi->promosi) {
                         $diskon = $transaksi->promosi->discount * $totalKeseluruhan;

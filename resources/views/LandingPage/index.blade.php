@@ -469,13 +469,17 @@
                                 }
                             },
                             error: function(xhr) {
-                                // Ambil nilai trackingCode yang diinputkan pengguna
-                                const trackingCode = $('#trackingCode').val();
-
-                                // Set the error message dynamically with the tracking code
-                                $('#errorMessage').html(
-                                    `Kode pesanan <strong>${trackingCode}</strong> tidak ditemukan. Pastikan Anda memasukkan kode yang benar.`
-                                );
+                                // Jika terjadi error, backend akan mengirimkan pesan error
+                                if (xhr.status === 404) {
+                                    const response = xhr.responseJSON;
+                                    $('#errorMessage').html(response
+                                        .error); // Tampilkan pesan error dari backend
+                                } else {
+                                    // Handle error lain jika ada
+                                    $('#errorMessage').html(
+                                        'Terjadi kesalahan. Silakan coba lagi nanti.'
+                                    );
+                                }
                                 // On error, show the error message
                                 $('#trackingCode').val('');
                                 $('#errorMessage').fadeIn();

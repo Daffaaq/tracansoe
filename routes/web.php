@@ -76,6 +76,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/transaksi/{uuid}/finish', [TransaksiController::class, 'finish'])->name('transaksi.finish');
         Route::get('/transaksi/{uuid}/revisi', [TransaksiController::class, 'revisi'])->name('transaksi.revisi');
         Route::get('/transaksi/{uuid}/cetak-pdf', [TransaksiController::class, 'cetak_pdf'])->name('transaksi.cetak_pdf');
+        Route::post('/transaksi/{id}/pelunasan', [TransaksiController::class, 'pelunasan'])->name('transaksi.pelunasan');
+        Route::post('/transaksi/{id}/update-pickup', [TransaksiController::class, 'updateStatusPickup'])->name('transaksi.updatePickup');
         Route::get('/validate-promosi', [TransaksiController::class, 'validatePromosi']);
         Route::post('/transaksi/list', [TransaksiController::class, 'list'])->name('transaksi.list');
     });
