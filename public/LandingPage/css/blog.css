@@ -1,0 +1,339 @@
+.blog-list-section {
+    padding: 100px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 36px;
+    color: #001f3f;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.filter-section {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 10px;
+}
+
+.filter-input {
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.filter-btn {
+    padding: 8px 15px;
+    background-color: #001f3f;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #f39c12;
+}
+.section-description {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 40px;
+}
+
+.blog-content-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* Two-thirds for blogs, one-third for sidebar */
+    gap: 30px;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.blog-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(0, 125, 255, 0.12);
+}
+
+.blog-image img {
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.blog-content {
+    padding: 20px;
+    text-align: left;
+}
+
+.blog-content h3 {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.blog-category {
+    display: inline-block;
+    background-color: #f39c12;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.read-more-btn {
+    font-size: 14px;
+    color: #fff;
+    background-color: #001f3f;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.read-more-btn:hover {
+    background-color: #f39c12;
+}
+
+/* Sidebar Section */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Categories Section */
+.categories-section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06); /* Shadow lebih terlihat */
+    transition: box-shadow 0.3s ease;
+    border: 1px solid #eee; /* Garis tipis di sekeliling untuk memberi kesan terstruktur */
+}
+
+.categories-section h3 {
+    font-size: 24px; /* Ukuran yang nyaman dan tegas */
+    color: #001f3f;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: 700; /* Lebih bold agar lebih menarik perhatian */
+}
+
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-list li {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd; /* Garis bawah pada setiap kategori */
+}
+
+.category-list li:last-child {
+    border-bottom: none; /* Menghilangkan garis pada item terakhir */
+}
+
+.category-list li a {
+    color: #001f3f;
+    font-size: 18px;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative; /* Untuk hover effect */
+    padding-left: 5px; /* Ruang kecil di kiri */
+    transition: all 0.3s ease;
+}
+
+.category-list li a::before {
+    content: "";
+    position: absolute;
+    left: -5px;
+    bottom: 0;
+    width: 4px;
+    height: 0;
+    background-color: #f39c12; /* Warna oranye untuk efek */
+    transition: height 0.3s ease;
+}
+
+.category-list li a:hover::before {
+    height: 100%; /* Garis akan muncul dari bawah ke atas saat hover */
+}
+
+.category-list li a:hover {
+    color: #f39c12; /* Mengubah warna teks menjadi oranye saat hover */
+}
+
+/* Popular Posts Section */
+.popular-posts-section {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.popular-posts-section h3 {
+    font-size: 24px;
+    color: #001f3f;
+    margin-bottom: 20px;
+}
+
+.popular-post-card {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.popular-post-image img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.popular-post-content {
+    flex: 1;
+    text-align: left;
+}
+
+.popular-post-category {
+    display: inline-block;
+    background-color: #333;
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.popular-post-date {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.popular-post-content h4 {
+    font-size: 18px;
+    color: #001f3f;
+    margin: 0;
+}
+
+/* Filter Section */
+.filter-section {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+/* Label Styling */
+.filter-label {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Custom Date Input Styling */
+.filter-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-input {
+    -webkit-appearance: none !important; /* Untuk Chrome, Safari */
+    -moz-appearance: none !important; /* Untuk Firefox */
+    appearance: none !important;
+    padding-left: 40px;
+}
+
+
+.filter-input {
+    padding: 10px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    cursor: pointer;
+    padding-left: 40px; /* Ruang untuk ikon kalender di sebelah kiri */
+}
+
+/* Ikon kalender yang kita tambahkan */
+.filter-wrapper::before {
+    all: unset; /* Hapus semua property default */
+    content: "\f073";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 10px;
+    font-size: 18px;
+    color: #f39c12;
+    pointer-events: none;
+}
+
+.filter-input:hover {
+    border-color: #f39c12;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    background-color: #001f3f;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-btn:hover {
+    background-color: #f39c12;
+}
+
+.pagination {
+    margin-top: 50px;
+    display: flex;
+    gap: 10px;
+    margin-left: 300px;
+}
+
+.pagination a {
+    color: #001f3f;
+    padding: 8px 14px;
+    border: 1px solid #001f3f;
+    border-radius: 50px; /* Membuat tombol pagination lebih bulat */
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #001f3f;
+    color: #fff;
+}

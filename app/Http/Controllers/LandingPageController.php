@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Blog;
 use App\Models\category;
 use App\Models\promosi;
 use Illuminate\Http\Request;
@@ -35,6 +36,9 @@ class LandingPageController extends Controller
             ->whereNull('parent_id') // Hanya ambil kategori induk
             ->get();
 
-        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories'));
+        $blog = Blog::with('category')->where('status_publish', 'published')->latest()->take(6)->get();
+        // dd($blog);
+
+        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog'));
     }
 }

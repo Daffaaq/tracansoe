@@ -100,6 +100,20 @@
                                 <span>Promosi</span>
                             </a>
                         </li>
+                        <li class="sidebar-item has-sub {{ Request::routeIs('kategori-blog.index') ? 'active' : '' }}">
+                            <a href="#" class="sidebar-link">
+                                <i class="bi bi-stack"></i>
+                                <span>Blog</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item {{ Request::routeIs('kategori-blog.index') ? 'active' : '' }}">
+                                    <a href="{{ route('kategori-blog.index') }}" class="submenu-link">Category Blog</a>
+                                </li>
+                                <li class="submenu-item {{ Request::routeIs('blog.index') ? 'active' : '' }}">
+                                    <a href="{{ route('blog.index') }}" class="submenu-link">Blog</a>
+                                </li>
+                            </ul>
+                        </li>
                         <li
                             class="sidebar-item {{ request()->routeIs('kategori.index', 'kategori.create', 'kategori.show', 'kategori.edit') ? 'active' : '' }}">
                             <a href="{{ route('kategori.index') }}" class="sidebar-link">

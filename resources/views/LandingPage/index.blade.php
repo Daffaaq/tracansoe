@@ -28,6 +28,7 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#services">Services</a></li>
+                <li><a href="#blog">Blog</a></li>
                 <li><a href="#tracking">Tracking</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -142,6 +143,127 @@
         </div>
     </section>
 
+    <!-- Blog Section -->
+    <section id="blog" class="blog-section">
+        <div class="container">
+            <h2>Blog Terbaru</h2>
+            <p class="blog-description">Temukan tips dan informasi menarik tentang perawatan sepatu dan gaya hidup
+                modern.</p>
+            {{-- @dd(count($blog)); --}}
+            @if (count($blog) > 3)
+                <div class="blog-grid">
+                    {{-- @dd($blog); --}}
+                    @foreach ($blog as $post)
+                        @php
+                            // Cek apakah image_url mengandung 'http://' atau 'https://'
+                            $isExternal = Str::startsWith($post->image_url, ['http://', 'https://']);
+                        @endphp
+
+                        <div class="blog-card" data-aos="fade-up">
+                            <div class="blog-image">
+                                {{-- Jika blog memiliki gambar, tampilkan gambar, jika tidak tampilkan placeholder --}}
+                                @if ($post->image_url)
+                                    @if ($isExternal)
+                                        {{-- Jika URL berasal dari Faker atau sumber eksternal --}}
+                                        <img src="{{ $post->image_url }}" alt="{{ $post->title }}">
+                                    @else
+                                        {{-- Jika gambar berasal dari storage lokal --}}
+                                        <img src="{{ asset('storage/' . $post->image_url) }}"
+                                            alt="{{ $post->title }}">
+                                    @endif
+                                @else
+                                    <img src="https://via.placeholder.com/400x250" alt="{{ $post->title }}">
+                                @endif
+                            </div>
+                            <div class="blog-content">
+                                <span
+                                    class="blog-category">{{ $post->category->name_category_blog ?? 'Kategori Tidak Tersedia' }}</span>
+                                <span class="blog-date">
+                                    Dipublikasikan:
+                                    {{ $post->date_publish ? date('d F Y, H:i', strtotime($post->date_publish . ' ' . $post->time_publish)) : 'Belum Dipublikasikan' }}
+                                </span>
+
+                                <!-- Nama Penulis dalam Badge -->
+                                <span class="badge blog-author">
+                                    {{ $post->user->name ?? 'Admin' }}
+                                </span>
+                                <h3>{{ $post->title }}</h3>
+                                <p>{{ Str::limit($post->content, 100) }}</p>
+                                <a href="#" class="read-more">Baca Selengkapnya</a>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="more-blog">
+                    <a href="#" class="more-blog-btn">
+                        Lihat Semua Blog
+                        <i class="fas fa-arrow-right"></i> <!-- Tambahkan ikon di sini -->
+                    </a>
+                    <!-- Sesuaikan URL dengan routing blog index -->
+                </div>
+            @else
+                <div class="blog-grid">
+                    <!-- Blog Card 1 -->
+                    <div class="blog-card" data-aos="fade-up">
+                        <div class="blog-image">
+                            <img src="https://via.placeholder.com/400x250" alt="Cara Merawat Sepatu Putih">
+                        </div>
+                        <div class="blog-content">
+                            <span class="blog-category">Perawatan Sepatu</span>
+                            <!-- Tambahkan tanggal dan waktu publish di sini -->
+                            <span class="blog-date">Dipublikasikan: 24 September 2023, 10:00</span>
+                            <h3>Cara Merawat Sepatu Putih</h3>
+                            <p>Pelajari cara menjaga sepatu putih Anda tetap bersih dan cerah dengan tips sederhana ini.
+                            </p>
+                            <a href="#" class="read-more">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+
+                    <!-- Blog Card 2 -->
+                    <div class="blog-card" data-aos="fade-up">
+                        <div class="blog-image">
+                            <img src="https://via.placeholder.com/400x250" alt="Memilih Sepatu untuk Sehari-hari">
+                        </div>
+                        <div class="blog-content">
+                            <span class="blog-category">Perawatan Sepatu</span>
+                            <!-- Tambahkan tanggal dan waktu publish di sini -->
+                            <span class="blog-date">Dipublikasikan: 24 September 2023, 10:00</span>
+                            <h3>Memilih Sepatu untuk Sehari-hari</h3>
+                            <p>Pilih sepatu yang nyaman dan stylish untuk aktivitas sehari-hari Anda dengan tips
+                                berikut.
+                            </p>
+                            <a href="#" class="read-more">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+
+                    <!-- Blog Card 3 -->
+                    <div class="blog-card" data-aos="fade-up">
+                        <div class="blog-image">
+                            <img src="https://via.placeholder.com/400x250" alt="Merawat Sepatu Kulit">
+                        </div>
+                        <div class="blog-content">
+                            <span class="blog-category">Perawatan Sepatu</span>
+                            <!-- Tambahkan tanggal dan waktu publish di sini -->
+                            <span class="blog-date">Dipublikasikan: 24 September 2023, 10:00</span>
+                            <h3>Merawat Sepatu Kulit</h3>
+                            <p>Ikuti panduan ini untuk merawat sepatu kulit Anda agar tetap awet dan terlihat bagus.</p>
+                            <a href="#" class="read-more">Baca Selengkapnya</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="more-blog">
+                    <a href="{{ route('blog-landingPage') }}" class="more-blog-btn">
+                        Lihat Semua Blog
+                        <i class="fas fa-arrow-right"></i> <!-- Tambahkan ikon di sini -->
+                    </a>
+                    <!-- Sesuaikan URL dengan routing blog index -->
+                </div>
+            @endif
+
+        </div>
+    </section>
+
+
     <!-- Tracking Timeline Section (Modern & Fresh) -->
     <section id="tracking" class="tracking-section">
         <div class="container">
@@ -162,7 +284,8 @@
                 Kode pesanan tidak ditemukan. Pastikan Anda memasukkan kode yang benar.
             </div>
 
-            <div id="trackingCodeInfo" style="display: none; font-size: 18px; font-weight: bold; margin-bottom: 20px;">
+            <div id="trackingCodeInfo"
+                style="display: none; font-size: 18px; font-weight: bold; margin-bottom: 20px;">
                 Kode Tracking: <span id="trackingCodeDisplay"></span>
             </div>
 
@@ -230,6 +353,7 @@
                 <div class="contact-form">
                     <form action="/advice" method="POST" id="adviceForm">
                         @csrf <!-- Tambahkan CSRF Token -->
+                        <input type="hidden" id="adviceRoute" value="{{ route('advice') }}">
                         <div class="form-group" id="name-group">
                             <label for="nama">Nama Anda</label>
                             <input type="text" id="nama" name="nama" placeholder="Nama Anda"
@@ -288,7 +412,20 @@
     <button id="backToTop"><i class="fas fa-arrow-up"></i></button>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="{{ asset('/LandingPage/js/tracking.js') }}"></script>
+    <script src="{{ asset('/LandingPage/js/advice.js') }}"></script>
+    <script src="{{ asset('/LandingPage/js/map.js') }}"></script>
+    <script src="{{ asset('/LandingPage/js/scroll-to-top.js') }}"></script>
+    <script src="{{ asset('/LandingPage/js/aos.js') }}"></script>
+    {{-- <script>
+        AOS.init({
+            duration: 800, // Animation duration
+            easing: 'ease-in-out', // Animation easing
+        });
+    </script> --}}
+    {{-- <script>
         $(document).ready(function() {
             // Hapus nilai input saat halaman dimuat atau di-refresh
             $('#adviceForm')[0].reset();
@@ -369,7 +506,7 @@
                 fieldGroup.find('.help-block').remove(); // Hapus pesan error
             });
         });
-    </script>
+    </script> --}}
 
 
     <script>
@@ -382,7 +519,7 @@
             });
         });
     </script>
-    <script>
+    {{-- <script>
         // Ketika pengguna menggulir ke bawah 100px dari bagian atas dokumen, tampilkan tombol
         window.onscroll = function() {
             scrollFunction();
@@ -403,8 +540,8 @@
                 behavior: 'smooth' // Animasi smooth saat kembali ke atas
             });
         });
-    </script>
-    <script>
+    </script> --}}
+    {{-- <script>
         $(document).ready(function() {
             $('#trackingForm').on('submit', function(e) {
                 e.preventDefault(); // Prevent form submission
@@ -512,10 +649,10 @@
                 }
             }
         });
-    </script>
+    </script> --}}
 
 
-    <script>
+    {{-- <script>
         // Initialize the Leaflet map
         var map = L.map('map').setView([-9.0837414, 124.89648], 13); // Coordinates of Atambua
 
@@ -528,7 +665,7 @@
         L.marker([-9.108398, 124.892494]).addTo(map)
             .bindPopup('Cuci Sepatu Modern')
             .openPopup();
-    </script>
+    </script> --}}
     <script>
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {

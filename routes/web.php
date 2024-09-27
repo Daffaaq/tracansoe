@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdviceController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CategoryBlogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\PlusServiceController;
@@ -23,6 +25,17 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [LandingPageController::class, 'landingPage'])->name('landingPage');
+Route::get('/list-blog', function () {
+    return view('LandingPage.blog');
+})->name('blog-landingPage');
+
+Route::prefix('/list-blog')->group(function () {
+    Route::get('/detail-blog', function () {
+        return view('LandingPage.detail-blog');
+    })->name('listBlog-detail');
+});
+
+
 Route::post('/track-order', [TrackController::class, 'tracking'])->name('tracking');
 Route::post('/advice', [AdviceController::class, 'postAdvice'])->name('advice');
 
@@ -39,6 +52,29 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/promosi/update/{uuid}', [PromosiController::class, 'update'])->name('promosi.update');
         Route::delete('/promosi/delete/{uuid}', [PromosiController::class, 'destroy'])->name('promosi.destroy');
         Route::post('/promosi/list', [PromosiController::class, 'list'])->name('promosi.list');
+    });
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/kategori-blog', [CategoryBlogController::class, 'index'])->name('kategori-blog.index');
+        Route::get('/kategori-blog/create', [CategoryBlogController::class, 'create'])->name('kategori-blog.create');
+        Route::post('/kategori-blog/store', [CategoryBlogController::class, 'store'])->name('kategori-blog.store');
+        Route::get('/kategori-blog/show/{uuid}', [CategoryBlogController::class, 'show'])->name('kategori-blog.show');
+        Route::get('/kategori-blog/edit/{uuid}', [CategoryBlogController::class, 'edit'])->name('kategori-blog.edit');
+        Route::put('/kategori-blog/update/{uuid}', [CategoryBlogController::class, 'update'])->name('kategori-blog.update');
+        Route::delete('/kategori-blog/delete/{uuid}', [CategoryBlogController::class, 'destroy'])->name('kategori-blog.destroy');
+        Route::post('/kategori-blog/list', [CategoryBlogController::class, 'list'])->name('kategori-blog.list');
+    });
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+        Route::get('/blog/create', [BlogController::class, 'create'])->name('blog.create');
+        Route::post('/blog/store', [BlogController::class, 'store'])->name('blog.store');
+        Route::get('/blog/show/{uuid}', [BlogController::class, 'show'])->name('blog.show');
+        Route::get('/blog/edit/{uuid}', [BlogController::class, 'edit'])->name('blog.edit');
+        Route::put('/blog/update/{uuid}', [BlogController::class, 'update'])->name('blog.update');
+        Route::delete('/blog/delete/{uuid}', [BlogController::class, 'destroy'])->name('blog.destroy');
+        Route::post('/blog/list', [BlogController::class, 'list'])->name('blog.list');
+        Route::post('/blog/publish/{uuid}', [BlogController::class, 'publishBlog'])->name('blog.publish');
+        Route::post('/blog/delete/post/{uuid}', [BlogController::class, 'deleteBlog'])->name('blog.delete');
+        Route::post('/blog/draft/{uuid}', [BlogController::class, 'draftBlog'])->name('blog.draft');
     });
     Route::prefix('dashboard')->group(function () {
         Route::get('/kategori', [CategoryController::class, 'index'])->name('kategori.index');
