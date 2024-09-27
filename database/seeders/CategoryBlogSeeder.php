@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Faker\Factory as Faker;
 
 class CategoryBlogSeeder extends Seeder
 {
@@ -14,6 +14,10 @@ class CategoryBlogSeeder extends Seeder
      */
     public function run(): void
     {
+        // Instansiasi Faker
+        $faker = Faker::create();
+        $faker->addProvider(new \Smknstd\FakerPicsumImages\FakerPicsumImagesProvider($faker));
+
         // Definisikan kategori terkait shoe cleaning
         $categories = [
             ['name_category_blog' => 'Cleaning Tips', 'slug' => Str::slug('Cleaning Tips')],
@@ -105,7 +109,7 @@ class CategoryBlogSeeder extends Seeder
                 'title' => $blogData['title'], // Judul sesuai kategori
                 'slug' => $blogData['slug'],   // Slug sesuai judul
                 'content' => $blogData['content'], // Konten manual yang singkat dan menarik
-                'image_url' => 'https://via.placeholder.com/640x480', // Placeholder gambar
+                'image_url' => $faker->imageUrl(width: 640, height:480), // Gambar dari Faker Picsum
                 'description' => $blogData['description'], // Deskripsi manual panjang sesuai kategori
                 'status_publish' => 'published', // Semua blog dipublikasikan
                 'date_publish' => now()->format('Y-m-d'), // Tanggal sekarang
