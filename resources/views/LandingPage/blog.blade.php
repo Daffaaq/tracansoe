@@ -69,11 +69,21 @@
                                     </span>
                                     <h3>{{ $blog->title }}</h3>
                                     <p>{{ Str::limit($blog->content, 100) }}</p>
-                                    <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-btn">Baca
+                                    <a href="{{ route('listBlog-detail', $blog->slug) }}" class="read-more-btn">Baca
                                         Selengkapnya</a>
                                 </div>
                             </div>
                         @endforeach
+                        @php
+                            $emptySlots = 6 - ($blogs->count() % 6);
+                        @endphp
+
+                        @if ($blogs->count() % 6 != 0)
+                            <!-- Cek apakah jumlah kartu tidak kelipatan 6 -->
+                            @for ($i = 0; $i < $emptySlots; $i++)
+                                <div class="blog-card placeholder"></div> <!-- Placeholder Kartu -->
+                            @endfor
+                        @endif
                     @else
                         <p>Tidak ada blog yang ditemukan.</p>
                     @endif
@@ -121,8 +131,8 @@
             </div>
 
             <!-- Pagination -->
-            <div class="pagination">
-                {{ $blogs->links() }}
+            <div class="pagination-links">
+                {{ $blogs->appends(request()->except(['page', '_token']))->links('pagination::bootstrap-4') }}
             </div>
         </div>
     </section>

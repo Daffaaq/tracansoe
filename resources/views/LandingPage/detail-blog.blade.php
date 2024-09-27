@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Judul Blog | CuciSepatu</title>
+    <title>{{ $blog->title }} | CuciSepatu</title> <!-- Dynamic title -->
     <link rel="stylesheet" href="/LandingPage/css/styles.css">
     <link rel="stylesheet" href="/LandingPage/css/blog-detail.css">
 </head>
@@ -27,17 +27,37 @@
     <section class="blog-detail-section">
         <div class="container">
             <div class="blog-detail-content">
-                <h1>Tips Merawat Sepatu Kulit Agar Tetap Kinclong</h1>
-                <p>Dipublikasikan pada: 24 September 2023</p>
+                <!-- Dynamic blog title -->
+                <h1>{{ $blog->title }}</h1>
+
+                <!-- Dynamic published date, time, and author -->
+                <p class="publish-info">
+                    Dipublikasikan pada: {{ \Carbon\Carbon::parse($blog->date_publish)->format('d F Y') }}
+                    {{ $blog->time_publish }} oleh
+                    {{ $blog->user->name }}
+                </p>
+
+                <!-- Dynamic blog image with conditional check -->
                 <div class="blog-image">
-                    <img src="https://via.placeholder.com/800x400" alt="Sepatu Kulit Kinclong">
+                    @if (Str::startsWith($blog->image_url, ['http://', 'https://']))
+                        <img src="{{ $blog->image_url }}" alt="{{ $blog->title }}">
+                    @else
+                        <img src="{{ asset('storage/' . $blog->image_url) }}" alt="{{ $blog->title }}">
+                    @endif
                 </div>
+
+                <!-- Dynamic blog description -->
                 <div class="blog-body">
-                    <p></p>
+                    <p>{!! nl2br(e($blog->description)) !!}</p>
+                </div>
+
+                <div class="back-button-container">
+                    <a href="{{ route('blog-landingPage') }}" class="back-button">Kembali ke Blog</a>
                 </div>
             </div>
         </div>
     </section>
+
 
     <!-- Footer -->
     <footer class="footer">

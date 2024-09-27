@@ -189,7 +189,7 @@
                                 </span>
                                 <h3>{{ $post->title }}</h3>
                                 <p>{{ Str::limit($post->content, 100) }}</p>
-                                <a href="#" class="read-more">Baca Selengkapnya</a>
+                                <a href="{{route('listBlog-detail', $post->slug)}}" class="read-more">Baca Selengkapnya</a>
                             </div>
                         </div>
                     @endforeach

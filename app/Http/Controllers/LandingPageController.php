@@ -75,4 +75,15 @@ class LandingPageController extends Controller
 
         return view('LandingPage.blog', compact('blogs', 'categories', 'popularPosts'));
     }
+
+    public function showBlog($slug)
+    {
+        $blog = Blog::where('slug', $slug)->published()->first(); // Check if blog is published
+        if (!$blog) {
+            return redirect()->back()->with('error', 'Blog tidak ditemukan atau belum dipublikasikan');
+        }
+
+        return view('LandingPage.detail-blog', compact('blog'));
+    }
+
 }
