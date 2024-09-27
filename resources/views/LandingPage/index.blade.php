@@ -195,7 +195,7 @@
                     @endforeach
                 </div>
                 <div class="more-blog">
-                    <a href="#" class="more-blog-btn">
+                    <a href="{{ route('blog-landingPage') }}" class="more-blog-btn">
                         Lihat Semua Blog
                         <i class="fas fa-arrow-right"></i> <!-- Tambahkan ikon di sini -->
                     </a>

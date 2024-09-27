@@ -21,18 +21,113 @@
                 <i class="fas fa-bars"></i>
             </button>
             <ul id="nav-links" class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#blog">Blog</a></li>
-                <li><a href="#tracking">Tracking</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="{{ route('landingPage') }}">Home</a></li>
+                <li><a href="{{ route('landingPage') }}">About</a></li>
+                <li><a href="{{ route('landingPage') }}">Services</a></li>
+                <li><a href="{{ route('landingPage') }}">Blog</a></li>
+                <li><a href="{{ route('landingPage') }}">Tracking</a></li>
+                <li><a href="{{ route('landingPage') }}">Contact</a></li>
             </ul>
         </div>
     </nav>
 
     <!-- Blog List Section -->
     <section id="blog-list" class="blog-list-section">
+        <div class="container">
+            <h2 class="section-title">Semua Blog Kami</h2>
+            <p class="section-description">Temukan artikel terbaru tentang tips merawat sepatu, gaya hidup, dan lainnya
+                di sini.</p>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <form action="{{ route('blog-landingPage') }}" method="GET">
+                    <label for="filter-date" class="filter-label">Filter by Tanggal:</label>
+                    <div class="filter-wrapper">
+                        <input type="date" name="filter_date" id="filter-date" class="filter-input"
+                            value="{{ request()->filter_date }}">
+                        <button class="filter-btn" type="submit">Filter</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="blog-content-wrapper">
+                <!-- Blog Grid -->
+                <div class="blog-grid">
+                    @if ($blogs->count())
+                        @foreach ($blogs as $blog)
+                            <div class="blog-card" data-aos="fade-up">
+                                <div class="blog-image">
+                                    <img src="{{ $blog->image_url ?? 'https://via.placeholder.com/400x250' }}"
+                                        alt="{{ $blog->title }}">
+                                </div>
+                                <div class="blog-content">
+                                    <span
+                                        class="blog-category">{{ $blog->category->name_category_blog ?? 'Kategori Tidak Tersedia' }}</span>
+                                    <span class="blog-date">
+                                        Dipublikasikan:
+                                        {{ $blog->date_publish ? \Carbon\Carbon::parse($blog->date_publish)->format('d M Y') : 'Belum Dipublikasikan' }}
+                                    </span>
+                                    <h3>{{ $blog->title }}</h3>
+                                    <p>{{ Str::limit($blog->content, 100) }}</p>
+                                    <a href="{{ route('blog.show', $blog->slug) }}" class="read-more-btn">Baca
+                                        Selengkapnya</a>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <p>Tidak ada blog yang ditemukan.</p>
+                    @endif
+                </div>
+
+
+                <!-- Sidebar for Categories and Popular Posts -->
+                <div class="sidebar">
+                    <!-- Categories Section -->
+                    <!-- Categories Section -->
+                    <div class="categories-section">
+                        <h3>Kategori</h3>
+                        <ul class="category-list">
+                            @foreach ($categories as $category)
+                                <li><a
+                                        href="{{ route('blog-landingPage', ['category' => $category->id]) }}">{{ $category->name_category_blog }}</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+
+
+                    <!-- Popular Posts Section -->
+                    <div class="popular-posts-section">
+                        <h3>Popular Posts</h3>
+                        @foreach ($popularPosts as $post)
+                            <div class="popular-post-card">
+                                <div class="popular-post-image">
+                                    <img src="{{ $post->image_url ?? 'https://via.placeholder.com/100x100' }}"
+                                        alt="{{ $post->title }}">
+                                </div>
+                                <div class="popular-post-content">
+                                    <span
+                                        class="popular-post-category">{{ $post->category->name_category_blog ?? 'Kategori Tidak Tersedia' }}</span>
+                                    <!-- Tanggal Popular Post -->
+                                    <span class="popular-post-date">
+                                        {{ $post->date_publish ? \Carbon\Carbon::parse($post->date_publish)->format('d M Y') : 'Belum Dipublikasikan' }}
+                                    </span>
+                                    <h4>{{ $post->title }}</h4>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                {{ $blogs->links() }}
+            </div>
+        </div>
+    </section>
+
+    {{-- <section id="blog-list" class="blog-list-section">
         <div class="container">
             <h2 class="section-title">Semua Blog Kami</h2>
             <p class="section-description">Temukan artikel terbaru tentang tips merawat sepatu, gaya hidup, dan lainnya
@@ -186,7 +281,7 @@
                 <a href="#" class="pagination-link">Selanjutnya</a>
             </div>
         </div>
-    </section>
+    </section> --}}
 
     <!-- Footer Section -->
     <footer class="footer">

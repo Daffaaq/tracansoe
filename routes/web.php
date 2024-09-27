@@ -25,9 +25,10 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [LandingPageController::class, 'landingPage'])->name('landingPage');
-Route::get('/list-blog', function () {
-    return view('LandingPage.blog');
-})->name('blog-landingPage');
+Route::get('/list-blog', [LandingPageController::class, 'index'])->name('blog-landingPage');
+// Route::get('/list-blog', function () {
+//     return view('LandingPage.blog');
+// })->name('blog-landingPage');
 
 Route::prefix('/list-blog')->group(function () {
     Route::get('/detail-blog', function () {
