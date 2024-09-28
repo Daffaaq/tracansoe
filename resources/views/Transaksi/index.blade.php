@@ -51,30 +51,6 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" id="closeModalHeader" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Promosi ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeModalFooter" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         $(document).ready(function() {
@@ -121,16 +97,6 @@
                                 <i class="bi bi-eye"></i>
                              </a>`;
 
-                            // Cek apakah user memiliki role superadmin
-                            @if (auth()->user()->role == 'superadmin')
-                                actionButtons += `<a href="/dashboard/promosi/edit/${data}" class="btn icon btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i>
-                              </a>
-                              <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
-                                <i class="bi bi-trash"></i>
-                              </button>`;
-                            @endif
-
                             return actionButtons;
                         }
                     },
@@ -165,10 +131,5 @@
 
             console.log("data masuk");
         });
-
-        function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/promosi/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
-        }
     </script>
 @endsection

@@ -2,6 +2,17 @@ $(document).ready(function () {
     $('#trackingForm').on('submit', function (e) {
         e.preventDefault(); // Prevent form submission
         const trackingCode1 = $('#trackingCode').val();
+        // Check if the input is empty
+        if (!trackingCode1) {
+            // Show SweetAlert for empty input
+            Swal.fire({
+                title: 'Error',
+                text: 'Kode pesanan tidak boleh kosong! Silakan masukkan kode pesanan Anda.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return; // Exit the function
+        }
 
         // Tampilkan konfirmasi SweetAlert
         Swal.fire({

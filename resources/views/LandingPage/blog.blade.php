@@ -110,23 +110,26 @@
                     <div class="popular-posts-section">
                         <h3>Popular Posts</h3>
                         @foreach ($popularPosts as $post)
-                            <div class="popular-post-card">
-                                <div class="popular-post-image">
-                                    <img src="{{ $post->image_url ?? 'https://via.placeholder.com/100x100' }}"
-                                        alt="{{ $post->title }}">
+                            <a href="{{ route('listBlog-detail', $post->slug) }}" class="popular-post-link">
+                                <div class="popular-post-card">
+                                    <div class="popular-post-image">
+                                        <img src="{{ $post->image_url ?? 'https://via.placeholder.com/100x100' }}"
+                                            alt="{{ $post->title }}">
+                                    </div>
+                                    <div class="popular-post-content">
+                                        <span
+                                            class="popular-post-category">{{ $post->category->name_category_blog ?? 'Kategori Tidak Tersedia' }}</span>
+                                        <!-- Tanggal Popular Post -->
+                                        <span class="popular-post-date">
+                                            {{ $post->date_publish ? \Carbon\Carbon::parse($post->date_publish)->format('d M Y') : 'Belum Dipublikasikan' }}
+                                        </span>
+                                        <h4>{{ $post->title }}</h4>
+                                    </div>
                                 </div>
-                                <div class="popular-post-content">
-                                    <span
-                                        class="popular-post-category">{{ $post->category->name_category_blog ?? 'Kategori Tidak Tersedia' }}</span>
-                                    <!-- Tanggal Popular Post -->
-                                    <span class="popular-post-date">
-                                        {{ $post->date_publish ? \Carbon\Carbon::parse($post->date_publish)->format('d M Y') : 'Belum Dipublikasikan' }}
-                                    </span>
-                                    <h4>{{ $post->title }}</h4>
-                                </div>
-                            </div>
+                            </a>
                         @endforeach
                     </div>
+
                 </div>
             </div>
 

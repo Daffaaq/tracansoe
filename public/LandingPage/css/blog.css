@@ -251,6 +251,11 @@
     margin: 0;
 }
 
+.popular-post-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 /* Filter Section */
 .filter-section {
     display: flex;

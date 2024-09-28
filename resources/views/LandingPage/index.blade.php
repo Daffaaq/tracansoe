@@ -189,7 +189,8 @@
                                 </span>
                                 <h3>{{ $post->title }}</h3>
                                 <p>{{ Str::limit($post->content, 100) }}</p>
-                                <a href="{{route('listBlog-detail', $post->slug)}}" class="read-more">Baca Selengkapnya</a>
+                                <a href="{{ route('listBlog-detail', $post->slug) }}" class="read-more">Baca
+                                    Selengkapnya</a>
                             </div>
                         </div>
                     @endforeach
@@ -273,7 +274,7 @@
                 <form id="trackingForm">
                     <div class="form-group">
                         <input type="text" id="trackingCode" name="trackingCode"
-                            placeholder="Masukkan Kode Pesanan Anda" required>
+                            placeholder="Masukkan Kode Pesanan Anda">
                     </div>
                     <button type="submit" class="cta-button">Lacak Pesanan</button>
                 </form>

@@ -1,3 +1,14 @@
+function formatRupiah(amount) {
+  const formatter = new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  });
+  return formatter.format(amount);
+}
+
+var totalPendapatanFormatted = totalPendapatanPerBulan.map(formatRupiah);
+
 var optionsProfileVisit = {
   annotations: {
     position: "back",
@@ -16,7 +27,7 @@ var optionsProfileVisit = {
   series: [
     {
       name: "sales",
-      data: [9, 20, 30, 20, 10, 20, 30, 20, 10, 20, 30, 20],
+      data: totalPendapatanPerBulan,
     },
   ],
   colors: "#435ebe",
@@ -36,10 +47,26 @@ var optionsProfileVisit = {
       "Dec",
     ],
   },
+  tooltip: {
+    y: {
+      formatter: function (val) {
+        return formatRupiah(val);
+      },
+    },
+  },
 }
+
+// Ambil label dan value dari objek totalPromosi
+var labels = Object.keys(totalPromosi);
+var series = Object.values(totalPromosi);
+
+function hasSignificantData(series) {
+  return series.reduce((a, b) => a + b, 0) > 1;
+}
+
 let optionsVisitorsProfile = {
-  series: [70, 30],
-  labels: ["Male", "Female"],
+  series: series,
+  labels: labels,
   colors: ["#435ebe", "#55c6e8"],
   chart: {
     type: "donut",
@@ -134,10 +161,18 @@ var chartProfileVisit = new ApexCharts(
   document.querySelector("#chart-profile-visit"),
   optionsProfileVisit
 )
-var chartVisitorsProfile = new ApexCharts(
-  document.getElementById("chart-visitors-profile"),
-  optionsVisitorsProfile
-)
+// Cek apakah data signifikan, jika tidak tampilkan pesan
+if (hasSignificantData(series)) {
+  var chartVisitorsProfile = new ApexCharts(
+    document.getElementById("chart-visitors-profile"),
+    optionsVisitorsProfile
+  );
+  chartVisitorsProfile.render();
+} else {
+  // Jika data minimal, tampilkan pesan
+  document.getElementById("chart-visitors-profile").innerHTML =
+    "<p>Data tidak cukup untuk divisualisasikan.</p>";
+}
 var chartEurope = new ApexCharts(
   document.querySelector("#chart-europe"),
   optionsEurope
@@ -155,4 +190,3 @@ chartIndonesia.render()
 chartAmerica.render()
 chartEurope.render()
 chartProfileVisit.render()
-chartVisitorsProfile.render()
