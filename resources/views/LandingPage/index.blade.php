@@ -342,6 +342,164 @@
         </div>
     </section>
 
+    <!-- Membership Campaign Section -->
+    <section id="membership" class="membership-section" style="padding: 40px 0;">
+        <div class="container">
+            <h2>Daftar Membership & Dapatkan Tambahan Diskon!</h2>
+            <p>Bergabunglah dengan program membership kami untuk mendapatkan berbagai keuntungan eksklusif, termasuk
+                tambahan diskon untuk setiap layanan cuci sepatu!</p>
+
+            <!-- Rincian Membership Benefit & Harga -->
+            <div class="membership-details">
+                <div class="membership-plan">
+                    <h3>Standard Membership</h3>
+                    <p>Harga: <strong>Rp 100.000/3 bulan</strong></p>
+                    <ul>
+                        <li>Diskon 5% untuk layanan cuci sepatu</li>
+                        <li>Prioritas layanan reguler</li>
+                        <li>Pemberitahuan promo spesial</li>
+                    </ul>
+                </div>
+
+                <div class="membership-plan">
+                    <h3>Gold Membership</h3>
+                    <p>Harga: <strong>Rp 250.000/6 bulan</strong></p>
+                    <ul>
+                        <li>Diskon 10% untuk layanan cuci sepatu</li>
+                        <li>Prioritas layanan cepat</li>
+                        <li>Pemberitahuan promo spesial & hadiah gratis</li>
+                    </ul>
+                </div>
+
+                <div class="membership-plan">
+                    <h3>Premium Membership</h3>
+                    <p>Harga: <strong>Rp 500.000/12 bulan</strong></p>
+                    <ul>
+                        <li>Diskon 15% untuk layanan cuci sepatu</li>
+                        <li>Prioritas layanan tercepat</li>
+                        <li>Pemberitahuan promo spesial & hadiah eksklusif</li>
+                        <li>Layanan cuci sepatu gratis 1x per bulan</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="membership-call-to-action" style="text-align: center; margin-top: 30px;">
+                <p>Jangan lewatkan kesempatan ini! Daftar sekarang dan nikmati keuntungan eksklusif hanya untuk member.
+                </p>
+                <button id="membershipButton" class="cta-button"
+                    style="background-color: #007BFF; color: white; border: none; padding: 10px 20px; cursor: pointer;">
+                    Daftar Membership Sekarang
+                </button>
+                <button id="extendButton" class="cta-button"
+                    style="background-color: #002a56; color: white; border: none; padding: 10px 20px; cursor: pointer;">
+                    Perpanjang Membership Sekarang
+                </button>
+            </div>
+
+            <!-- Form Daftar Membership (Tersembunyi) -->
+            <div id="membershipForm" style="display: none; margin-top: 30px;">
+                <h3>Formulir Pendaftaran Membership</h3>
+                <form id="membershipFormSubmit" enctype="multipart/form-data">
+                    @csrf
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="nama_membership">Nama Lengkap</label>
+                        <input type="text" id="nama_membership" name="nama_membership" class="form-control"
+                            placeholder="Masukkan Nama Lengkap Anda">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="email_membership">Email</label>
+                        <input type="email" id="email_membership" name="email_membership" class="form-control"
+                            placeholder="Masukkan Email Anda">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="phone_membership">Nomor Telepon</label>
+                        <input type="text" id="phone_membership" name="phone_membership" class="form-control"
+                            placeholder="Masukkan Nomor Telepon Anda">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="alamat_membership">Alamat</label>
+                        <input type="text" id="alamat_membership" name="alamat_membership" class="form-control"
+                            placeholder="Masukkan Alamat Anda">
+                    </div>
+
+                    <!-- Radio Buttons untuk Kelas Membership -->
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label>Kelas Membership</label>
+                        <div class="membership-options">
+                            <label>
+                                <input type="radio" name="kelas_membership" value="standard">
+                                <span>Standard - Rp 100.000/3 bulan</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="kelas_membership" value="gold">
+                                <span>Gold - Rp 250.000/6 bulan</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="kelas_membership" value="premium">
+                                <span>Premium - Rp 500.000/12 bulan</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="buktiPembayaran">Upload Bukti Pembayaran</label>
+                        <input type="file" id="buktiPembayaran" name="buktiPembayaran" class="form-control">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="totalPembayaran">Total Pembayaran</label>
+                        <input type="number" id="totalPembayaran" name="totalPembayaran" class="form-control"
+                            placeholder="Masukkan Total Pembayaran">
+                    </div>
+                    <button type="submit" class="cta-button"
+                        style="background-color: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer;">Daftar
+                        Sekarang</button>
+                </form>
+            </div>
+            <!-- Form Perpanjangan Membership (Tersembunyi) -->
+            <div id="extendMembershipForm" style="display: none; margin-top: 30px;">
+                <h3>Formulir Perpanjangan Membership</h3>
+                <form id="extendMembershipFormSubmit" enctype="multipart/form-data" class="membership-form">
+                    @csrf
+                    <div class="form-group">
+                        <label for="kode">Kode Membership</label>
+                        <input type="text" id="kode" name="kode" class="form-control"
+                            placeholder="Masukkan Kode Membership" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="buktiPembayaran">Upload Bukti Pembayaran</label>
+                        <input type="file" id="buktiPembayaran" name="buktiPembayaran" class="form-control"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas Membership</label>
+                        <div class="membership-options">
+                            <label>
+                                <input type="radio" name="kelas_membership" value="standard" required>
+                                <span>Standard - Rp 100.000/3 bulan</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="kelas_membership" value="gold" required>
+                                <span>Gold - Rp 250.000/6 bulan</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="kelas_membership" value="premium" required>
+                                <span>Premium - Rp 500.000/12 bulan</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalPembayaran">Total Pembayaran</label>
+                        <input type="number" id="totalPembayaran" name="totalPembayaran" class="form-control"
+                            placeholder="Masukkan Total Pembayaran" required>
+                    </div>
+                    <button type="submit" class="cta-button">Perpanjang Membership</button>
+                </form>
+            </div>
+
+
+        </div>
+    </section>
+
     <!-- Contact Section -->
     <section id="contact" class="contact-section">
         <div class="container">
@@ -420,6 +578,229 @@
     <script src="{{ asset('/LandingPage/js/map.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/scroll-to-top.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/aos.js') }}"></script>
+    <script>
+        document.getElementById('membershipButton').addEventListener('click', function() {
+            var membershipForm = document.getElementById('membershipForm');
+            var extendMembershipForm = document.getElementById('extendMembershipForm');
+            var button = document.getElementById('membershipButton');
+
+            // Sembunyikan form perpanjangan jika terbuka
+            if (extendMembershipForm.style.display === "block") {
+                extendMembershipForm.style.display = "none"; // Sembunyikan form perpanjangan
+                document.getElementById('extendButton').textContent =
+                "Perpanjang Membership Sekarang"; // Reset teks tombol perpanjangan
+            }
+
+            // Tampilkan atau sembunyikan form pendaftaran
+            if (membershipForm.style.display === "none" || membershipForm.style.display === "") {
+                membershipForm.style.display = "block"; // Tampilkan form pendaftaran
+                button.textContent = "Tutup Form Membership"; // Ubah teks tombol
+            } else {
+                membershipForm.style.display = "none"; // Sembunyikan form pendaftaran
+                button.textContent = "Daftar Membership Sekarang"; // Ubah teks tombol kembali
+            }
+        });
+
+        document.getElementById('extendButton').addEventListener('click', function() {
+            var membershipForm = document.getElementById('membershipForm');
+            var extendMembershipForm = document.getElementById('extendMembershipForm');
+            var button = document.getElementById('extendButton');
+
+            // Sembunyikan form pendaftaran jika terbuka
+            if (membershipForm.style.display === "block") {
+                membershipForm.style.display = "none"; // Sembunyikan form pendaftaran
+                document.getElementById('membershipButton').textContent =
+                "Daftar Membership Sekarang"; // Reset teks tombol pendaftaran
+            }
+
+            // Tampilkan atau sembunyikan form perpanjangan
+            if (extendMembershipForm.style.display === "none" || extendMembershipForm.style.display === "") {
+                extendMembershipForm.style.display = "block"; // Tampilkan form perpanjangan
+                button.textContent = "Tutup Form Perpanjangan"; // Ubah teks tombol
+            } else {
+                extendMembershipForm.style.display = "none"; // Sembunyikan form perpanjangan
+                button.textContent = "Perpanjang Membership Sekarang"; // Ubah teks tombol kembali
+            }
+        });
+    </script>
+
+    <script>
+        // Handle form submission via Ajax dengan konfirmasi dan validasi
+        document.getElementById('membershipFormSubmit').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah submit form default
+
+            // Ambil data form
+            let formData = new FormData(this);
+            let totalPembayaran = parseFloat(formData.get(
+                'totalPembayaran')); // Ambil dan ubah totalPembayaran menjadi angka
+            let kelasMembership = formData.get('kelas_membership'); // Ambil kelas membership yang dipilih
+
+            // Validasi form: Pastikan semua field diisi
+            if (!formData.get('nama_membership') || !formData.get('email_membership') || !formData.get(
+                    'phone_membership') ||
+                !formData.get('alamat_membership') || !kelasMembership || !formData.get('buktiPembayaran') ||
+                !formData.get('totalPembayaran')) {
+
+                // Jika ada field yang kosong, tampilkan SweetAlert error
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Semua field harus diisi!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return; // Stop jika ada field kosong
+            }
+
+            // Validasi total pembayaran berdasarkan kelas membership yang dipilih
+            let hargaYangDiharapkan = 0;
+
+            if (kelasMembership === 'standard') {
+                hargaYangDiharapkan = 100000; // Harga untuk Standard
+            } else if (kelasMembership === 'gold') {
+                hargaYangDiharapkan = 250000; // Harga untuk Gold
+            } else if (kelasMembership === 'premium') {
+                hargaYangDiharapkan = 500000; // Harga untuk Premium
+            }
+
+            // Cek apakah total pembayaran sesuai dengan kelas membership yang dipilih
+            if (totalPembayaran !== hargaYangDiharapkan) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: `Total pembayaran harus sesuai dengan kelas yang dipilih. Untuk ${kelasMembership}, totalnya harus Rp ${hargaYangDiharapkan}.`,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return; // Stop jika total pembayaran tidak sesuai
+            }
+
+            // Tampilkan SweetAlert untuk konfirmasi
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda akan mendaftarkan membership dengan data ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, daftar sekarang!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika user mengonfirmasi, kirim form menggunakan fetch
+                    fetch("{{ route('membership.register') }}", {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                // Tampilkan SweetAlert sukses
+                                Swal.fire({
+                                    title: 'Sukses!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+                                document.getElementById('membershipFormSubmit').reset();
+                            } else {
+                                // Tampilkan SweetAlert error jika ada masalah dari server
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                                document.getElementById('membershipFormSubmit').reset();
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan saat mengirimkan form.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                            document.getElementById('membershipFormSubmit').reset();
+                        });
+                }
+            });
+        });
+    </script>
+
+
+    <script>
+        document.getElementById('extendMembershipFormSubmit').addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah submit form default
+
+            // Ambil data form
+            let formData = new FormData(this);
+            let kodeMembership = formData.get('kode'); // Ambil kode membership
+            let kelasMembership = formData.get('kelas_membership'); // Ambil kelas membership yang dipilih
+
+            // Validasi form: Pastikan semua field diisi
+            if (!kodeMembership || !formData.get('buktiPembayaran') || !kelasMembership) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Semua field harus diisi!',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return; // Stop jika ada field kosong
+            }
+
+            // Tampilkan SweetAlert untuk konfirmasi
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda akan memperpanjang membership dengan kode ini.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, perpanjang sekarang!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika user mengonfirmasi, kirim form menggunakan fetch
+                    fetch("{{ route('memberships.extend') }}", {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Sukses!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+                                document.getElementById('extendMembershipFormSubmit')
+                                    .reset(); // Reset form setelah sukses
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan saat mengirimkan form.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                }
+            });
+        });
+    </script>
+
     {{-- <script>
         AOS.init({
             duration: 800, // Animation duration

@@ -6,18 +6,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class tracking_status extends Model
+class MembersTrack extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'uuid',
-        'transaksi_id',
-        'status_id',
-        'description',
-        'tanggal_status',
-        'jam_status'
+        'membership_id',
+        'buktiPembayaran',
+        'totalPembayaran',
+        'tanggalPembayaran',
+        'jamPembayaran',
+        'start_membership',
+        'end_membership',
+        'status',
+        'kelas_membership',
+        'discount'
     ];
+
+    public function member()
+    {
+        return $this->belongsTo(Members::class, 'membership_id');
+    }
 
     protected static function boot()
     {
@@ -26,16 +36,5 @@ class tracking_status extends Model
         static::creating(function ($model) {
             $model->uuid = Str::uuid();
         });
-    }
-
-    public function transaksi()
-    {
-        return $this->belongsTo(transaksi::class);
-    }
-
-    // Relasi ke status (Many-to-One)
-    public function status()
-    {
-        return $this->belongsTo(status::class);
     }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CategoryBlogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PlusServiceController;
 use App\Http\Controllers\PromosiController;
 use App\Http\Controllers\TrackController;
@@ -25,6 +26,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::get('/', [LandingPageController::class, 'landingPage'])->name('landingPage');
+Route::post('/register-memberships', [MembershipController::class, 'register'])->name('membership.register');
+Route::post('/memberships/extend', [MembershipController::class, 'extend'])->name('memberships.extend');
 Route::get('/list-blog', [LandingPageController::class, 'index'])->name('blog-landingPage');
 Route::get('/list-blog/{slug}', [LandingPageController::class, 'showBlog'])->name('listBlog-detail');
 // Route::get('/list-blog', function () {
@@ -54,6 +57,17 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/promosi/update/{uuid}', [PromosiController::class, 'update'])->name('promosi.update');
         Route::delete('/promosi/delete/{uuid}', [PromosiController::class, 'destroy'])->name('promosi.destroy');
         Route::post('/promosi/list', [PromosiController::class, 'list'])->name('promosi.list');
+    });
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/memberships', [MembershipController::class, 'index'])->name('memberships.index');
+        Route::get('/memberships/create', [MembershipController::class, 'create'])->name('memberships.create');
+        Route::post('/memberships/store', [MembershipController::class, 'store'])->name('memberships.store');
+        Route::get('/memberships/show/{uuid}', [MembershipController::class, 'show'])->name('memberships.show');
+        Route::get('/memberships/edit/{uuid}', [MembershipController::class, 'edit'])->name('memberships.edit');
+        Route::put('/memberships/update/{uuid}', [MembershipController::class, 'update'])->name('memberships.update');
+        Route::delete('/memberships/delete/{uuid}', [MembershipController::class, 'destroy'])->name('memberships.destroy');
+        Route::post('/memberships/verify/{uuid}', [MembershipController::class, 'verify'])->name('memberships.verify');
+        Route::post('/memberships/list', [MembershipController::class, 'list'])->name('memberships.list');
     });
     Route::prefix('dashboard')->group(function () {
         Route::get('/kategori-blog', [CategoryBlogController::class, 'index'])->name('kategori-blog.index');

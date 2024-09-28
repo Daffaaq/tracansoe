@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('status')->comment('downpayment, paid');
             $table->foreignId('promosi_id')->nullable()->constrained('promosis')->onDelete('set null');
             $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('membership_id')->nullable()->constrained('members')->onDelete('set null');
             $table->double('total_harga');
             $table->double('downpayment_amount')->nullable(); // Jumlah DP
             $table->double('remaining_payment')->nullable(); // Sisa pembayaran

@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('promotion:update-status')->daily();
+        $schedule->command('membership:update-status')->daily();
     }
 
 

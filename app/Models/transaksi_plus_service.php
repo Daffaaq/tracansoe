@@ -10,7 +10,11 @@ class transaksi_plus_service extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'transaksi_id', 'plus_service_id'];
+    protected $fillable = [
+        'uuid',
+        'transaksi_id',
+        'plus_service_id'
+    ];
 
     protected static function boot()
     {

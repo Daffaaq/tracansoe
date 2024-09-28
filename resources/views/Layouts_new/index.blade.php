@@ -100,6 +100,13 @@
                                 <span>Promosi</span>
                             </a>
                         </li>
+                        <li
+                            class="sidebar-item {{ request()->routeIs('memberships.index', 'memberships.create', 'memberships.edit', 'memberships.show') ? 'active' : '' }}">
+                            <a href="{{ route('memberships.index') }}" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Memberships</span>
+                            </a>
+                        </li>
                         <li class="sidebar-item has-sub {{ Request::routeIs('kategori-blog.index') ? 'active' : '' }}">
                             <a href="#" class="sidebar-link">
                                 <i class="bi bi-stack"></i>

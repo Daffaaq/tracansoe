@@ -9,7 +9,12 @@ use Illuminate\Support\Str;
 class transaksi_category_harga extends Model
 {
     use HasFactory;
-    protected $fillable = ['uuid', 'qty', 'transaksi_id', 'category_harga_id'];
+    protected $fillable = [
+        'uuid',
+        'qty',
+        'transaksi_id',
+        'category_harga_id'
+    ];
 
     protected static function boot()
     {
