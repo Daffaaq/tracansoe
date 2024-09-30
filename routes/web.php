@@ -131,6 +131,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/transaksi/{id}/pelunasan', [TransaksiController::class, 'pelunasan'])->name('transaksi.pelunasan');
         Route::post('/transaksi/{id}/update-pickup', [TransaksiController::class, 'updateStatusPickup'])->name('transaksi.updatePickup');
         Route::get('/validate-promosi', [TransaksiController::class, 'validatePromosi']);
+        Route::get('/validate-membership', [TransaksiController::class, 'validateMembership']);
         Route::post('/transaksi/list', [TransaksiController::class, 'list'])->name('transaksi.list');
     });
 });

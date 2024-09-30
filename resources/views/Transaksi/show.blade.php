@@ -319,6 +319,13 @@
                         $diskon = 0;
                         $totalSetelahDiskon = $totalKeseluruhan;
                     }
+
+                    if ($memberDiscount > 0) {
+                        // dd($totalSetelahDiskon, $memberDiscount);
+                        $totalDiskonMember = $totalSetelahDiskon * $memberDiscount;
+                        $totalSetelahDiskonMember = $totalSetelahDiskon - $totalDiskonMember;
+                        // dd($totalSetelahDiskonMember);
+                    }
                 @endphp
 
                 <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
@@ -329,13 +336,25 @@
 
                 @if ($diskon > 0)
                     <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
-                        Diskon ({{ $transaksi->promosi->discount * 100 }}%)
+                        Diskon Promo ({{ $transaksi->promosi->discount * 100 }}%)
                         <span>- Rp{{ number_format($diskon, 0, ',', '.') }}</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
                         style="background-color: gold; color: black;">
-                        Total Setelah Diskon
+                        Total Setelah Diskon Promo
                         <span style="color: black;">Rp{{ number_format($totalSetelahDiskon, 0, ',', '.') }}</span>
+                    </li>
+                @endif
+
+                @if ($memberDiscount > 0)
+                    <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
+                        Diskon Member ({{ $memberDiscount * 100 }}%)
+                        <span>- Rp{{ number_format($totalDiskonMember, 0, ',', '.') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"
+                        style="background-color: gold; color: black;">
+                        Total Setelah Diskon Member
+                        <span style="color: black;">Rp{{ number_format($totalSetelahDiskonMember, 0, ',', '.') }}</span>
                     </li>
                 @endif
 

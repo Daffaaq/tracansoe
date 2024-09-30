@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\category;
 use App\Models\category_harga;
+use App\Models\Members;
+use App\Models\MembersTrack;
 use App\Models\plus_service;
 use App\Models\promosi;
 use App\Models\status;
@@ -13,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 class TransaksiController extends Controller
@@ -76,6 +79,82 @@ class TransaksiController extends Controller
             ]);
         }
     }
+
+    public function validateMembership(Request $request)
+    {
+        DB::beginTransaction();
+        $validatedData = $request->validate([
+            'kode' => 'required|exists:members,kode',
+        ]);
+
+        $membership = Members::where('kode', $validatedData['kode'])->first();
+        if (!$membership) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode membership tidak valid.'
+            ]);
+        }
+
+        $membersTrack = MembersTrack::where('membership_id', $membership->id)
+            ->orderBy('created_at', 'desc')->first();
+        // dd($membersTrack);
+
+        if (!$membersTrack) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada track untuk anggota ini.'
+            ]);
+        }
+
+        $statusLast = $membersTrack->status;
+        if ($statusLast == 'active') {
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'nama_membership' => $membership->nama_membership,
+                'email_membership' => $membership->email_membership,
+                'phone_membership' => $membership->phone_membership,
+                'alamat_membership' => $membership->alamat_membership,
+                'discount' => $membersTrack->discount, // Diskon dari membership track
+                'kelas_membership' => $membersTrack->kelas_membership,
+                'membership_status' => $membersTrack->status
+            ]);
+        }
+        if ($statusLast == 'waiting') {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Status anda masih Waiting, tidak bisa melakukan Transaksi menggunakan member.'
+            ], 400);
+        } elseif ($statusLast == 'expired') {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Status anda sudah expired, tidak bisa melakukan Transaksi Menggunakan Member.'
+            ], 400);
+        } else {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Kode membership tidak valid.'
+            ], 400);
+        }
+    }
+
+    // public function setPromosi(Request $request)
+    // {
+    //     session(['promosi' => $request->all()]);
+    //     return response()->json(['success' => true]);
+    // }
+
+    // public function setMembership(Request $request)
+    // {
+    //     session(['membership' => $request->all()]);
+    //     return response()->json(['success' => true]);
+    // }
+
 
     public function pelunasan(Request $request, $id)
     {
@@ -200,6 +279,31 @@ class TransaksiController extends Controller
                 }
             }
 
+
+            if ($request->membership_kode) {
+                $member = Members::where('kode', $request->membership_kode)->first();
+                // dd($member);
+                if (!$member) {
+                    return redirect()->route('transaksi.create')->with('error', 'Kode membership tidak valid.');
+                }
+                $membersTrack = MembersTrack::where('membership_id', $member->id)
+                    ->orderBy('created_at', 'desc')->first();
+                // dd($membersTrack);
+                if (!$membersTrack) {
+                    return redirect()->route('transaksi.create')->with('error', 'Tidak ada track untuk anggota ini.');
+                }
+                // dd($membersTrack->status);
+                if ($membersTrack->status === 'active') {
+                    $totalHarga -= ($totalHarga * ($membersTrack->discount));
+                    // dd($totalHarga);
+                } elseif ($membersTrack->status === 'expired') {
+                    return redirect()->route('transaksi.create')->with('error', 'Kode membership sudah expired.');
+                } elseif ($membersTrack->status === 'waiting') {
+                    return redirect()->route('transaksi.create')->with('error', 'Kode membership belum aktif.');
+                } else {
+                    return redirect()->route('transaksi.create')->with('error', 'Kode membership tidak valid.');
+                }
+            }
             $minimalDownpaymentPercentage = 0.40;
             $minimalDownpayment = $totalHarga * $minimalDownpaymentPercentage;
             $downpaymentAmount = round($request->downpayment_amount, 0); // Hapus desimal
@@ -235,6 +339,7 @@ class TransaksiController extends Controller
                 'status_downpayment' => $statusDownpayment ?? null,
                 'pelunasan_amount' => $pelunasanAmount ?? 0,
                 'status_pickup' => 'not_picked_up',
+                'membership_id' => $member->id ?? null,
                 'tracking_number' => $this->generateTrackingNumber(),
                 'tanggal_transaksi' => Carbon::now()->toDateString(), // Tanggal saat ini
                 'jam_transaksi' => Carbon::now()->toTimeString(), // Jam saat ini
@@ -270,6 +375,7 @@ class TransaksiController extends Controller
                 'jam_status' => Carbon::now()->toTimeString()
             ]);
 
+            // dd($transaksi);
             DB::commit(); // Commit transaksi jika semuanya sukses
 
             return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
@@ -506,20 +612,31 @@ class TransaksiController extends Controller
     public function show($uuid)
     {
         try {
-            // Cari transaksi berdasarkan UUID, sertakan relasi promosi
-            $transaksi = Transaksi::with(['categoryHargas', 'plusServices', 'trackingStatuses.status', 'promosi'])
+            // Cari transaksi berdasarkan UUID, sertakan relasi promosi dan member
+            $transaksi = Transaksi::with(['categoryHargas', 'plusServices', 'trackingStatuses.status', 'promosi', 'member.tracks'])
                 ->where('uuid', $uuid)
                 ->firstOrFail();
             // Ambil semua kategori dari database
             $categories = Category::all();
 
-            // Kirim data transaksi dan kategori ke view
-            return view('transaksi.show', compact('transaksi', 'categories'));
+            // Logika Diskon dari MembersTrack
+            if ($transaksi->member) {
+                // Jika ada member, ambil track terbaru dan diskon
+                $memberTrack = $transaksi->member->tracks->first(); // Asumsi mengambil track terbaru
+                $memberDiscount = $memberTrack ? $memberTrack->discount : 0;
+            } else {
+                // Jika tidak ada member, diskon 0
+                $memberDiscount = 0;
+            }
+
+            // Kirim data transaksi, kategori, dan diskon ke view
+            return view('transaksi.show', compact('transaksi', 'categories', 'memberDiscount'));
         } catch (\Exception $e) {
             // Jika terjadi kesalahan, arahkan kembali dengan pesan error
             return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
         }
     }
+
 
     /**
      * Show the form for editing the specified resource.
