@@ -45,8 +45,8 @@ class TransaksiController extends Controller
      */
     public function create()
     {
-        $categories = category::all();
-        $plus_services = plus_service::all();
+        $categories = category::where('status_kategori', 'active')->get();
+        $plus_services = plus_service::where('status_plus_service', 'active')->get();
         return view('transaksi.create', compact('categories', 'plus_services'));
     }
 
@@ -271,7 +271,7 @@ class TransaksiController extends Controller
                 // Cek status promosi
                 if ($promosi->status === 'upcoming') {
                     return redirect()->route('transaksi.index')->with('error', 'Kode belum bisa digunakan untuk tanggal sekarang.');
-                } elseif ($promosi->status === 'expired' || now()->greaterThan($promosi->end_date)) {
+                } elseif ($promosi->status === 'expired') {
                     return redirect()->route('transaksi.index')->with('error', 'Kode promosi sudah expired.');
                 } elseif ($promosi->isActive()) {
                     // Terapkan diskon jika promosi aktif
@@ -587,11 +587,21 @@ class TransaksiController extends Controller
         // Ambil semua kategori dari database untuk diakses sebagai kategori induk dan sub-kategori
         $categories = Category::all();
 
+        // Logika Diskon dari MembersTrack
+        if ($transaksi->member) {
+            // Jika ada member, ambil track terbaru dan diskon
+            $memberTrack = $transaksi->member->tracks->first(); // Asumsi mengambil track terbaru
+            $memberDiscount = $memberTrack ? $memberTrack->discount : 0;
+        } else {
+            // Jika tidak ada member, diskon 0
+            $memberDiscount = 0;
+        }
+
         // Sanitize the tracking number to remove invalid characters
         $safeTrackingNumber = preg_replace('/[\/\\\]/', '_', $transaksi->tracking_number);
 
         // Load view untuk PDF, dan kirimkan data transaksi serta kategori ke view
-        $pdf = PDF::loadView('transaksi.cetak_pdf', compact('transaksi', 'categories'));
+        $pdf = PDF::loadView('transaksi.cetak_pdf', compact('transaksi', 'categories', 'memberDiscount'));
 
         // Set orientasi landscape dan ukuran kertas jika perlu
         return $pdf->setPaper('b4', 'portrait')->stream('transaksi_' . $safeTrackingNumber . '.pdf');

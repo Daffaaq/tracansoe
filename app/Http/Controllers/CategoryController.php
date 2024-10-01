@@ -214,4 +214,53 @@ class CategoryController extends Controller
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil dihapus.');
     }
+
+    public function activateCategory($uuid)
+    {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk mengaktifkan kategori.');
+        }
+
+        // Cari kategori berdasarkan UUID
+        $category = category::where('uuid', $uuid)->firstOrFail();
+
+        // Jika ini adalah kategori utama (parent_id null), aktifkan semua subkategori juga
+        if ($category->parent_id === null) {
+            // Aktifkan kategori utama
+            $category->update(['status_kategori' => 'active']);
+
+            // Aktifkan semua subkategori yang terkait dengan kategori utama ini
+            category::where('parent_id', $category->id)->update(['status_kategori' => 'active']);
+        } else {
+            // Jika ini adalah subkategori, hanya aktifkan subkategori ini saja
+            $category->update(['status_kategori' => 'active']);
+        }
+
+        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil diaktifkan.');
+    }
+
+    public function deactivateCategory($uuid)
+    {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menonaktifkan kategori.');
+        }
+
+        // Cari kategori berdasarkan UUID
+        $category = category::where('uuid', $uuid)->firstOrFail();
+
+        // Jika ini adalah kategori utama (parent_id null), nonaktifkan semua subkategori juga
+        if ($category->parent_id === null) {
+            // Nonaktifkan kategori utama
+            $category->update(['status_kategori' => 'nonactive']);
+
+            // Nonaktifkan semua subkategori yang terkait dengan kategori utama ini
+            category::where('parent_id', $category->id)->update(['status_kategori' => 'nonactive']);
+        } else {
+            // Jika ini adalah subkategori, hanya nonaktifkan subkategori ini saja
+            $category->update(['status_kategori' => 'nonactive']);
+        }
+
+        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil dinonaktifkan.');
+    }
+
 }

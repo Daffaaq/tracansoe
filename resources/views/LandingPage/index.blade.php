@@ -123,7 +123,7 @@
     <section id="services" class="services-section">
         <div class="container">
             <h2>Layanan Kami</h2>
-
+            <p class="description-first">Kami menawarkan layanan perawatan dan pembersihan sepatu terbaik untuk menjaga penampilan dan kualitas sepatu Anda. Setiap layanan dirancang untuk memenuhi kebutuhan spesifik Anda dan memastikan kepuasan maksimal.</p>
             @foreach ($categories as $category)
                 <!-- Kategori Induk -->
                 <div class="service-category">
@@ -142,6 +142,25 @@
             @endforeach
         </div>
     </section>
+
+    <!-- Plus Service Section -->
+    <section id="plus-services" class="plus-services-section">
+        <div class="container">
+            <h2>Plus Layanan</h2>
+
+            <p>Kami menyediakan berbagai layanan tambahan untuk memastikan sepatu Anda mendapatkan perawatan yang maksimal. Pilih dari layanan-layanan di bawah ini untuk menambah kenyamanan dan kepuasan Anda dalam menggunakan jasa kami.</p>
+            <div class="plus-service-container">
+                @foreach ($plusService as $service)
+                    <div class="plus-service-item">
+                        <strong>{{ $service->name }}</strong>
+                        <span class="price">Rp {{ number_format($service->price, 0, ',', '.') }}</span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+
 
     <!-- Blog Section -->
     <section id="blog" class="blog-section">
@@ -588,7 +607,7 @@
             if (extendMembershipForm.style.display === "block") {
                 extendMembershipForm.style.display = "none"; // Sembunyikan form perpanjangan
                 document.getElementById('extendButton').textContent =
-                "Perpanjang Membership Sekarang"; // Reset teks tombol perpanjangan
+                    "Perpanjang Membership Sekarang"; // Reset teks tombol perpanjangan
             }
 
             // Tampilkan atau sembunyikan form pendaftaran
@@ -610,7 +629,7 @@
             if (membershipForm.style.display === "block") {
                 membershipForm.style.display = "none"; // Sembunyikan form pendaftaran
                 document.getElementById('membershipButton').textContent =
-                "Daftar Membership Sekarang"; // Reset teks tombol pendaftaran
+                    "Daftar Membership Sekarang"; // Reset teks tombol pendaftaran
             }
 
             // Tampilkan atau sembunyikan form perpanjangan

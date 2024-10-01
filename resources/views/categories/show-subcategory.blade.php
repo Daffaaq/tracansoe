@@ -58,6 +58,7 @@
                                     <th>Deskripsi</th>
                                     <th>Harga</th>
                                     <th>Estimasi (Hari)</th>
+                                    <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -68,7 +69,19 @@
                                         <td>{{ $subKriteria->description }}</td>
                                         <td>Rp{{ number_format($subKriteria->price, 0, ',', '.') }}</td>
                                         <td>{{ $subKriteria->estimation }}</td>
+                                        <td>{{ $subKriteria->status_kategori }}</td>
                                         <td>
+                                            @if ($subKriteria->status_kategori === 'active')
+                                                <a href="{{ route('kategori.deactivate', $subKriteria->uuid) }}"
+                                                    class="btn btn-warning btn-sm" title="Nonaktifkan">
+                                                    <i class="fas fa-lock"></i> <!-- Icon for deactivating (lock) -->
+                                                </a>
+                                            @else
+                                                <a href="{{ route('kategori.activate', $subKriteria->uuid) }}"
+                                                    class="btn btn-success btn-sm" title="Aktifkan">
+                                                    <i class="fas fa-unlock"></i> <!-- Icon for activating (unlock) -->
+                                                </a>
+                                            @endif
                                             <button class="btn icon btn-sm btn-danger delete-button"
                                                 data-uuid="{{ $subKriteria->uuid }}"
                                                 data-row-id="row-{{ $subKriteria->uuid }}">

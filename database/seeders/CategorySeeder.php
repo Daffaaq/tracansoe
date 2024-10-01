@@ -18,10 +18,11 @@ class CategorySeeder extends Seeder
         $fastCleaningId = DB::table('categories')->insertGetId([
             'uuid' => Str::uuid(),
             'nama_kategori' => 'Fast Cleaning',
-            'price' => null, // Kategori induk tidak perlu harga
+            'price' => null,
             'description' => 'Kategori untuk layanan pembersihan cepat',
             'estimation' => null,
-            'parent_id' => null, // Ini kategori induk
+            'parent_id' => null,
+            'status_kategori' => 'active', // Status active
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -33,6 +34,7 @@ class CategorySeeder extends Seeder
             'description' => 'Kategori untuk layanan pembersihan mendalam',
             'estimation' => null,
             'parent_id' => null,
+            'status_kategori' => 'active', // Status active
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -44,6 +46,7 @@ class CategorySeeder extends Seeder
             'description' => 'Kategori untuk layanan restorasi warna sepatu',
             'estimation' => null,
             'parent_id' => null,
+            'status_kategori' => 'active', // Status active
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -56,7 +59,8 @@ class CategorySeeder extends Seeder
                 'price' => 30000,
                 'description' => 'Pencucian instant pada bagian Upper dan Midsole',
                 'estimation' => 1,
-                'parent_id' => $fastCleaningId, // Mengacu ke kategori Fast Cleaning
+                'parent_id' => $fastCleaningId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -66,7 +70,8 @@ class CategorySeeder extends Seeder
                 'price' => 50000,
                 'description' => 'Pencucian instant pada bagian Upper, Midsole, dan Outsole',
                 'estimation' => 1,
-                'parent_id' => $fastCleaningId, // Mengacu ke kategori Fast Cleaning
+                'parent_id' => $fastCleaningId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -77,30 +82,33 @@ class CategorySeeder extends Seeder
             [
                 'uuid' => Str::uuid(),
                 'nama_kategori' => 'Deep Cleaning Mid',
-                'description' => 'Perawatan pembersihan secara detail dan menyeluruh pada tingkat menengah dengan fokus pada area yang sering terlewat.',
+                'description' => 'Perawatan pembersihan secara detail dan menyeluruh pada tingkat menengah.',
                 'price' => 60000,
                 'estimation' => 3,
-                'parent_id' => $deepCleaningId, // Mengacu ke kategori Deep Cleaning
+                'parent_id' => $deepCleaningId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'uuid' => Str::uuid(),
                 'nama_kategori' => 'Deep Cleaning Reguler',
-                'description' => 'Perawatan pembersihan secara detail dan menyeluruh dengan fokus pada area standar yang membutuhkan perhatian rutin.',
+                'description' => 'Perawatan pembersihan secara detail dan menyeluruh.',
                 'price' => 80000,
                 'estimation' => 3,
-                'parent_id' => $deepCleaningId, // Mengacu ke kategori Deep Cleaning
+                'parent_id' => $deepCleaningId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'uuid' => Str::uuid(),
                 'nama_kategori' => 'Deep Cleaning Hard',
-                'description' => 'Perawatan pembersihan secara mendalam dengan fokus pada area sulit yang membutuhkan tenaga ekstra dan alat khusus.',
+                'description' => 'Perawatan pembersihan secara mendalam.',
                 'price' => 160000,
                 'estimation' => 4,
-                'parent_id' => $deepCleaningId, // Mengacu ke kategori Deep Cleaning
+                'parent_id' => $deepCleaningId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -111,34 +119,38 @@ class CategorySeeder extends Seeder
             [
                 'uuid' => Str::uuid(),
                 'nama_kategori' => 'Repaint Soft',
-                'description' => 'Perawatan restorasi warna ringan dengan fokus pada area kecil atau bagian yang memudar secara minimal, menggunakan cat khusus untuk mengembalikan warna asli sepatu.',
+                'description' => 'Perawatan restorasi warna ringan.',
                 'price' => 200000,
                 'estimation' => 5,
-                'parent_id' => $repaintId, // Mengacu ke kategori Repaint
+                'parent_id' => $repaintId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'uuid' => Str::uuid(),
                 'nama_kategori' => 'Repaint Medium',
-                'description' => 'Perawatan restorasi warna tingkat menengah dengan penanganan pada area yang lebih luas, menggunakan cat khusus untuk mengembalikan warna asli sepatu secara menyeluruh.',
+                'description' => 'Perawatan restorasi warna tingkat menengah.',
                 'price' => 250000,
                 'estimation' => 6,
-                'parent_id' => $repaintId, // Mengacu ke kategori Repaint
+                'parent_id' => $repaintId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
                 'uuid' => Str::uuid(),
                 'nama_kategori' => 'Repaint Hard',
-                'description' => 'Perawatan restorasi warna intensif dengan fokus pada seluruh bagian sepatu atau area yang mengalami kerusakan parah, menggunakan cat khusus untuk mengembalikan warna asli sepatu.',
+                'description' => 'Perawatan restorasi warna intensif.',
                 'price' => 300000,
                 'estimation' => 7,
-                'parent_id' => $repaintId, // Mengacu ke kategori Repaint
+                'parent_id' => $repaintId,
+                'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ]);
+
 
         // DB::table('categories')->insert([
         //     [

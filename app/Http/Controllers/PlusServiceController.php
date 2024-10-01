@@ -21,7 +21,7 @@ class PlusServiceController extends Controller
     public function list(Request $request)
     {
         if ($request->ajax()) {
-            $dataPlusService = plus_service::select("uuid", "name", "price")->get();
+            $dataPlusService = plus_service::select("uuid", "name", "price", "status_plus_service")->get();
             return DataTables::of($dataPlusService)
                 ->addIndexColumn()
                 ->make(true);
@@ -111,13 +111,38 @@ class PlusServiceController extends Controller
     public function destroy(string $uuid)
     {
         if (auth()->user()->role != 'superadmin') {
-            return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk menghapus plus service.');
+            return response()->json(['error' => 'Anda tidak memiliki akses untuk menghapus plus service.'], 403);
         }
+
         $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
 
         // Hapus data plus service
         $plusService->delete();
 
-        return redirect()->route('plus-service.index')->with('success', 'Plus service berhasil dihapus.');
+        return response()->json(['success' => 'Plus service berhasil dihapus.'], 200);
+    }
+
+    public function activate(string $uuid)
+    {
+        if (auth()->user()->role != 'superadmin') {
+            return response()->json(['message' => 'Anda tidak memiliki akses untuk mengaktifkan plus service.'], 403);
+        }
+
+        $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
+        $plusService->update(['status_plus_service' => 'active']);
+
+        return response()->json(['message' => 'Plus service berhasil diaktifkan.'], 200);
+    }
+
+    public function deactivate(string $uuid)
+    {
+        if (auth()->user()->role != 'superadmin') {
+            return response()->json(['message' => 'Anda tidak memiliki akses untuk menonaktifkan plus service.'], 403);
+        }
+
+        $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
+        $plusService->update(['status_plus_service' => 'nonactive']);
+
+        return response()->json(['message' => 'Plus service berhasil dinonaktifkan.'], 200);
     }
 }

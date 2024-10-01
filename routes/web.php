@@ -104,6 +104,8 @@ Route::middleware(['auth'])->group(function () {
         // Route untuk menampilkan form tambah sub-kategori
         Route::get('/kategori/subkategori/{uuid}', [CategoryController::class, 'tambahSubKategori'])->name('kategori.tambahSubKategori');
         Route::get('/kategori/showsub/{uuid}', [CategoryController::class, 'showSubCategory'])->name('kategori.detailSubKategori');
+        Route::get('/kategori/{uuid}/activate', [CategoryController::class, 'activateCategory'])->name('kategori.activate');
+        Route::get('/kategori/{uuid}/deactivate', [CategoryController::class, 'deactivateCategory'])->name('kategori.deactivate');
 
         // Route untuk menyimpan sub-kategori
         Route::post('/kategorisubkategori/{uuid}', [CategoryController::class, 'storeSubCategory'])->name('kategori.storeSubCategory');
@@ -118,6 +120,8 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/plus-service/update/{uuid}', [PlusServiceController::class, 'update'])->name('plus-service.update');
         Route::delete('/plus-service/delete/{uuid}', [PlusServiceController::class, 'destroy'])->name('plus-service.destroy');
         Route::post('/plus-service/list', [PlusServiceController::class, 'list'])->name('plus-service.list');
+        Route::put('/plus-service/{uuid}/activate', [PlusServiceController::class, 'activate'])->name('plus-service.activate');
+        Route::put('/plus-service/{uuid}/deactivate', [PlusServiceController::class, 'deactivate'])->name('plus-service.deactivate');
     });
     Route::prefix('dashboard')->group(function () {
         Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Blog;
 use App\Models\category;
 use App\Models\CategoryBlog;
+use App\Models\plus_service;
 use App\Models\promosi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,14 +34,20 @@ class LandingPageController extends Controller
             ->get();
 
         // Query categories including their subcategories
-        $categories = category::with('subKriteria') // Ambil subkategori
+        $categories = category::with(['subKriteria' => function ($query) {
+            $query->where('status_kategori', 'active'); // Filter subkategori yang aktif
+        }])
             ->whereNull('parent_id') // Hanya ambil kategori induk
+            ->where('status_kategori', 'active') // Hanya ambil kategori induk yang aktif
             ->get();
+
+
+        $plusService = plus_service::where('status_plus_service', 'active')->get();
 
         $blog = Blog::with('category')->where('status_publish', 'published')->latest()->take(6)->get();
         // dd($blog);
 
-        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog'));
+        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService'));
     }
 
     public function index(Request $request)
@@ -85,5 +92,4 @@ class LandingPageController extends Controller
 
         return view('LandingPage.detail-blog', compact('blog'));
     }
-
 }

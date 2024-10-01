@@ -78,6 +78,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
             var dataMaster = $('#periodeTable').DataTable({
@@ -121,6 +122,16 @@
                 <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
                     <i class="bi bi-trash"></i>
                 </button>`;
+                                // Tombol Aktif/Nonaktif
+                                if (row.status_plus_service == 'active') {
+                                    actionButtons += `<button class="btn icon btn-sm btn-secondary" onclick="changeStatus('${data}', 'deactivate')">
+                                    Nonaktifkan
+                                </button>`;
+                                } else {
+                                    actionButtons += `<button class="btn icon btn-sm btn-success" onclick="changeStatus('${data}', 'activate')">
+                                    Aktifkan
+                                </button>`;
+                                }
                             @endif
 
                             return actionButtons;
@@ -144,9 +155,77 @@
             console.log("data masuk");
         });
 
+        function changeStatus(uuid, action) {
+            let url = `/dashboard/plus-service/${uuid}/${action}`;
+            let method = 'PUT';
+
+            $.ajax({
+                url: url,
+                type: method,
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#periodeTable').DataTable().ajax.reload(null,
+                        false); // Reload datatable tanpa refresh halaman
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Terjadi kesalahan, coba lagi.',
+                    });
+                }
+            });
+        }
+
         function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/plus-service/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak dapat mengembalikan data ini setelah dihapus!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/plus-service/delete/${uuid}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $('#periodeTable').DataTable().ajax.reload(null, false);
+
+                            // Menampilkan pesan sukses
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Dihapus!',
+                                text: response.success,
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: 'Terjadi kesalahan, coba lagi.',
+                            });
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection

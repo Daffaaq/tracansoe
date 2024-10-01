@@ -10,7 +10,7 @@ class category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'nama_kategori', 'price', 'description', 'estimation', 'parent_id'];
+    protected $fillable = ['uuid', 'nama_kategori', 'price', 'description', 'estimation', 'parent_id', 'status_kategori'];
 
     protected static function boot()
     {

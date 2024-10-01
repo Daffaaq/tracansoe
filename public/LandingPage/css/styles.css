@@ -410,6 +410,13 @@ body {
     margin-bottom: 40px;
     font-weight: 600;
 }
+.description-first {
+    font-size: 18px;
+    font-family: "Roboto", sans-serif;
+    color: #001f3f; /* Navy blue */
+    margin-bottom: 20px;
+    font-weight: 400;
+}
 
 .service-category {
     margin-bottom: 50px;
@@ -482,6 +489,81 @@ body {
     }
     .subcategory-item .price {
         margin-top: 10px;
+    }
+}
+
+/* Plus Service Section Styling */
+.plus-services-section {
+    padding: 60px 20px;
+    background-color: #eaf2f8; /* Soft blue for differentiation */
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.plus-services-section h2 {
+    font-size: 36px;
+    color: #001f3f; /* Navy blue for consistency */
+    margin-bottom: 40px;
+    font-weight: 600;
+}
+
+.plus-services-section p {
+    font-family: "Roboto", sans-serif;
+    font-size: 18px;
+    color: #555; /* Soft gray for intro text */
+    margin-bottom: 40px;
+}
+
+.plus-service-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.plus-service-item {
+    background-color: #001f3f;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+    width: calc(33.333% - 40px); /* 3 items per row */
+}
+
+.plus-service-item:hover {
+    background-color: #f8f9fa; /* Subtle hover effect */
+}
+
+.plus-service-item strong {
+    display: block;
+    font-size: 20px;
+    color: #e77e23;
+    margin-bottom: 10px;
+}
+
+.plus-service-item .price {
+    font-size: 18px;
+    color: #e77e23; /* Orange color for price */
+    font-weight: bold;
+}
+
+.plus-service-item:hover strong {
+    color: #000000; /* Change to black on hover */
+}
+
+.plus-service-item:hover .price {
+    color: #000000; /* Change to black on hover */
+}
+
+@media (max-width: 768px) {
+    .plus-service-item {
+        width: calc(50% - 20px); /* 2 items per row on smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .plus-service-item {
+        width: 100%; /* 1 item per row on mobile */
     }
 }
 

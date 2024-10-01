@@ -43,7 +43,6 @@
             <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Deskripsi:</div>
                 <div class="col-md-9">
-                    {{-- Jika deskripsi tidak kosong, tampilkan, jika tidak tampilkan pesan default --}}
                     @if (!empty($category->description))
                         {{ $category->description }}
                     @else
@@ -52,9 +51,18 @@
                 </div>
             </div>
 
+            <div class="d-flex justify-content-start">
+                @if ($category->status_kategori === 'active')
+                    <a href="{{ route('kategori.deactivate', $category->uuid) }}"
+                        class="btn btn-warning mr-2">Nonaktifkan</a>
+                @else
+                    <a href="{{ route('kategori.activate', $category->uuid) }}" class="btn btn-success mr-2">Aktifkan</a>
+                @endif
+            </div>
             <div class="d-flex justify-content-end">
                 <a href="{{ route('kategori.index') }}" class="btn btn-secondary mr-2">Kembali</a>
                 <a href="{{ route('kategori.edit', $category->uuid) }}" class="btn btn-primary mr-2">Edit</a>
+
                 <form action="{{ route('kategori.destroy', $category->uuid) }}" method="POST"
                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus Kategori ini?');">
                     @csrf

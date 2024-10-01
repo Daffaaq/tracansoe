@@ -10,7 +10,7 @@ class plus_service extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['uuid', 'name', 'price'];
+    protected $fillable = ['uuid', 'name', 'price', 'status_plus_service'];
 
     protected static function boot()
     {

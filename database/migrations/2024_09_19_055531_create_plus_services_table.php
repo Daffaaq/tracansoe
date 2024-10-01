@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid('uuid')->unique();
             $table->string('name');
             $table->double('price');
+            $table->enum('status_plus_service', ['active', 'nonactive'])->default('active');
             $table->timestamps();
         });
     }

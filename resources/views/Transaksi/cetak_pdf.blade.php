@@ -278,6 +278,13 @@
                     if ($transaksi->promosi) {
                         $diskon = $transaksi->promosi->discount * $totalKeseluruhan;
                     }
+
+                    if ($memberDiscount > 0) {
+                        // dd($totalSetelahDiskon, $memberDiscount);
+                        $totalDiskonMember = $diskon * $memberDiscount;
+                        $totalSetelahDiskonMember = $diskon - $totalDiskonMember;
+                        // dd($totalSetelahDiskonMember);
+                    }
                 @endphp
 
                 @if ($diskon > 0)
@@ -288,6 +295,17 @@
                     <tr>
                         <th>Total Setelah Diskon</th>
                         <td>Rp{{ number_format($totalKeseluruhan - $diskon, 0, ',', '.') }}</td>
+                    </tr>
+                @endif
+
+                @if ($memberDiscount > 0)
+                    <tr>
+                        <th>Diskon</th>
+                        <td>-Rp{{ number_format($totalDiskonMember, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total Setelah Diskon</th>
+                        <td>Rp{{ number_format($totalSetelahDiskonMember, 0, ',', '.') }}</td>
                     </tr>
                 @endif
 
