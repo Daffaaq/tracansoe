@@ -53,6 +53,14 @@
                 <div class="col-md-9">{{ $promosi->discount }}%</div>
             </div>
             <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Minimum Pembayaran:</div>
+                <div class="col-md-9">{{ $promosi->minimum_payment }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 font-weight-bold">Ketentuan:</div>
+                <div class="col-md-9">{{ $promosi->terms_conditions }}</div>
+            </div>
+            <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Deskripsi:</div>
                 <div class="col-md-9">
                     {{-- Jika deskripsi tidak kosong, tampilkan, jika tidak tampilkan pesan default --}}

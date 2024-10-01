@@ -20,6 +20,8 @@ class promosi extends Model
         'discount',
         'image',
         'description',
+        'minimum_payment',
+        'terms_conditions',
     ];
 
     // Jika Anda menggunakan tipe data tanggal, sebaiknya casting ke tipe date

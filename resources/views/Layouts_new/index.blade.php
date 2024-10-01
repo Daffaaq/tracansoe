@@ -143,12 +143,20 @@
                                 <span>Transaksi</span>
                             </a>
                         </li>
+                        <li
+                            class="sidebar-item {{ request()->routeIs('transaksi.index', 'transaksi.create', 'transaksi.edit') ? 'active' : '' }}">
+                            <a href="{{ route('transaksi.index') }}" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Profile</span>
+                            </a>
+                        </li>
                         {{-- @dd(auth()->user()->role) --}}
-                        @if (auth()->user()->role == 'karyawan')
-                            <li class="sidebar-item">
-                                <a href="#" class="sidebar-link">
+                        @if (auth()->user()->role == 'superadmin')
+                            <li
+                                class="sidebar-item {{ request()->routeIs('user.index', 'user.create', 'user.edit') ? 'active' : '' }}">
+                                <a href="{{ route('user.index') }}" class="sidebar-link">
                                     <i class="bi bi-grid-fill"></i>
-                                    <span>Profile</span>
+                                    <span>User</span>
                                 </a>
                             </li>
                         @endif

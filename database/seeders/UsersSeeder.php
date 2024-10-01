@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class UsersSeeder extends Seeder
 {
@@ -15,6 +16,7 @@ class UsersSeeder extends Seeder
     public function run(): void
     {
         DB::table('users')->insert([
+            'uuid' => Str::uuid(),
             'name' => 'Super Admin',
             'email' => 'superadmin@gmail.com',
             'password' => Hash::make('password123'), // Make sure to hash the password
@@ -25,6 +27,7 @@ class UsersSeeder extends Seeder
 
         // Insert a karyawan user
         DB::table('users')->insert([
+            'uuid' => Str::uuid(),
             'name' => 'Ache',
             'email' => 'ache@gmail.com',
             'password' => Hash::make('password123'), // Make sure to hash the password
@@ -33,6 +36,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
         ]);
         DB::table('users')->insert([
+            'uuid' => Str::uuid(),
             'name' => 'Melati',
             'email' => 'melati@gmail.com',
             'password' => Hash::make('password123'), // Make sure to hash the password

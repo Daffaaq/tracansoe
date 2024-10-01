@@ -60,7 +60,8 @@ class TransaksiController extends Controller
             return response()->json([
                 'success' => true,
                 'nama_promosi' => $promosi->nama_promosi,
-                'discount' => $promosi->discount // Discount should be a decimal (e.g., 0.10 for 10%)
+                'discount' => $promosi->discount, // Discount should be a decimal (e.g., 0.10 for 10%)
+                'minimum_payment' => $promosi->minimum_payment
             ]);
         } elseif ($promosi && $promosi->isUpcoming()) {
             return response()->json([
@@ -221,6 +222,7 @@ class TransaksiController extends Controller
                 'alamat_customer' => 'required|string|max:255',
                 'plus_services.*' => 'exists:plus_services,id', // Pastikan ID service valid
                 'promosi_kode' => 'nullable|string|exists:promosis,kode', // Promosi kode opsional
+                'status' => 'required|in:downpayment,paid',
             ],
             [
                 'nama_customer.required' => 'Nama customer wajib diisi.',
@@ -274,6 +276,9 @@ class TransaksiController extends Controller
                 } elseif ($promosi->status === 'expired') {
                     return redirect()->route('transaksi.index')->with('error', 'Kode promosi sudah expired.');
                 } elseif ($promosi->isActive()) {
+                    if ($totalHarga < $promosi->minimum_payment) {
+                        return redirect()->route('transaksi.index')->with('error', 'Total harga tidak memenuhi syarat minimum pembayaran untuk menggunakan kode promosi ini.');
+                    }
                     // Terapkan diskon jika promosi aktif
                     $totalHarga -= ($totalHarga * ($promosi->discount)); // Terapkan diskon
                 }

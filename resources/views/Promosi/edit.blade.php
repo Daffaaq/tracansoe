@@ -101,6 +101,25 @@
                                     </div>
                                 </div>
 
+                                 <div class="col-md-6">
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-lg-3 col-form-label" for="minimum_payment">Minimal Pembayaran</label>
+                                        <div class="col-lg-9">
+                                            <input type="number" id="minimum_payment" class="form-control" name="minimum_payment"
+                                                value="{{ old('minimum_payment',  $promosi->minimum_payment) }}" placeholder="Minimal Pembayaran">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-lg-3 col-form-label" for="terms_conditions">Ketentuan</label>
+                                        <div class="col-lg-9">
+                                            <input type="text" id="terms_conditions" class="form-control" name="terms_conditions"
+                                                value="{{ old('terms_conditions',  $promosi->terms_conditions) }}" placeholder="Ketentuan dan Kondisi">
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group row align-items-center">
                                         <label class="col-lg-3 col-form-label" for="image">Gambar</label>

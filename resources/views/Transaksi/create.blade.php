@@ -368,6 +368,20 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
+                                const totalHarga = parseFloat(totalHargaInput.value.replace(
+                                    /[^0-9.-]+/g, "")) || 0;
+                                console.log(totalHarga);
+                                if (totalHarga < data.minimum_payment) {
+                                    Swal.fire({
+                                        title: 'Tidak Memenuhi Syarat!',
+                                        text: `Total harga harus minimal Rp${data.minimum_payment} untuk menggunakan kode promosi ini.`,
+                                        icon: 'warning',
+                                        confirmButtonText: 'OK'
+                                    });
+
+                                    // Jika syarat tidak terpenuhi, tidak melanjutkan
+                                    return;
+                                }
                                 // Tampilkan SweetAlert jika kode promosi valid
                                 Swal.fire({
                                     title: 'Kode Promosi Valid!',

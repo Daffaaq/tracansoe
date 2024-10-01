@@ -23,6 +23,8 @@ class PromosiSeeder extends Seeder
                 'status' => 'expired',
                 'kode' => 'MERDEKA2024',
                 'discount' => 0.20, // Diskon 20%
+                'minimum_payment' => 75000, // Minimal total pembayaran
+                'terms_conditions' => 'Minimal total pembayaran Rp75.000',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -34,6 +36,8 @@ class PromosiSeeder extends Seeder
                 'status' => 'active',
                 'kode' => 'NATAL2024',
                 'discount' => 0.25, // Diskon 25%
+                'minimum_payment' => 120000, // Minimal total pembayaran
+                'terms_conditions' => 'Minimal total pembayaran Rp120.000',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -45,6 +49,8 @@ class PromosiSeeder extends Seeder
                 'status' => 'upcoming',
                 'kode' => 'NEWYEAR2025',
                 'discount' => 0.30, // Diskon 30%
+                'minimum_payment' => 150000, // Minimal total pembayaran
+                'terms_conditions' => 'Minimal total pembayaran Rp150.000',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -56,6 +62,8 @@ class PromosiSeeder extends Seeder
                 'status' => 'upcoming',
                 'kode' => 'TANIJAYA2024',
                 'discount' => 0.50, // Diskon 50%
+                'minimum_payment' => 75000, // Minimal total pembayaran
+                'terms_conditions' => 'Minimal total pembayaran Rp75.000',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

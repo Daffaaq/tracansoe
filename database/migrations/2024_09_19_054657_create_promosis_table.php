@@ -22,6 +22,8 @@ return new class extends Migration
             $table->double('discount');
             $table->string('image')->nullable();
             $table->longText('description')->nullable();
+            $table->double('minimum_payment')->nullable();
+            $table->longText('terms_conditions')->nullable();
             $table->timestamps();
         });
     }

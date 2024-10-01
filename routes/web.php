@@ -10,6 +10,7 @@ use App\Http\Controllers\PlusServiceController;
 use App\Http\Controllers\PromosiController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,15 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/user', [UserController::class, 'index'])->name('user.index');
+        Route::get('/user/create', [UserController::class, 'create'])->name('user.create');
+        Route::post('/user/store', [UserController::class, 'store'])->name('user.store');
+        Route::get('/user/edit/{uuid}', [UserController::class, 'edit'])->name('user.edit');
+        Route::put('/user/update/{uuid}', [UserController::class, 'update'])->name('user.update');
+        Route::delete('/user/delete/{uuid}', [UserController::class, 'destroy'])->name('user.destroy');
+        Route::post('/user/list', [UserController::class, 'list'])->name('user.list');
+    });
     Route::prefix('dashboard')->group(function () {
         Route::get('/promosi', [PromosiController::class, 'index'])->name('promosi.index');
         Route::get('/promosi/create', [PromosiController::class, 'create'])->name('promosi.create');

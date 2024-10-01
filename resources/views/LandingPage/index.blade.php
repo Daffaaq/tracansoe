@@ -66,8 +66,15 @@
                             <div class="promo-code">{{ $activePromo->kode }}</div>
                         </div>
                     </div>
+
                     <div class="promo-image">
                         <img src="{{ asset($activePromo->image) }}" alt="Promo Diskon">
+                    </div>
+
+                    <!-- Terms and Conditions Section (Initially Hidden) -->
+                    <div class="promo-terms">
+                        <h4>Syarat dan Ketentuan</h4>
+                        <p>{{ $activePromo->terms_conditions }}</p>
                     </div>
                 </div>
             @else
@@ -85,7 +92,7 @@
                         <div class="promo-card-content">
                             <h4>{{ $promo->nama_promosi }}</h4>
                             <p>Diskon: Segera Diumumkan!</p>
-                            <p>Kode: {{ $promo->kode }}</p>
+                            <p>Kode: Segera Diumumkan!</p>
                             <p>Mulai: {{ \Carbon\Carbon::parse($promo->start_date)->format('d M Y') }}</p>
                         </div>
                     </div>
@@ -123,7 +130,9 @@
     <section id="services" class="services-section">
         <div class="container">
             <h2>Layanan Kami</h2>
-            <p class="description-first">Kami menawarkan layanan perawatan dan pembersihan sepatu terbaik untuk menjaga penampilan dan kualitas sepatu Anda. Setiap layanan dirancang untuk memenuhi kebutuhan spesifik Anda dan memastikan kepuasan maksimal.</p>
+            <p class="description-first">Kami menawarkan layanan perawatan dan pembersihan sepatu terbaik untuk menjaga
+                penampilan dan kualitas sepatu Anda. Setiap layanan dirancang untuk memenuhi kebutuhan spesifik Anda dan
+                memastikan kepuasan maksimal.</p>
             @foreach ($categories as $category)
                 <!-- Kategori Induk -->
                 <div class="service-category">
@@ -148,7 +157,9 @@
         <div class="container">
             <h2>Plus Layanan</h2>
 
-            <p>Kami menyediakan berbagai layanan tambahan untuk memastikan sepatu Anda mendapatkan perawatan yang maksimal. Pilih dari layanan-layanan di bawah ini untuk menambah kenyamanan dan kepuasan Anda dalam menggunakan jasa kami.</p>
+            <p>Kami menyediakan berbagai layanan tambahan untuk memastikan sepatu Anda mendapatkan perawatan yang
+                maksimal. Pilih dari layanan-layanan di bawah ini untuk menambah kenyamanan dan kepuasan Anda dalam
+                menggunakan jasa kami.</p>
             <div class="plus-service-container">
                 @foreach ($plusService as $service)
                     <div class="plus-service-item">
@@ -597,6 +608,21 @@
     <script src="{{ asset('/LandingPage/js/map.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/scroll-to-top.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/aos.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('terms-toggle').addEventListener('click', function() {
+                document.querySelector('.promo-content').style.display = 'none';
+                document.querySelector('.promo-image').style.display = 'none';
+                document.getElementById('promo-terms').style.display = 'block';
+            });
+
+            document.getElementById('promo-back').addEventListener('click', function() {
+                document.querySelector('.promo-content').style.display = 'block';
+                document.querySelector('.promo-image').style.display = 'block';
+                document.getElementById('promo-terms').style.display = 'none';
+            });
+        });
+    </script>
     <script>
         document.getElementById('membershipButton').addEventListener('click', function() {
             var membershipForm = document.getElementById('membershipForm');

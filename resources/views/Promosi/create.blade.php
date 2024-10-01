@@ -50,7 +50,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <div class="form-group row align-items-center">
                                         <label class="col-lg-3 col-form-label" for="start_date">Tanggal Mulai</label>
@@ -60,7 +60,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <div class="form-group row align-items-center">
                                         <label class="col-lg-3 col-form-label" for="end_date">Tanggal Berakhir</label>
@@ -86,7 +86,29 @@
                                         <label class="col-lg-3 col-form-label" for="discount">Diskon (%)</label>
                                         <div class="col-lg-9">
                                             <input type="number" id="discount" class="form-control" name="discount"
-                                                value="{{ old('discount') }}" placeholder="Diskon" min="0" max="100" step="0.01">
+                                                value="{{ old('discount') }}" placeholder="Diskon" min="0"
+                                                max="100" step="0.01">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-lg-3 col-form-label" for="minimum_payment">Minimal
+                                            Pembayaran</label>
+                                        <div class="col-lg-9">
+                                            <input type="number" id="minimum_payment" class="form-control"
+                                                name="minimum_payment" value="{{ old('minimum_payment') }}"
+                                                placeholder="Minimal Pembayaran">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row align-items-center">
+                                        <label class="col-lg-3 col-form-label" for="terms_conditions">Ketentuan</label>
+                                        <div class="col-lg-9">
+                                            <input type="text" id="terms_conditions" class="form-control"
+                                                name="terms_conditions" value="{{ old('terms_conditions') }}"
+                                                placeholder="Ketentuan dan Kondisi">
                                         </div>
                                     </div>
                                 </div>
@@ -95,7 +117,8 @@
                                     <div class="form-group row align-items-center">
                                         <label class="col-lg-3 col-form-label" for="image">Gambar</label>
                                         <div class="col-lg-9">
-                                            <input type="file" id="image" class="form-control" name="image" accept="image/*">
+                                            <input type="file" id="image" class="form-control" name="image"
+                                                accept="image/*">
                                         </div>
                                     </div>
                                 </div>
@@ -125,7 +148,8 @@
                             </div>
                             <div class="row mt-3">
                                 <div class="col-12 d-flex justify-content-end">
-                                    <a href="{{ route('promosi.index') }}" class="btn btn-primary rounded-pill me-1 mb-1">
+                                    <a href="{{ route('promosi.index') }}"
+                                        class="btn btn-primary rounded-pill me-1 mb-1">
                                         Batal
                                     </a>
                                     <button type="submit" class="btn btn-success rounded-pill me-1 mb-1">Submit</button>
@@ -137,7 +161,7 @@
                 </div>
             </div>
         </div>
-        
+
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <ul class="mb-0">

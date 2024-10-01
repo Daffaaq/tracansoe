@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Blog;
 use App\Models\CategoryBlog;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
@@ -33,6 +34,10 @@ class BlogController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->role != 'karyawan') {
+            return redirect()->route('blog.index')
+            ->with('error', 'Anda tidak memiliki akses untuk membuat Blog.');
+        }
         $categoryBlog = CategoryBlog::all();
         return view('blogs.create', compact('categoryBlog'));
     }
@@ -42,6 +47,10 @@ class BlogController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->role != 'karyawan') {
+            return redirect()->route('blog.index')
+            ->with('error', 'Anda tidak memiliki akses untuk membuat Blog.');
+        }
         // Validate input
         $request->validate([
             'title' => 'required|max:255',
@@ -147,6 +156,11 @@ class BlogController extends Controller
 
     public function publishBlog(string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('blog.show', $uuid)
+                ->with('error', 'Anda tidak memiliki akses untuk mempublish Blog ini.');
+        }
+
         // Temukan blog berdasarkan UUID
         $blog = Blog::where('uuid', $uuid)->firstOrFail();
 
@@ -173,6 +187,11 @@ class BlogController extends Controller
 
     public function deleteBlog(Request $request, string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('blog.show', $uuid)
+                ->with('error', 'Anda tidak memiliki akses untuk menghapus Blog ini.');
+        }
+
         // Temukan blog berdasarkan UUID
         $blog = Blog::where('uuid', $uuid)->firstOrFail();
 
@@ -193,6 +212,11 @@ class BlogController extends Controller
 
     public function draftBlog(Request $request, string $uuid)
     {
+        if (auth()->user()->role != 'superadmin') {
+            return redirect()->route('blog.show', $uuid)
+                ->with('error', 'Anda tidak memiliki akses untuk draft Blog ini.');
+        }
+
         // Temukan blog berdasarkan UUID
         $blog = Blog::where('uuid', $uuid)->firstOrFail();
 

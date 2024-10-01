@@ -59,6 +59,8 @@ class PromosiController extends Controller
             'kode' => 'required|string',
             'discount' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi gambar
+            'minimum_payment' => 'nullable|numeric',
+            'terms_conditions' => 'nullable|string',
         ]);
 
         // Cek apakah ada promosi lain dengan rentang tanggal yang persis sama
@@ -102,14 +104,20 @@ class PromosiController extends Controller
         $discountInDecimal = $request->discount / 100;
 
         // Tentukan status promosi berdasarkan tanggal mulai dan berakhir
-        $today = now();
-        if ($request->start_date > $today) {
+        $today = now()->toDateString(); // Mengambil tanggal hari ini (tanpa jam)
+
+        // Konversi start_date dan end_date dari string menjadi objek Carbon
+        $startDate = Carbon::parse($request->start_date)->toDateString();
+        $endDate = Carbon::parse($request->end_date)->toDateString();
+
+        if ($startDate > $today) {
             $status = 'upcoming';
-        } elseif ($request->start_date <= $today && $request->end_date >= $today) {
+        } elseif ($startDate <= $today && $endDate >= $today) {
             $status = 'active';
         } else {
             $status = 'expired';
         }
+
         promosi::create([
             'nama_promosi' => $request->nama_promosi,
             'start_date' => $request->start_date,
@@ -119,6 +127,8 @@ class PromosiController extends Controller
             'discount' => $discountInDecimal,
             'image' => $imagePath,
             'description' => $request->description,
+            'minimum_payment' => $request->minimum_payment,
+            'terms_conditions' => $request->terms_conditions,
         ]);
 
         return redirect()->route('promosi.index')->with('success', 'Promosi berhasil ditambahkan.');
@@ -163,6 +173,8 @@ class PromosiController extends Controller
             'kode' => 'required|string',
             'discount' => 'required|numeric',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi gambar
+            'minimum_payment' => 'nullable|numeric',
+            'terms_conditions' => 'nullable|string',
         ]);
 
         DB::beginTransaction(); // Mulai transaksi
@@ -234,14 +246,20 @@ class PromosiController extends Controller
             $discountInDecimal = $request->discount / 100;
 
             // Tentukan status promosi berdasarkan tanggal
-            $today = now();
-            if ($request->start_date > $today) {
+            $today = now()->toDateString(); // Mengambil tanggal hari ini (tanpa jam)
+
+            // Konversi start_date dan end_date dari string menjadi objek Carbon
+            $startDate = Carbon::parse($request->start_date)->toDateString();
+            $endDate = Carbon::parse($request->end_date)->toDateString();
+
+            if ($startDate > $today) {
                 $status = 'upcoming';
-            } elseif ($request->start_date <= $today && $request->end_date >= $today) {
+            } elseif ($startDate <= $today && $endDate >= $today) {
                 $status = 'active';
             } else {
                 $status = 'expired';
             }
+
 
             // Update data promosi
             $promosi->update([
@@ -253,6 +271,8 @@ class PromosiController extends Controller
                 'status' => $status,
                 'image' => $imagePath,
                 'description' => $request->description,
+                'minimum_payment' => $request->minimum_payment,
+                'terms_conditions' => $request->terms_conditions,
             ]);
 
             DB::commit(); // Commit transaksi jika semua berjalan baik

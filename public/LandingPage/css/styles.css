@@ -142,6 +142,7 @@ body {
 .promo-content {
     text-align: left;
     max-width: 50%;
+    transition: opacity 0.3s ease;
 }
 
 .promo-content h3 {
@@ -165,6 +166,32 @@ body {
 
 .promo-image img:hover {
     transform: scale(1.05);
+}
+
+/* Promo Terms (Initially Hidden) */
+.promo-terms {
+    position: absolute;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+    border-radius: 20px;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show the terms on hover */
+.promo-banner:hover .promo-terms {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.promo-banner:hover .promo-content,
+.promo-banner:hover .promo-image {
+    opacity: 0;
 }
 
 /* Promo Code Box Styling */
@@ -196,6 +223,10 @@ body {
 .promo-code:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+#promo-terms {
+    display: none;
 }
 
 .no-active-promo {
