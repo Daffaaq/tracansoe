@@ -4,6 +4,7 @@ use App\Http\Controllers\AdviceController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CategoryBlogController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DoorprizeController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PlusServiceController;
@@ -49,6 +50,9 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/get-hadiah-data', [DoorprizeController::class, 'getHadiahData'])->name('get-hadiah-data');
+    Route::get('/hadiah-data', [DoorprizeController::class, 'getHadiah'])->name('hadiah-data');
+    Route::post('/pick-doorprize-winner', [DoorprizeController::class, 'pickDoorprizeWinner'])->name('pick-doorprize-winner');
     Route::prefix('dashboard')->group(function () {
         Route::get('/user', [UserController::class, 'index'])->name('user.index');
         Route::get('/user/create', [UserController::class, 'create'])->name('user.create');

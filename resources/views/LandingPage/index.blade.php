@@ -19,7 +19,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                <a href="#">CuciSepatu</a>
+                <a href="{{ route('landingPage') }}">CuciSepatu</a>
             </div>
             <button class="hamburger" id="hamburger">
                 <i class="fas fa-bars"></i>
@@ -73,8 +73,8 @@
 
                     <!-- Terms and Conditions Section (Initially Hidden) -->
                     <div class="promo-terms">
-                        <h4>Syarat dan Ketentuan</h4>
-                        <p>{{ $activePromo->terms_conditions }}</p>
+                        <h4>Syarat dan Ketentuan</h4> &nbsp;
+                        <p> {{ $activePromo->terms_conditions }}</p>
                     </div>
                 </div>
             @else

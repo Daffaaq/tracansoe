@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\advice;
+use App\Models\Hadiah;
 use App\Models\transaksi;
 use Illuminate\Http\Request;
 
@@ -53,6 +54,10 @@ class HomeController extends Controller
             'Dengan Kode Promosi' => $jumlahKodePromosiDigunakan,
             'Tanpa Kode Promosi' => $transaksiWithoutPromosi
         ];
-        return view('Dashboard.index', compact('totalTransaksi', 'jumlahKodePromosiDigunakan', 'totalPaid', 'totalOutstanding', 'advice', 'totalPendapatanPerBulan', 'promosiData'));
+
+        $winners = \App\Models\DoorprizeWinner::with(['transaksi', 'hadiah'])->get();
+        $hadiah = Hadiah::select("nama_hadiah", "jumlah")->get();
+        // dd($hadiah);
+        return view('Dashboard.index', compact('totalTransaksi', 'jumlahKodePromosiDigunakan', 'totalPaid', 'totalOutstanding', 'advice', 'totalPendapatanPerBulan', 'promosiData', 'winners', 'hadiah'));
     }
 }
