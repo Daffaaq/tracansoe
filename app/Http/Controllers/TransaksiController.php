@@ -15,6 +15,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Http\Requests\TransaksiRequest;
+use App\Http\Requests\ValidatePromosiRequest;
+use App\Http\Requests\ValidateMembershipRequest;
+use App\Http\Requests\PelunasanRequest;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -50,7 +54,7 @@ class TransaksiController extends Controller
         return view('transaksi.create', compact('categories', 'plus_services'));
     }
 
-    public function validatePromosi(Request $request)
+    public function validatePromosi(ValidatePromosiRequest $request)
     {
         $kode = $request->query('kode');
         $promosi = Promosi::where('kode', $kode)->first();
@@ -81,13 +85,11 @@ class TransaksiController extends Controller
         }
     }
 
-    public function validateMembership(Request $request)
+    public function validateMembership(ValidateMembershipRequest $request)
     {
         DB::beginTransaction();
-        $validatedData = $request->validate([
-            'kode' => 'required|exists:members,kode',
-        ]);
 
+        $validatedData = $request->validated();
         $membership = Members::where('kode', $validatedData['kode'])->first();
         if (!$membership) {
             DB::rollBack();
@@ -157,16 +159,8 @@ class TransaksiController extends Controller
     // }
 
 
-    public function pelunasan(Request $request, $id)
+    public function pelunasan(PelunasanRequest $request, $id)
     {
-        $request->validate([
-            'pelunasan_amount' => 'required|numeric|min:0',
-        ], [
-            'pelunasan_amount.required' => 'Jumlah pelunasan harus diisi.',
-            'pelunasan_amount.numeric' => 'Jumlah pelunasan harus berupa angka.',
-            'pelunasan_amount.min' => 'Jumlah pelunasan tidak boleh kurang dari 0.'
-        ]);
-
         DB::beginTransaction();
 
         try {
@@ -211,30 +205,9 @@ class TransaksiController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TransaksiRequest $request)
     {
         // dd($request->all());
-        $request->validate(
-            [
-                'nama_customer' => 'required|string|max:255',
-                'email_customer' => 'required|email|max:255',
-                'notelp_customer' => 'required|string|max:15',
-                'alamat_customer' => 'required|string|max:255',
-                'plus_services.*' => 'exists:plus_services,id', // Pastikan ID service valid
-                'promosi_kode' => 'nullable|string|exists:promosis,kode', // Promosi kode opsional
-                'status' => 'required|in:downpayment,paid',
-            ],
-            [
-                'nama_customer.required' => 'Nama customer wajib diisi.',
-                'email_customer.required' => 'Email customer wajib diisi.',
-                'email_customer.email' => 'Format email tidak valid.',
-                'notelp_customer.required' => 'Nomor telepon wajib diisi.',
-                'alamat_customer.required' => 'Alamat wajib diisi.',
-                'status.required' => 'Status pembayaran harus dipilih.',
-                'plus_services.*.exists' => 'Layanan tambahan tidak valid.',
-                'promosi_kode.exists' => 'Kode promosi tidak ditemukan.',
-            ]
-        );
         DB::beginTransaction(); // Mulai transaksi database
 
         try {

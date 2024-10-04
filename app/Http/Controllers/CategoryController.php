@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\StoreMainCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\category;
 
 class CategoryController extends Controller
@@ -41,18 +44,12 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreMainCategoryRequest $request)
     {
         // Cek apakah user adalah superadmin
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menyimpan kategori.');
         }
-
-        // Validasi data input
-        $request->validate([
-            'nama_kategori' => 'required|string',
-            'description' => 'required|string',
-        ]);
 
         // Simpan Kategori Induk (parent_id = null)
         category::create([
@@ -76,7 +73,7 @@ class CategoryController extends Controller
         $category = category::where('uuid', $uuid)->firstOrFail();
         return view('categories.create-subcategory', compact('category'));
     }
-    public function storeSubCategory(Request $request, $uuid)
+    public function storeSubCategory(StoreCategoryRequest $request, $uuid)
     {
         // Cek apakah user adalah superadmin
         if (auth()->user()->role != 'superadmin') {
@@ -85,15 +82,6 @@ class CategoryController extends Controller
 
         // Cari kategori induk berdasarkan UUID
         $category = category::where('uuid', $uuid)->firstOrFail();
-
-        // Validasi data input tanpa memerlukan validasi parent_id
-        $request->validate([
-            'nama_kategori' => 'required|string',
-            'price' => 'required|numeric',
-            'description' => 'required|string',
-            'estimation' => 'required|integer',
-            'parent_id' => 'exists:categories,id',
-        ]);
 
         // Simpan Sub-Kategori (parent_id mengacu ke Kategori Induk)
         $subCategory = category::create([
@@ -157,31 +145,19 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $uuid)
+    public function update(UpdateCategoryRequest $request, string $uuid)
     {
-        if (auth()->user()->role != 'superadmin') {
-            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk memperbarui kategori.');
-        }
-
         $category = category::where('uuid', $uuid)->firstOrFail();
 
-        // Update Kategori Induk
         if ($category->parent_id === null) {
-            $request->validate([
-                'nama_kategori' => 'required|string',
-                'description' => 'required|string',
-            ]);
-
             $category->update([
                 'nama_kategori' => $request->nama_kategori,
                 'description' => $request->description,
             ]);
         }
 
-        // Update Sub-Kategori
         if ($request->has('subKriteria')) {
             foreach ($request->subKriteria as $subKategoriData) {
-                // Pastikan bahwa data id ada
                 if (isset($subKategoriData['id'])) {
                     $subKategori = category::findOrFail($subKategoriData['id']);
                     $subKategori->update([
@@ -262,5 +238,4 @@ class CategoryController extends Controller
 
         return redirect()->route('kategori.index')->with('success', 'Kategori berhasil dinonaktifkan.');
     }
-
 }

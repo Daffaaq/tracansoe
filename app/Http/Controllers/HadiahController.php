@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\HadiahRequest;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Hadiah;
 
@@ -39,16 +40,8 @@ class HadiahController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(HadiahRequest $request)
     {
-        $request->validate([
-            'nama_hadiah' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'jumlah' => 'required|integer|min:0',
-            'tanggal_awal' => 'required|date',
-            'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal_awal',
-        ]);
-
         Hadiah::create($request->all());
         return redirect()->route('hadiah.index')->with('success', 'Hadiah berhasil ditambahkan.');
     }
@@ -74,16 +67,8 @@ class HadiahController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $uuid)
+    public function update(HadiahRequest $request, string $uuid)
     {
-        $request->validate([
-            'nama_hadiah' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'jumlah' => 'required|integer|min:0',
-            'tanggal_awal' => 'required|date',
-            'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal_awal',
-        ]);
-
         $hadiah = Hadiah::where('uuid', $uuid)->firstOrFail();
         $hadiah->update($request->all());
         return redirect()->route('hadiah.index')->with('success', 'Hadiah berhasil diupdate.');

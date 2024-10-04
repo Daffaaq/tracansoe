@@ -4,45 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\advice;
 use Illuminate\Http\Request;
+use App\Http\Requests\AdviceRequest;
 use Illuminate\Support\Facades\Validator;
 
 class AdviceController extends Controller
 {
 
-    public function postAdvice(Request $request)
+    public function postAdvice(AdviceRequest $request)
     {
         // Ubah email menjadi lowercase
         $request->merge(['email' => strtolower($request->email)]);
 
         // Periksa apakah request adalah AJAX
         if ($request->ajax()) {
-            // Validasi request
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required|string|max:255',
-                'email' => [
-                    'required',
-                    'email',
-                    'regex:/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/', // regex untuk huruf kecil
-                ],
-                'advice' => 'required|string|min:10|max:5000'
-            ]);
-
-            // Jika validasi gagal
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validasi gagal, Silahkan Cek Lagi Input Data anda',
-                    'errors' => $validator->errors()
-                ], 422);
-            }
-
-            // Jika validasi berhasil, simpan data
+            // Validasi berhasil dilakukan oleh AdviceRequest, sekarang simpan data
             $advice = new advice();
             $advice->nama = $request->nama;
             $advice->email = $request->email;
             $advice->advice = $request->advice;
             $advice->save();
 
-            return response()->json(['message' => 'Terima kasih telah memberikan Saran/kritik kepada kami. Kritik/Saran Anda dapat berkontribusi terhadap pelayanan kami.'], 200);
+            return response()->json([
+                'message' => 'Terima kasih telah memberikan Saran/kritik kepada kami. Kritik/Saran Anda dapat berkontribusi terhadap pelayanan kami.'
+            ], 200);
         }
 
         // Jika bukan request AJAX, kembalikan respons Method Not Allowed

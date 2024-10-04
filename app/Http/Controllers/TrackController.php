@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\transaksi;
 use Carbon\Carbon;
+use App\Http\Requests\TrackingRequest;
 use Illuminate\Http\Request;
 
 class TrackController extends Controller
@@ -12,13 +13,8 @@ class TrackController extends Controller
      * Display a listing of the resource.
      */
 
-    public function tracking(Request $request)
+    public function tracking(TrackingRequest $request)
     {
-        // Validasi input dari form untuk memastikan tracking number tidak kosong dan sesuai format
-        $request->validate([
-            'trackingCode' => 'required|string|max:50'
-        ]);
-
         // Ambil trackingCode dari request
         $trackingCode = $request->input('trackingCode');
 

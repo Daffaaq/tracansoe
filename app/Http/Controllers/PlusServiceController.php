@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
+use App\Http\Requests\PlusServiceRequest;
 use App\Models\plus_service;
 
 class PlusServiceController extends Controller
@@ -42,15 +43,11 @@ class PlusServiceController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PlusServiceRequest $request)
     {
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk menyimpan plus service.');
         }
-        $request->validate([
-            'name' => 'required|string',
-            'price' => 'required|numeric',
-        ]);
 
         plus_service::create([
             'uuid' => Str::uuid(),
@@ -85,15 +82,11 @@ class PlusServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $uuid)
+    public function update(PlusServiceRequest $request, string $uuid)
     {
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('plus-service.index')->with('error', 'Anda tidak memiliki akses untuk memperbarui plus service.');
         }
-        $request->validate([
-            'name' => 'required|string',
-            'price' => 'required|numeric',
-        ]);
 
         $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
 

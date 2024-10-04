@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Blog;
 use App\Models\CategoryBlog;
+use App\Http\Requests\BlogRequest;
 use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
@@ -45,21 +46,12 @@ class BlogController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BlogRequest $request)
     {
         if (auth()->user()->role != 'karyawan') {
             return redirect()->route('blog.index')
             ->with('error', 'Anda tidak memiliki akses untuk membuat Blog.');
         }
-        // Validate input
-        $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required|max:255',
-            'description' => 'required',
-            'category_blog_id' => 'required|exists:category_blogs,id',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
         // Handle image upload
         $imagePath = null;
         if ($request->hasFile('image_url')) {
@@ -107,19 +99,10 @@ class BlogController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $uuid)
+    public function update(BlogRequest $request, string $uuid)
     {
         // Find blog by UUID
         $blog = Blog::where('uuid', $uuid)->firstOrFail();
-
-        // Validate input
-        $request->validate([
-            'title' => 'required|max:255',
-            'content' => 'required|max:255',
-            'description' => 'required',
-            'category_blog_id' => 'required|exists:category_blogs,id',
-            'image_url' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
 
         // Handle image upload
         $imagePath = $blog->image_url; // Retain the old image if no new image is uploaded

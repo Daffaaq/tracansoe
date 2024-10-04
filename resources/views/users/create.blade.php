@@ -32,8 +32,7 @@
                                         <label class="col-lg-3 col-form-label" for="name">Name</label>
                                         <div class="col-lg-9">
                                             <input type="text" id="name" class="form-control" name="name"
-                                                value="{{ old('name') }}" placeholder="Full Name" autocomplete="off"
-                                                required>
+                                                value="{{ old('name') }}" placeholder="Full Name" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -43,8 +42,7 @@
                                         <label class="col-lg-3 col-form-label" for="email">Email</label>
                                         <div class="col-lg-9">
                                             <input type="email" id="email" class="form-control" name="email"
-                                                value="{{ old('email') }}" placeholder="Email Address" autocomplete="off"
-                                                required>
+                                                value="{{ old('email') }}" placeholder="Email Address" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -54,7 +52,7 @@
                                         <label class="col-lg-3 col-form-label" for="password">Password</label>
                                         <div class="col-lg-9">
                                             <input type="password" id="password" class="form-control" name="password"
-                                                placeholder="Password" autocomplete="off" required>
+                                                placeholder="Password" autocomplete="off">
                                         </div>
                                     </div>
                                 </div>
@@ -63,8 +61,7 @@
                                     <div class="form-group row align-items-center">
                                         <label class="col-lg-3 col-form-label" for="role">Role</label>
                                         <div class="col-lg-9">
-                                            <select id="role" class="form-control" name="role" autocomplete="off"
-                                                required>
+                                            <select id="role" class="form-control" name="role" autocomplete="off">
                                                 <option value="">-- Select Role --</option>
                                                 <option value="superadmin">Superadmin</option>
                                                 <option value="karyawan">Karyawan</option>

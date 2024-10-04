@@ -39,7 +39,6 @@ class DoorprizeController extends Controller
         $hadiahdata = Hadiah::select("nama_hadiah", "jumlah")
         ->whereDate('tanggal_awal', '<=', $today)
         ->whereDate('tanggal_akhir', '>=', $today)
-        ->where('jumlah', '>', 0) // Hadiah harus memiliki jumlah lebih dari 0
         ->get();
         return response()->json([
             'success' => true,

@@ -97,14 +97,25 @@
                 </div>
             @endif
 
-            @if (!$membersTrack->contains('status', 'active'))
-                <!-- Check if none have 'active' status -->
+            @php
+                // Ambil status terakhir dari memberTrack1
+                $lastStatus = $memberTrack1 ? $memberTrack1->status : null;
+
+                // Filter untuk mengecek apakah status 'active' atau 'expired' tidak ada dalam list status yang terakhir
+                $filteredMembersTrack = $membersTrack->filter(function ($track) {
+                    return !in_array($track->status, ['active', 'expired']);
+                });
+            @endphp
+
+            @if ($filteredMembersTrack->isNotEmpty() && !in_array($lastStatus, ['active', 'expired']))
+                <!-- Check if none have 'active' or 'expired' status -->
                 <h5 class="font-weight-bold text-secondary mb-3 mt-4">Verifikasi Membership</h5>
                 <form action="{{ route('memberships.verify', $member->uuid) }}" method="POST" id="verifyMembershipForm">
                     @csrf
                     <button type="submit" class="btn btn-primary">Verifikasi Membership</button>
                 </form>
             @endif
+
 
             <!-- Tombol Kembali -->
             <div class="d-flex justify-content-end">

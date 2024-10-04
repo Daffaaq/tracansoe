@@ -35,14 +35,14 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="nama_kategori" class="form-label">Nama Sub-Kategori</label>
                                     <input type="text" id="nama_kategori" class="form-control" name="nama_kategori"
-                                        value="{{ old('nama_kategori') }}" placeholder="Nama Sub-Kategori" required>
+                                        value="{{ old('nama_kategori') }}" placeholder="Nama Sub-Kategori" >
                                 </div>
 
                                 <!-- Harga -->
                                 <div class="col-md-6 mb-3">
                                     <label for="price" class="form-label">Harga</label>
                                     <input type="text" id="price" class="form-control numeric-only" name="price"
-                                        value="{{ old('price') }}" placeholder="Harga" required>
+                                        value="{{ old('price') }}" placeholder="Harga" >
                                 </div>
 
                                 <!-- Estimasi -->
@@ -50,7 +50,7 @@
                                     <label for="estimation" class="form-label">Estimasi Selesai</label>
                                     <input type="text" id="estimation" class="form-control numeric-only"
                                         name="estimation" value="{{ old('estimation') }}"
-                                        placeholder="Estimasi Selesai (hari)" required>
+                                        placeholder="Estimasi Selesai (hari)" >
                                 </div>
 
                                 <!-- Deskripsi -->

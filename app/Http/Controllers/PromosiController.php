@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\promosi;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Http\Requests\PromosiRequest;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -46,22 +47,12 @@ class PromosiController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PromosiRequest $request)
     {
         if (auth()->user()->role != 'superadmin') {
             // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
             return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk membuat promosi.');
         }
-        $request->validate([
-            'nama_promosi' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'kode' => 'required|string',
-            'discount' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi gambar
-            'minimum_payment' => 'nullable|numeric',
-            'terms_conditions' => 'nullable|string',
-        ]);
 
         // Cek apakah ada promosi lain dengan rentang tanggal yang persis sama
         $existingPromosiExact = promosi::where('start_date', $request->start_date)
@@ -160,22 +151,11 @@ class PromosiController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $uuid)
+    public function update(PromosiRequest $request, string $uuid)
     {
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk mengubah promosi.');
         }
-
-        $request->validate([
-            'nama_promosi' => 'required|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'kode' => 'required|string',
-            'discount' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validasi gambar
-            'minimum_payment' => 'nullable|numeric',
-            'terms_conditions' => 'nullable|string',
-        ]);
 
         DB::beginTransaction(); // Mulai transaksi
 

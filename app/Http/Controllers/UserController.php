@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
@@ -42,14 +44,9 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest  $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'role' => 'required|string|in:superadmin,karyawan',
-        ]);
+        $validated = $request->validated();
 
         $validated['password'] = Hash::make($validated['password']); // Use Hash facade
 
@@ -70,17 +67,12 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $uuid)
+    public function update(UpdateUserRequest  $request, string $uuid)
     {
         $user = User::where('uuid', $uuid)->firstOrFail();
 
         // Validate and update the user
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:8',
-            'role' => 'required|string|in:superadmin,karyawan',
-        ]);
+        $validated = $request->validated();
 
         if ($request->filled('password')) {
             $validated['password'] = Hash::make($validated['password']); // Use Hash facade

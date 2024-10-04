@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ExtendMemberRequest;
+use App\Http\Requests\RegisterMemberRequest;
 use Illuminate\Http\Request;
 use App\Models\Members;
 use App\Models\MembersTrack;
@@ -12,18 +14,16 @@ use Carbon\Carbon;
 class MembershipController extends Controller
 {
 
-    public function register(Request $request)
+    public function register(RegisterMemberRequest $request)
     {
-        // Validasi input dari form
-        $validatedData = $request->validate([
-            'nama_membership' => 'required|string|max:255',
-            'email_membership' => 'required|email|max:255',
-            'phone_membership' => 'required|string|max:15',
-            'alamat_membership' => 'required|string|max:255',
-            'buktiPembayaran' => 'required|file|mimes:jpg,png,pdf|max:2048',
-            'kelas_membership' => 'required|in:standard,gold,premium',
-            'totalPembayaran' => 'required|numeric|min:0',
-        ]);
+        // Pengecekan apakah email atau nomor telepon sudah digunakan
+        $existingMember = Members::where('email_membership', $request->email_membership)
+            ->orWhere('phone_membership', $request->phone_membership)
+            ->first();
+
+        if ($existingMember) {
+            return response()->json(['status' => 'error', 'message' => 'Satu orang hanya dapat memiliki satu membership.'], 400);
+        }
 
         // Proses upload file bukti pembayaran
         if ($request->hasFile('buktiPembayaran')) {
@@ -36,10 +36,10 @@ class MembershipController extends Controller
 
         // Buat record untuk tabel members
         $member = Members::create([
-            'nama_membership' => $validatedData['nama_membership'],
-            'email_membership' => $validatedData['email_membership'],
-            'phone_membership' => $validatedData['phone_membership'],
-            'alamat_membership' => $validatedData['alamat_membership'],
+            'nama_membership' => $request->nama_membership,
+            'email_membership' => $request->email_membership,
+            'phone_membership' => $request->phone_membership,
+            'alamat_membership' => $request->alamat_membership,
             'kode' => null,
         ]);
 
@@ -47,13 +47,13 @@ class MembershipController extends Controller
         MembersTrack::create([
             'membership_id' => $member->id,
             'buktiPembayaran' => $buktiPembayaranPath,
-            'totalPembayaran' => $validatedData['totalPembayaran'],
+            'totalPembayaran' => $request->totalPembayaran,
             'tanggalPembayaran' => Carbon::now()->toDateString(),
             'jamPembayaran' => Carbon::now()->toTimeString(),
             'start_membership' => null,
             'end_membership' => null,
             'status' => 'waiting',
-            'kelas_membership' => $validatedData['kelas_membership'],
+            'kelas_membership' => $request->kelas_membership,
             'discount' => null,
         ]);
 
@@ -61,18 +61,12 @@ class MembershipController extends Controller
         return response()->json(['status' => 'success', 'message' => 'Membership berhasil didaftarkan.'], 200);
     }
 
-    public function extend(Request $request)
-    {
-        // Validasi input dari form
-        $validatedData = $request->validate([
-            'kode' => 'required|string|max:255',
-            'buktiPembayaran' => 'required|file|mimes:jpg,png,pdf|max:2048',
-            'kelas_membership' => 'required|in:standard,gold,premium',
-            'totalPembayaran' => 'required|numeric|min:0',
-        ]);
 
+
+    public function extend(ExtendMemberRequest $request)
+    {
         // Temukan record members berdasarkan kode
-        $member = Members::where('kode', $validatedData['kode'])->first();
+        $member = Members::where('kode', $request->kode)->first();
         if (!$member) {
             return response()->json(['status' => 'error', 'message' => 'Kode membership tidak valid.'], 400);
         }
@@ -104,19 +98,20 @@ class MembershipController extends Controller
         MembersTrack::create([
             'membership_id' => $member->id,
             'buktiPembayaran' => $buktiPembayaranPath,
-            'totalPembayaran' => $validatedData['totalPembayaran'],
+            'totalPembayaran' => $request->totalPembayaran,
             'tanggalPembayaran' => Carbon::now()->toDateString(),
             'jamPembayaran' => Carbon::now()->toTimeString(),
             'start_membership' => null, // Ini bisa diupdate di fungsi verifikasi
             'end_membership' => null, // Ini bisa diupdate di fungsi verifikasi
             'status' => 'waiting',
-            'kelas_membership' => $validatedData['kelas_membership'],
+            'kelas_membership' => $request->kelas_membership,
             'discount' => null,
         ]);
 
         // Kembalikan respons JSON berhasil
         return response()->json(['status' => 'success', 'message' => 'Membership berhasil diperpanjang, menunggu verifikasi.'], 200);
     }
+
 
     public function verify(Request $request, $uuid)
     {
@@ -129,27 +124,23 @@ class MembershipController extends Controller
 
         // Tentukan durasi membership berdasarkan kelas yang dipilih
         $membershipDuration = 0;
-        $kodeMembershipPrefix = '';
 
         switch ($membersTrack->kelas_membership) {
             case 'standard':
                 $membershipDuration = 3; // 3 bulan untuk standard
-                $kodeMembershipPrefix = 'ST';
                 break;
             case 'gold':
                 $membershipDuration = 6; // 6 bulan untuk gold
-                $kodeMembershipPrefix = 'GL';
                 break;
             case 'premium':
                 $membershipDuration = 12; // 12 bulan untuk premium
-                $kodeMembershipPrefix = 'PR';
                 break;
         }
 
         // Cek apakah kode sudah ada
         if (is_null($member->kode)) {
             // Hitung nomor urut untuk kode membership
-            $lastMembership = Members::where('kode', 'like', $kodeMembershipPrefix . '-%')
+            $lastMembership = Members::where('kode', 'like', 'MB-%')
                 ->orderBy('created_at', 'desc')
                 ->first();
 
@@ -158,8 +149,8 @@ class MembershipController extends Controller
             // Format nomor urut menjadi 4 digit
             $formattedNumber = str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-            // Generate kode unik dengan format
-            $kodeMembership = $kodeMembershipPrefix . '-' . $formattedNumber . '-' . Str::random(4); // Tambahkan 4 karakter acak
+            // Generate kode unik dengan format "MB-XXXX-YYYY" (XXXX = nomor urut, YYYY = karakter acak)
+            $kodeMembership = 'MB-' . $formattedNumber . '-' . Str::random(4);
 
             // Simpan kode unik di model Members
             $member->update([
@@ -178,6 +169,7 @@ class MembershipController extends Controller
         // Redirect atau response untuk admin
         return redirect()->route('memberships.show', $member->uuid)->with('success', 'Membership berhasil diverifikasi.');
     }
+
 
 
 
@@ -222,8 +214,9 @@ class MembershipController extends Controller
     {
         $member = Members::where('uuid', $uuid)->firstOrFail();
         $membersTrack = MembersTrack::where('membership_id', $member->id)->get(); // Ambil semua record members_track
+        $memberTrack1 = MembersTrack::where('membership_id', $member->id)->orderBy('created_at', 'desc')->first();
 
-        return view('membership.show', compact('member', 'membersTrack')); // Sertakan membersTrack
+        return view('membership.show', compact('member', 'membersTrack', 'memberTrack1')); // Sertakan membersTrack
     }
 
 

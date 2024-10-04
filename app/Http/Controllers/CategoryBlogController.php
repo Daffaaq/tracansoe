@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\CategoryBlogRequest;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\CategoryBlog;
 
@@ -38,13 +39,8 @@ class CategoryBlogController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CategoryBlogRequest $request)
     {
-        // Validate input
-        $request->validate([
-            'name_category_blog' => 'required|unique:category_blogs,name_category_blog|max:255',
-        ]);
-
         // Create a new category
         CategoryBlog::create([
             'name_category_blog' => $request->name_category_blog,
@@ -73,16 +69,10 @@ class CategoryBlogController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $uuid)
+    public function update(CategoryBlogRequest $request, string $uuid)
     {
         // Find category by UUID
         $category_blog = CategoryBlog::where('uuid', $uuid)->firstOrFail();
-
-        // Validate input
-        $request->validate([
-            'name_category_blog' => 'required|unique:category_blogs,name_category_blog,' . $category_blog->id . '|max:255',
-        ]);
-
         // Update category
         $category_blog->update([
             'name_category_blog' => $request->name_category_blog,
