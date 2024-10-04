@@ -17,8 +17,8 @@ class HadiahSeeder extends Seeder
         DB::table('hadiahs')->insert([
             [
                 'uuid' => Str::uuid(),
-                'nama_hadiah' => 'Smartphone',
-                'deskripsi' => 'Smartphone terbaru dengan fitur lengkap',
+                'nama_hadiah' => 'Smartphone Samsung Galaxy A03',
+                'deskripsi' => 'Smartphone Samsung Galaxy A03 terbaru dengan fitur lengkap',
                 'jumlah' => 1,
                 'tanggal_awal' => '2024-10-01', // Periode mulai dari 1 Oktober 2024
                 'tanggal_akhir' => '2024-10-31', // Periode berakhir pada 31 Oktober 2024
@@ -27,8 +27,8 @@ class HadiahSeeder extends Seeder
             ],
             [
                 'uuid' => Str::uuid(),
-                'nama_hadiah' => 'Laptop',
-                'deskripsi' => 'Laptop untuk kebutuhan kerja dan gaming',
+                'nama_hadiah' => 'Laptop Asus ROG Strix',
+                'deskripsi' => 'Laptop Asus ROG Strix terbaru dengan fitur lengkap',
                 'jumlah' => 1,
                 'tanggal_awal' => '2024-10-01', // Periode mulai dari 1 Oktober 2024
                 'tanggal_akhir' => '2024-10-31', // Periode berakhir pada 31 Oktober 2024
@@ -37,11 +37,21 @@ class HadiahSeeder extends Seeder
             ],
             [
                 'uuid' => Str::uuid(),
-                'nama_hadiah' => 'Voucher Belanja',
-                'deskripsi' => 'Voucher belanja senilai Rp. 500.000',
+                'nama_hadiah' => 'TWS Samsung Galaxy Buds 2',
+                'deskripsi' => 'TWS Samsung Galaxy Buds 2 terbaru dengan fitur lengkap',
                 'jumlah' => 2,
                 'tanggal_awal' => '2024-10-01', // Periode mulai dari 1 Oktober 2024
                 'tanggal_akhir' => '2024-10-31', // Periode berakhir pada 31 Oktober 2024
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'uuid' => Str::uuid(),
+                'nama_hadiah' => 'TWS Samsung Galaxy Buds 4',
+                'deskripsi' => 'TWS Samsung Galaxy Buds 4 terbaru dengan fitur lengkap',
+                'jumlah' => 2,
+                'tanggal_awal' => '2024-11-01', // Periode mulai dari 1 Oktober 2024
+                'tanggal_akhir' => '2024-11-30', // Periode berakhir pada 31 Oktober 2024
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

@@ -387,7 +387,7 @@
                     <ul>
                         <li>Diskon 5% untuk layanan cuci sepatu</li>
                         <li>Prioritas layanan reguler</li>
-                        <li>Pemberitahuan promo spesial</li>
+                        <li>Diskon langsung tanpa minimal pembayaran</li>
                     </ul>
                 </div>
 
@@ -397,7 +397,7 @@
                     <ul>
                         <li>Diskon 10% untuk layanan cuci sepatu</li>
                         <li>Prioritas layanan cepat</li>
-                        <li>Pemberitahuan promo spesial & hadiah gratis</li>
+                        <li>Diskon langsung tanpa minimal pembayaran</li>
                     </ul>
                 </div>
 
@@ -407,8 +407,7 @@
                     <ul>
                         <li>Diskon 15% untuk layanan cuci sepatu</li>
                         <li>Prioritas layanan tercepat</li>
-                        <li>Pemberitahuan promo spesial & hadiah eksklusif</li>
-                        <li>Layanan cuci sepatu gratis 1x per bulan</li>
+                        <li>Diskon langsung tanpa minimal pembayaran</li>
                     </ul>
                 </div>
             </div>
@@ -530,6 +529,103 @@
         </div>
     </section>
 
+
+    <!-- Doorprize Section (Elegant, Modern, Luxurious with Scroll Animations) -->
+    <section id="doorprize-items" class="doorprize-section">
+        <div class="container">
+            <!-- Date Section -->
+            @if ($datadoorprize->isNotEmpty())
+                <div class="date-range" data-aos="fade-up">
+                    <p class="date-text">
+                        Doorprize Berlangsung:
+                        <span
+                            class="start-date">{{ \Carbon\Carbon::parse($datadoorprize->first()->tanggal_awal)->translatedFormat('d F Y') }}</span>
+                        -
+                        <span
+                            class="end-date">{{ \Carbon\Carbon::parse($datadoorprize->first()->tanggal_akhir)->translatedFormat('d F Y') }}</span>
+
+                    </p>
+                </div>
+
+                <h2 class="section-title" data-aos="fade-up">Doorprize</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Berikut adalah daftar hadiah doorprize menarik yang bisa kamu menangkan!
+                </p>
+
+                <div class="doorprize-grid">
+                    @foreach ($datadoorprize as $doorprize)
+                        <!-- Prize -->
+                        <div class="prize-card" data-aos="fade-up" data-aos-delay="{{ 200 + $loop->index * 100 }}">
+                            <img src="img/default-prize-image.jpg" alt="{{ $doorprize->nama_hadiah }}"
+                                class="prize-image">
+                            <div class="prize-body">
+                                <p class="prize-name">{{ $doorprize->nama_hadiah }}</p>
+                                <p class="prize-description">{{ $doorprize->deskripsi }}</p>
+                                @if ($doorprize->jumlah > 0)
+                                    <p class="prize-quantity">Jumlah: {{ $doorprize->jumlah }} buah</p>
+                                @else
+                                    <p class="prize-quantity">Hadiah Telah Dimenangkan</p>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="no-doorprize">Saat ini belum ada doorprize yang tersedia. Silakan cek kembali nanti.</p>
+            @endif
+        </div>
+    </section>
+
+
+
+
+
+    <!-- Doorprize Winner Section (Elegant, Modern, Luxurious with Scroll Animations) -->
+    <section id="doorprize-winners" class="doorprize-section">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">Pemenang Doorprize</h2>
+            @if ($winners->isEmpty())
+                <!-- No Winners Available -->
+                <div class="no-winners" data-aos="fade-up" data-aos-delay="200">
+                    <p>Belum ada pemenang yang diumumkan saat ini. Silakan cek kembali nanti untuk melihat siapa yang
+                        beruntung!</p>
+                </div>
+            @else
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Selamat kepada para pemenang! Berikut adalah nomor tracking dan hadiah yang mereka terima.
+                </p>
+                <div class="winner-grid">
+                    @foreach ($winners as $winner)
+                        <!-- Winner Card -->
+                        <div class="winner-card" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
+                            <div class="cover left-cover"></div>
+                            <div class="cover right-cover"></div>
+                            <div class="winner-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="winner-body">
+                                <p class="winner-name">{{ $winner->transaksi->nama_customer }}</p>
+                                <p class="winner-prize">{{ $winner->hadiah->nama_hadiah }}</p>
+                            </div>
+                            <div class="winner-footer">
+                                <p class="winner-tracking">Tracking No: {{ $winner->transaksi->tracking_number }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="congrats-note" data-aos="fade-up" data-aos-delay="500">
+                    <p>Selamat kepada para pemenang! Hadiah dapat diambil dengan menunjukkan nota yang sesuai dengan
+                        nomor
+                        tracking yang tertera. Jangan lewatkan doorprize menarik berikutnya dari kami.</p>
+                </div>
+            @endif
+
+        </div>
+    </section>
+
+
+
+
     <!-- Contact Section -->
     <section id="contact" class="contact-section">
         <div class="container">
@@ -608,6 +704,22 @@
     <script src="{{ asset('/LandingPage/js/map.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/scroll-to-top.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/aos.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Confetti script running'); // Tambahkan ini untuk cek
+            const confettiContainer = document.getElementById('confetti');
+            console.log(confettiContainer);
+            for (let i = 0; i < 100; i++) {
+                const confettiPiece = document.createElement('div');
+                console.log(confettiPiece);
+                confettiPiece.classList.add('confetti-piece');
+                confettiPiece.style.left = Math.random() * 100 + 'vw'; // Random horizontal position
+                confettiPiece.style.animationDelay = Math.random() * 5 + 's'; // Random delay
+                confettiContainer.appendChild(confettiPiece);
+            }
+        });
+    </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('terms-toggle').addEventListener('click', function() {

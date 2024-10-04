@@ -144,10 +144,10 @@
                             </a>
                         </li>
                         <li
-                            class="sidebar-item {{ request()->routeIs('transaksi.index', 'transaksi.create', 'transaksi.edit') ? 'active' : '' }}">
-                            <a href="{{ route('transaksi.index') }}" class="sidebar-link">
+                            class="sidebar-item {{ request()->routeIs('hadiah.index', 'hadiah.create', 'hadiah.edit') ? 'active' : '' }}">
+                            <a href="{{ route('hadiah.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
-                                <span>Profile</span>
+                                <span>Hadiah</span>
                             </a>
                         </li>
                         {{-- @dd(auth()->user()->role) --}}

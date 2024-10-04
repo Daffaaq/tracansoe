@@ -11,9 +11,12 @@ class Hadiah extends Model
     use HasFactory;
 
     protected $fillable = [
+        'uuid',
         'nama_hadiah',
         'deskripsi',
         'jumlah',
+        'tanggal_awal',
+        'tanggal_akhir',
     ];
 
     protected static function boot()

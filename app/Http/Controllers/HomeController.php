@@ -54,9 +54,22 @@ class HomeController extends Controller
             'Dengan Kode Promosi' => $jumlahKodePromosiDigunakan,
             'Tanpa Kode Promosi' => $transaksiWithoutPromosi
         ];
+        $today = now()->toDateString();
 
-        $winners = \App\Models\DoorprizeWinner::with(['transaksi', 'hadiah'])->get();
-        $hadiah = Hadiah::select("nama_hadiah", "jumlah")->get();
+        // Query untuk Doorprize Winners dengan where date
+        $winners = \App\Models\DoorprizeWinner::with(['transaksi', 'hadiah'])
+            ->whereHas('hadiah', function ($query) use ($today) {
+                $query->whereDate('tanggal_awal', '<=', $today)
+                    ->whereDate('tanggal_akhir', '>=', $today);
+            })
+            ->get();
+
+        // Query untuk Hadiah dengan where date
+        $hadiah = Hadiah::select("nama_hadiah", "jumlah")
+            ->whereDate('tanggal_awal', '<=', $today)
+            ->whereDate('tanggal_akhir', '>=', $today)
+            ->get();
+
         // dd($hadiah);
         return view('Dashboard.index', compact('totalTransaksi', 'jumlahKodePromosiDigunakan', 'totalPaid', 'totalOutstanding', 'advice', 'totalPendapatanPerBulan', 'promosiData', 'winners', 'hadiah'));
     }

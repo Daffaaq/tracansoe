@@ -354,15 +354,17 @@
 
             let totalHarga = 0;
 
+            // Apply promo button
             applyPromoBtn.addEventListener('click', function() {
                 const kodePromosi = promosiKodeInput.value;
+                const kodeMembership = membershipKodeInput.value;
 
                 if (kodePromosi) {
                     // Kirim AJAX request untuk validasi kode promo
                     fetch(`/dashboard/validate-promosi?kode=${kodePromosi}`, {
                             method: 'GET',
                             headers: {
-                                'X-Requested-With': 'XMLHttpRequest', // Penting untuk mengindikasikan request AJAX
+                                'X-Requested-With': 'XMLHttpRequest',
                             },
                         })
                         .then(response => response.json())
@@ -370,8 +372,9 @@
                             if (data.success) {
                                 const totalHarga = parseFloat(totalHargaInput.value.replace(
                                     /[^0-9.-]+/g, "")) || 0;
-                                console.log(totalHarga);
-                                if (totalHarga < data.minimum_payment) {
+
+                                // Jika tidak ada kode membership, lakukan pengecekan minimum payment
+                                if (!kodeMembership && totalHarga < data.minimum_payment) {
                                     Swal.fire({
                                         title: 'Tidak Memenuhi Syarat!',
                                         text: `Total harga harus minimal Rp${data.minimum_payment} untuk menggunakan kode promosi ini.`,
@@ -379,9 +382,9 @@
                                         confirmButtonText: 'OK'
                                     });
 
-                                    // Jika syarat tidak terpenuhi, tidak melanjutkan
-                                    return;
+                                    return; // Jika tidak memenuhi syarat, hentikan eksekusi
                                 }
+
                                 // Tampilkan SweetAlert jika kode promosi valid
                                 Swal.fire({
                                     title: 'Kode Promosi Valid!',
@@ -396,11 +399,10 @@
                                 namaPromosiInput.value = data.nama_promosi;
                                 discountInput.value = (data.discount * 100) + '%';
 
-                                // Recalculate total with discount
+                                // Hitung total dengan diskon
                                 calculateTotal(data.discount);
 
                             } else {
-                                // Tampilkan SweetAlert jika kode promosi tidak valid
                                 Swal.fire({
                                     title: 'Kode Promosi Tidak Valid',
                                     text: data.message,
@@ -408,29 +410,20 @@
                                     confirmButtonText: 'Coba Lagi'
                                 });
 
-                                // Jika kode tidak valid, sembunyikan bagian promosi
                                 promosiSection.style.display = 'none';
                                 discountSection.style.display = 'none';
                                 calculateTotal(0); // Tanpa diskon
-
                             }
                         })
                         .catch(error => {
-                            console.error('Error:', error);
-                            // Tampilkan SweetAlert jika ada error pada request
                             Swal.fire({
                                 title: 'Error!',
-                                text: data.message,
+                                text: 'Terjadi kesalahan dalam validasi promosi.',
                                 icon: 'error',
                                 confirmButtonText: 'OK'
                             });
                         });
                 } else {
-                    // Jika input kosong, sembunyikan section promosi
-                    promosiSection.style.display = 'none';
-                    discountSection.style.display = 'none';
-                    calculateTotal(0); // Tanpa diskon
-                    // Tampilkan SweetAlert jika input kosong
                     Swal.fire({
                         title: 'Kode Promosi Kosong',
                         text: 'Silakan masukkan kode promosi terlebih dahulu.',
@@ -440,6 +433,7 @@
                 }
             });
 
+            // Validate membership button
             validateMembershipBtn.addEventListener('click', function() {
                 const kodeMembership = membershipKodeInput.value;
 
@@ -453,25 +447,21 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            console.log(data);
                             if (data.success) {
-                                // Tampilkan SweetAlert jika kode membership valid
                                 Swal.fire({
                                     title: 'Kode Membership Valid!',
-                                    text: `kelas Membership: ${data.kelas_membership}\nDiskon: ${data.discount * 100}%`,
+                                    text: `Kelas Membership: ${data.kelas_membership}\nDiskon: ${data.discount * 100}%`,
                                     icon: 'success',
                                     confirmButtonText: 'OK'
                                 });
 
-                                // Isi otomatis data customer berdasarkan data membership
                                 document.getElementById('nama_customer').value = data.nama_membership;
                                 document.getElementById('email_customer').value = data.email_membership;
                                 document.getElementById('notelp_customer').value = data
-                                    .phone_membership;
+                                .phone_membership;
                                 document.getElementById('alamat_customer').value = data
                                     .alamat_membership;
 
-                                // Tampilkan section membership jika ada
                                 membershipsSection.style.display = 'block';
                                 discountMembershipsSection.style.display = 'block';
                                 kelasMembershipInput.value = data.kelas_membership;
@@ -481,7 +471,6 @@
                                 calculateTotal(data.discount);
 
                             } else {
-                                // Tampilkan SweetAlert jika kode membership tidak valid
                                 Swal.fire({
                                     title: 'Kode Membership Tidak Valid',
                                     text: data.message,
@@ -489,13 +478,11 @@
                                     confirmButtonText: 'Coba Lagi'
                                 });
 
-                                // Sembunyikan section jika kode tidak valid
                                 membershipsSection.style.display = 'none';
                                 discountMembershipsSection.style.display = 'none';
                             }
                         })
                         .catch(error => {
-                            console.error('Error:', error);
                             Swal.fire({
                                 title: 'Error!',
                                 text: 'Terjadi kesalahan dalam validasi membership.',
@@ -504,16 +491,8 @@
                             });
                             membershipsSection.style.display = 'none';
                             discountMembershipsSection.style.display = 'none';
-
-                            // Terapkan diskon ke total harga
-                            calculateTotal(0);
                         });
                 } else {
-                    membershipsSection.style.display = 'none';
-                    discountMembershipsSection.style.display = 'none';
-
-                    // Terapkan diskon ke total harga
-                    calculateTotal(0);
                     Swal.fire({
                         title: 'Kode Membership Kosong',
                         text: 'Silakan masukkan kode membership terlebih dahulu.',
@@ -522,6 +501,7 @@
                     });
                 }
             });
+
 
 
             function calculateTotal() {

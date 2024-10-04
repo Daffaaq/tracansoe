@@ -263,6 +263,7 @@ class TransaksiController extends Controller
             }
 
             // Cek apakah ada kode promosi yang dimasukkan
+            // Cek apakah ada kode promosi yang dimasukkan
             if ($request->promosi_kode) {
                 $promosi = Promosi::where('kode', $request->promosi_kode)->first();
 
@@ -276,31 +277,37 @@ class TransaksiController extends Controller
                 } elseif ($promosi->status === 'expired') {
                     return redirect()->route('transaksi.index')->with('error', 'Kode promosi sudah expired.');
                 } elseif ($promosi->isActive()) {
-                    if ($totalHarga < $promosi->minimum_payment) {
-                        return redirect()->route('transaksi.index')->with('error', 'Total harga tidak memenuhi syarat minimum pembayaran untuk menggunakan kode promosi ini.');
+                    // Cek apakah user memiliki kode membership
+                    if (!$request->membership_kode) {
+                        // Jika tidak ada kode membership, cek minimum payment dari promosi
+                        if ($totalHarga < $promosi->minimum_payment) {
+                            return redirect()->route('transaksi.index')->with('error', 'Total harga tidak memenuhi syarat minimum pembayaran untuk menggunakan kode promosi ini.');
+                        }
                     }
-                    // Terapkan diskon jika promosi aktif
+
+                    // Terapkan diskon jika promosi aktif (tanpa cek minimum payment jika ada membership)
                     $totalHarga -= ($totalHarga * ($promosi->discount)); // Terapkan diskon
                 }
             }
 
-
+            // Cek apakah ada kode membership yang dimasukkan
             if ($request->membership_kode) {
                 $member = Members::where('kode', $request->membership_kode)->first();
-                // dd($member);
+
                 if (!$member) {
                     return redirect()->route('transaksi.create')->with('error', 'Kode membership tidak valid.');
                 }
+
                 $membersTrack = MembersTrack::where('membership_id', $member->id)
                     ->orderBy('created_at', 'desc')->first();
-                // dd($membersTrack);
+
                 if (!$membersTrack) {
                     return redirect()->route('transaksi.create')->with('error', 'Tidak ada track untuk anggota ini.');
                 }
-                // dd($membersTrack->status);
+
                 if ($membersTrack->status === 'active') {
+                    // Terapkan diskon membership tanpa batasan minimum pembayaran
                     $totalHarga -= ($totalHarga * ($membersTrack->discount));
-                    // dd($totalHarga);
                 } elseif ($membersTrack->status === 'expired') {
                     return redirect()->route('transaksi.create')->with('error', 'Kode membership sudah expired.');
                 } elseif ($membersTrack->status === 'waiting') {
@@ -309,6 +316,7 @@ class TransaksiController extends Controller
                     return redirect()->route('transaksi.create')->with('error', 'Kode membership tidak valid.');
                 }
             }
+
             $minimalDownpaymentPercentage = 0.40;
             $minimalDownpayment = $totalHarga * $minimalDownpaymentPercentage;
             $downpaymentAmount = round($request->downpayment_amount, 0); // Hapus desimal

@@ -1311,6 +1311,275 @@ body {
     background-color: #f39c12;
 }
 
+/* Doorprize Section Styling */
+/* Doorprize Section Styling */
+.doorprize-section {
+    padding: 100px 20px;
+    background: linear-gradient(135deg, #001f3f, #f39c12);
+    text-align: center;
+    color: #ffffff;
+}
+
+.section-title {
+    font-size: 48px;
+    color: #f39c12;
+    font-family: "Playfair Display", serif;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.date-range {
+    margin-bottom: 20px;
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
+    color: #f39c12;
+    letter-spacing: 0.5px;
+}
+
+.date-text {
+    background-color: #2c3e50;
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 2px solid #f39c12;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.date-text:hover {
+    box-shadow: 0 30px 50px rgba(255, 215, 0, 0.5);
+    border: 2px solid #ffdf00;
+}
+
+.section-subtitle {
+    font-size: 20px;
+    color: #ffffff;
+    max-width: 600px;
+    margin: 0 auto 50px;
+    line-height: 1.8;
+    font-family: "Roboto", sans-serif;
+}
+
+.doorprize-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+}
+
+.prize-card {
+    background: #2c3e50;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #f39c12;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border 0.4s ease;
+    text-align: center;
+    position: relative;
+}
+
+.prize-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 50px rgba(255, 215, 0, 0.5);
+    border: 2px solid #ffdf00;
+}
+
+.prize-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+}
+
+.prize-quantity {
+    font-size: 16px;
+    color: #ffffff;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.prize-card:hover .prize-image {
+    transform: scale(1.1);
+}
+
+.prize-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.prize-description {
+    font-size: 16px;
+    color: #f39c12;
+    margin-bottom: 15px;
+    font-family: "Roboto", sans-serif;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .doorprize-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* doorprize Section Styling */
+.doorprize-section {
+    padding: 100px 20px;
+    background: linear-gradient(135deg, #f5f5f5, #ffffff);
+    text-align: center;
+    position: relative;
+}
+
+.section-title {
+    font-size: 48px;
+    color: #001f3f;
+    font-family: "Playfair Display", serif;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.section-subtitle {
+    font-size: 20px;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto 50px;
+    line-height: 1.8;
+    font-family: "Roboto", sans-serif;
+}
+
+.no-winners {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+    font-family: "Roboto", sans-serif;
+    font-size: 18px;
+}
+
+/* Hover effect to make it more interactive */
+.no-winners:hover {
+    background-color: #34495e;
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* Keyframes for fade-in animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.winner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+}
+
+.winner-card {
+    background: #2c3e50;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    text-align: center;
+    position: relative;
+    border: 1px solid #f39c12;
+    overflow: hidden; /* Ensure the cover doesn't overflow */
+    position: relative;
+}
+
+.winner-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3);
+}
+
+.winner-icon {
+    font-size: 50px;
+    color: #f39c12;
+    margin-bottom: 20px;
+}
+
+.winner-body {
+    padding: 20px 0;
+}
+
+.winner-name {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.winner-prize {
+    font-size: 18px;
+    color: #f39c12;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.winner-footer {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #f39c12;
+}
+
+.winner-tracking {
+    font-size: 16px;
+    color: #ecf0f1;
+    font-family: "Roboto", sans-serif;
+}
+
+.congrats-note {
+    margin-top: 60px;
+    font-size: 16px;
+    color: #001f3f;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+}
+
+/* Styling untuk tirai kiri dan kanan */
+.cover {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background-color: #ffffff; /* Warna solid putih */
+    transition: transform 0.5s ease-in-out;
+    z-index: 2;
+}
+
+.left-cover {
+    left: 0;
+    transform: translateX(0);
+}
+
+.right-cover {
+    right: 0;
+    transform: translateX(0);
+}
+
+.winner-card:hover .left-cover {
+    transform: translateX(-100%);
+}
+
+.winner-card:hover .right-cover {
+    transform: translateX(100%);
+}
+
 /* Contact Section Styling */
 .contact-section {
     padding: 80px 20px;

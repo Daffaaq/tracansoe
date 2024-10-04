@@ -5,6 +5,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CategoryBlogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DoorprizeController;
+use App\Http\Controllers\HadiahController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PlusServiceController;
@@ -53,6 +54,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-hadiah-data', [DoorprizeController::class, 'getHadiahData'])->name('get-hadiah-data');
     Route::get('/hadiah-data', [DoorprizeController::class, 'getHadiah'])->name('hadiah-data');
     Route::post('/pick-doorprize-winner', [DoorprizeController::class, 'pickDoorprizeWinner'])->name('pick-doorprize-winner');
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/hadiah', [HadiahController::class, 'index'])->name('hadiah.index');
+        Route::get('/hadiah/create', [HadiahController::class, 'create'])->name('hadiah.create');
+        Route::post('/hadiah/store', [HadiahController::class, 'store'])->name('hadiah.store');
+        Route::get('/hadiah/edit/{uuid}', [HadiahController::class, 'edit'])->name('hadiah.edit');
+        Route::get('/hadiah/show/{uuid}', [HadiahController::class, 'show'])->name('hadiah.show');
+        Route::put('/hadiah/update/{uuid}', [HadiahController::class, 'update'])->name('hadiah.update');
+        Route::delete('/hadiah/delete/{uuid}', [HadiahController::class, 'destroy'])->name('hadiah.destroy');
+        Route::post('/hadiah/list', [HadiahController::class, 'list'])->name('hadiah.list');
+    });
     Route::prefix('dashboard')->group(function () {
         Route::get('/user', [UserController::class, 'index'])->name('user.index');
         Route::get('/user/create', [UserController::class, 'create'])->name('user.create');

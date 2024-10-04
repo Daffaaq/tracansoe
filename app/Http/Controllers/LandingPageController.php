@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Blog;
 use App\Models\category;
 use App\Models\CategoryBlog;
+use App\Models\DoorprizeWinner;
+use App\Models\Hadiah;
 use App\Models\plus_service;
 use App\Models\promosi;
 use Illuminate\Http\Request;
@@ -46,8 +48,21 @@ class LandingPageController extends Controller
 
         $blog = Blog::with('category')->where('status_publish', 'published')->latest()->take(6)->get();
         // dd($blog);
+        $today = now()->toDateString();
 
-        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService'));
+        $datadoorprize = Hadiah::select("nama_hadiah", "jumlah", "deskripsi", "tanggal_awal", "tanggal_akhir")
+            ->whereDate('tanggal_awal', '<=', $today)
+            ->whereDate('tanggal_akhir', '>=', $today)
+            ->get();
+
+        $winners = DoorprizeWinner::with(['transaksi', 'hadiah'])
+            ->whereHas('hadiah', function ($query) use ($today) {
+                $query->whereDate('tanggal_awal', '<=', $today)
+                    ->whereDate('tanggal_akhir', '>=', $today);
+            })
+            ->get();
+
+        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService', 'datadoorprize', 'winners'));
     }
 
     public function index(Request $request)

@@ -13,11 +13,16 @@ class DoorprizeController extends Controller
 
     public function getHadiahData()
     {
+        $today = now()->toDateString();
         // Ambil semua hadiah yang jumlahnya lebih dari 0
-        $hadiah = Hadiah::where('jumlah', '>', 0)->get();
-
+        // $hadiah = Hadiah::where('jumlah', '>', 0)->get();
+        $hadiah = Hadiah::whereDate('tanggal_awal', '<=', $today)
+            ->whereDate('tanggal_akhir', '>=', $today)
+            ->where('jumlah', '>', 0) // Hadiah harus memiliki jumlah lebih dari 0
+            ->get();
         // Misalnya, jumlah putaran ditentukan oleh total jumlah hadiah yang tersedia
         $totalHadiah = $hadiah->sum('jumlah');
+
         $spins = $totalHadiah > 10 ? 8 : ($totalHadiah > 5 ? 6 : 4); // Tentukan jumlah putaran sesuai logika yang diinginkan
 
         // Kembalikan data hadiah dalam bentuk JSON, sertakan jumlah putaran
@@ -30,7 +35,12 @@ class DoorprizeController extends Controller
 
     public function getHadiah()
     {
-        $hadiahdata = Hadiah::select("nama_hadiah", "jumlah")->get();
+        $today = now()->toDateString();
+        $hadiahdata = Hadiah::select("nama_hadiah", "jumlah")
+        ->whereDate('tanggal_awal', '<=', $today)
+        ->whereDate('tanggal_akhir', '>=', $today)
+        ->where('jumlah', '>', 0) // Hadiah harus memiliki jumlah lebih dari 0
+        ->get();
         return response()->json([
             'success' => true,
             'hadiahData' => $hadiahdata,
@@ -226,70 +236,4 @@ class DoorprizeController extends Controller
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }
