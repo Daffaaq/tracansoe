@@ -1,5 +1,10 @@
+// Access the global variable defined in the Blade template
+var latitude = window.storeLocation.latitude;
+var longitude = window.storeLocation.longitude;
+
 // Initialize the Leaflet map
-var map = L.map('map').setView([-9.0837414, 124.89648], 13); // Coordinates of Atambua
+var map = L.map('map').setView([latitude, longitude], 13);
+console.log(latitude, longitude, map);
 
 // Add tile layer from OpenStreetMap
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -7,6 +12,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 // Add a marker for the store location in Atambua
-L.marker([-9.108398, 124.892494]).addTo(map)
+L.marker([latitude, longitude]).addTo(map)
     .bindPopup('Cuci Sepatu Modern')
     .openPopup();

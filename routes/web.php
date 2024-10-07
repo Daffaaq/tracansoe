@@ -10,6 +10,7 @@ use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\PlusServiceController;
 use App\Http\Controllers\PromosiController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UserController;
@@ -54,6 +55,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/get-hadiah-data', [DoorprizeController::class, 'getHadiahData'])->name('get-hadiah-data');
     Route::get('/hadiah-data', [DoorprizeController::class, 'getHadiah'])->name('hadiah-data');
     Route::post('/pick-doorprize-winner', [DoorprizeController::class, 'pickDoorprizeWinner'])->name('pick-doorprize-winner');
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+        Route::get('/store/{uuid}/edit-logo', [StoreController::class, 'viewEditLogo'])->name('store.edit-logo');
+        Route::get('/store/{uuid}/edit-information', [StoreController::class, 'viewEditInformation'])->name('store.edit-information');
+        Route::get('/store/{uuid}/edit-social-media', [StoreController::class, 'viewEditSocialMedia'])->name('store.edit-social-media');
+        Route::post('/store/{uuid}/update-logo', [StoreController::class, 'updateLogo'])->name('store.update-logo');
+        Route::post('/store/{uuid}/update-information', [StoreController::class, 'updateStoreInformation'])->name('store.update-information');
+        Route::post('/store/{uuid}/update-social-media', [StoreController::class, 'updateSocialMedia'])->name('store.update-social-media');
+    });
     Route::prefix('dashboard')->group(function () {
         Route::get('/hadiah', [HadiahController::class, 'index'])->name('hadiah.index');
         Route::get('/hadiah/create', [HadiahController::class, 'create'])->name('hadiah.create');

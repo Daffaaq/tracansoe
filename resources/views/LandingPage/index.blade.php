@@ -19,7 +19,7 @@
     <nav class="navbar">
         <div class="container">
             <div class="logo">
-                <a href="{{ route('landingPage') }}">CuciSepatu</a>
+                <a href="{{ route('landingPage') }}">{{ $store->name }}</a>
             </div>
             <button class="hamburger" id="hamburger">
                 <i class="fas fa-bars"></i>
@@ -345,7 +345,7 @@
                 <div class="step">
                     <i class="fas fa-map-marker-alt"></i>
                     <h3>Kunjungi CuciSepatu</h3>
-                    <p>Datang ke <strong>Jl. IR. SUTAMI, ATAMBUA</strong> dan sampaikan layanan yang Anda
+                    <p>Datang ke <strong>{{ $store->address }}</strong> dan sampaikan layanan yang Anda
                         butuhkan.</p>
                 </div>
                 <div class="step">
@@ -662,9 +662,9 @@
                 <!-- Informasi Kontak -->
                 <div class="contact-info">
                     <div id="map" class="maplp" style="height: 200px;"></div>
-                    <p><i class="fas fa-map-marker-alt"></i> Jl. IR. SUTAMI, ATAMBUA</p>
-                    <p><i class="fas fa-phone-alt"></i> +62 812 3456 7890</p>
-                    <p><i class="fas fa-envelope"></i> info@cucisepatu.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i>{{ $store->address }}</p>
+                    <p><i class="fas fa-phone-alt"></i>{{ $store->phone }}</p>
+                    <p><i class="fas fa-envelope"></i>{{ $store->email }}</p>
                 </div>
             </div>
         </div>
@@ -675,17 +675,20 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <h3 class="footer-logo">CuciSepatu</h3>
-                <p class="footer-description">Jasa Cuci Sepatu Modern & Profesional</p>
+                <h3 class="footer-logo">{{ $store->name }}</h3>
+                <p class="footer-description">{{ $store->description }}</p>
                 <div class="social-icons">
-                    <a href="#" aria-label="Facebook">
+                    <a href="{{ $store->facebook_url }}" aria-label="Facebook">
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="#" aria-label="Twitter">
+                    <a href="{{ $store->twitter_url }}" aria-label="Twitter">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="#" aria-label="Instagram">
+                    <a href="{{ $store->instagram_url }}" aria-label="Instagram">
                         <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="{{ $store->tiktok_url }}" aria-label="Tiktok">
+                        <i class="fab fa-tiktok"></i>
                     </a>
                 </div>
             </div>
@@ -701,9 +704,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script src="{{ asset('/LandingPage/js/tracking.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/advice.js') }}"></script>
-    <script src="{{ asset('/LandingPage/js/map.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/scroll-to-top.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/aos.js') }}"></script>
+    <script>
+        window.storeLocation = {
+            latitude: {!! json_encode($store->latitude) !!},
+            longitude: {!! json_encode($store->longitude) !!}
+        };
+    </script>
+    <script src="{{ asset('/LandingPage/js/map.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Confetti script running'); // Tambahkan ini untuk cek

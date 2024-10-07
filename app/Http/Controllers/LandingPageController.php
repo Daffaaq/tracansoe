@@ -9,6 +9,7 @@ use App\Models\DoorprizeWinner;
 use App\Models\Hadiah;
 use App\Models\plus_service;
 use App\Models\promosi;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -61,8 +62,9 @@ class LandingPageController extends Controller
                     ->whereDate('tanggal_akhir', '>=', $today);
             })
             ->get();
+        $store = Store::first();
 
-        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService', 'datadoorprize', 'winners'));
+        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService', 'datadoorprize', 'winners', 'store'));
     }
 
     public function index(Request $request)

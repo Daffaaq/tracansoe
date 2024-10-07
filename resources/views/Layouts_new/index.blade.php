@@ -108,16 +108,19 @@
                                 <span>Memberships</span>
                             </a>
                         </li>
-                        <li class="sidebar-item has-sub {{ Request::routeIs('kategori-blog.index', 'kategori-blog.create', 'kategori-blog.edit', 'kategori-blog.show', 'blog.index', 'blog.create', 'blog.edit', 'blog.show') ? 'active' : '' }}">
+                        <li
+                            class="sidebar-item has-sub {{ Request::routeIs('kategori-blog.index', 'kategori-blog.create', 'kategori-blog.edit', 'kategori-blog.show', 'blog.index', 'blog.create', 'blog.edit', 'blog.show') ? 'active' : '' }}">
                             <a href="#" class="sidebar-link">
                                 <i class="bi bi-stack"></i>
                                 <span>Blog</span>
                             </a>
                             <ul class="submenu">
-                                <li class="submenu-item {{ Request::routeIs('kategori-blog.index', 'kategori-blog.create', 'kategori-blog.edit', 'kategori-blog.show') ? 'active' : '' }}">
+                                <li
+                                    class="submenu-item {{ Request::routeIs('kategori-blog.index', 'kategori-blog.create', 'kategori-blog.edit', 'kategori-blog.show') ? 'active' : '' }}">
                                     <a href="{{ route('kategori-blog.index') }}" class="submenu-link">Category Blog</a>
                                 </li>
-                                <li class="submenu-item {{ Request::routeIs('blog.index', 'blog.create', 'blog.edit', 'blog.show') ? 'active' : '' }}">
+                                <li
+                                    class="submenu-item {{ Request::routeIs('blog.index', 'blog.create', 'blog.edit', 'blog.show') ? 'active' : '' }}">
                                     <a href="{{ route('blog.index') }}" class="submenu-link">Blog</a>
                                 </li>
                             </ul>
@@ -157,6 +160,13 @@
                                 <a href="{{ route('user.index') }}" class="sidebar-link">
                                     <i class="bi bi-grid-fill"></i>
                                     <span>User</span>
+                                </a>
+                            </li>
+                            <li
+                                class="sidebar-item {{ request()->routeIs('store.index', 'user.create', 'user.edit') ? 'active' : '' }}">
+                                <a href="{{ route('store.index') }}" class="sidebar-link">
+                                    <i class="bi bi-grid-fill"></i>
+                                    <span>Store</span>
                                 </a>
                             </li>
                         @endif
