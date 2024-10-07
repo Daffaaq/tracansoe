@@ -29,9 +29,7 @@
         <div class="card-body">
             @if (auth()->user()->role == 'superadmin')
                 <div class="d-flex justify-content-end mb-3">
-                    <a href="{{ url('/dashboard/promosi/create') }}" class="btn btn-primary"
-                        style="margin-right: 5px;">Tambah
-                        Promosi</a>
+                    <a href="{{ url('/dashboard/promosi/create') }}" class="btn btn-primary" style="margin-right: 5px;">Tambah Promosi</a>
                 </div>
             @endif
             <div class="table-responsive">
@@ -54,31 +52,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" id="closeModalHeader" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Promosi ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeModalFooter" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
             var dataMaster = $('#periodeTable').DataTable({
@@ -139,12 +113,11 @@
                         name: 'uuid',
                         orderable: false,
                         searchable: false,
-                        render: function(data, type, row) {
+                        render: function(data) {
                             let actionButtons = `<a href="/dashboard/promosi/show/${data}" class="btn icon btn-sm btn-info">
                                 <i class="bi bi-eye"></i>
                              </a>`;
 
-                            // Cek apakah user memiliki role superadmin
                             @if (auth()->user()->role == 'superadmin')
                                 actionButtons += `<a href="/dashboard/promosi/edit/${data}" class="btn icon btn-sm btn-warning">
                                 <i class="bi bi-pencil"></i>
@@ -157,27 +130,58 @@
                             return actionButtons;
                         }
                     }
-
                 ],
                 autoWidth: false,
                 drawCallback: function(settings) {
                     $('a').tooltip();
                 }
             });
-
-            console.log("DataTable loaded");
-
-            $('#closeModalHeader, #closeModalFooter').on('click', function() {
-                console.log('close');
-                $('#deleteConfirmationModal').modal('hide');
-            });
-
-            console.log("data masuk");
         });
 
         function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/promosi/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data promosi akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/promosi/delete/${uuid}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    'Dihapus!',
+                                    'Data promosi berhasil dihapus.',
+                                    'success'
+                                );
+                                $('#periodeTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    'Terjadi kesalahan saat menghapus data promosi.',
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function() {
+                            Swal.fire(
+                                'Gagal!',
+                                'Tidak dapat menghubungi server.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection

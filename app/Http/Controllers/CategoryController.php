@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\StoreMainCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
+use Illuminate\Support\Facades\DB;
 use App\Models\category;
 
 class CategoryController extends Controller
@@ -109,17 +110,43 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki akses untuk menghapus sub-kategori.'
-            ]);
+            ], 403);
         }
 
-        $category = category::where('uuid', $uuid)->with('subKriteria')->firstOrFail();
-        $category->delete();
+        DB::beginTransaction();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Sub-Kategori berhasil dihapus.'
-        ]);
+        try {
+            $category = category::where('uuid', $uuid)->firstOrFail();
+            $nama_kategori = $category->nama_kategori; // Simpan nama kategori untuk respon
+
+            // Hapus data sub-kategori
+            $category->delete();
+
+            // Commit transaksi setelah penghapusan berhasil
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Sub-Kategori '{$nama_kategori}' berhasil dihapus.",
+                'nama_kategori' => $nama_kategori
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Rollback transaksi jika data tidak ditemukan
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Sub-Kategori tidak ditemukan.'
+            ], 404);
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan lain
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menghapus sub-kategori.'
+            ], 500);
+        }
     }
+
 
     /**
      * Display the specified resource.
@@ -172,23 +199,43 @@ class CategoryController extends Controller
         return redirect()->route('kategori.index')->with('success', 'Kategori dan Sub-Kategori berhasil diperbarui.');
     }
 
-
-
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $uuid)
     {
         if (auth()->user()->role != 'superadmin') {
-            return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menghapus kategori.');
+            return response()->json(['success' => false, 'message' => 'Anda tidak memiliki akses untuk menghapus kategori.'], 403);
         }
-        $category = category::where('uuid', $uuid)->firstOrFail();
 
-        // Hapus data kategori
-        $category->delete();
+        DB::beginTransaction();
 
-        return redirect()->route('kategori.index')->with('success', 'Kategori berhasil dihapus.');
+        try {
+            $category = category::where('uuid', $uuid)->firstOrFail();
+
+            // Cek apakah kategori ini merupakan kategori utama dengan sub-kategori
+            if ($category->parent_id === null) {
+                $hasChildCategories = category::where('parent_id', $category->id)->exists();
+
+                if ($hasChildCategories) {
+                    return response()->json(['success' => false, 'message' => 'Kategori ini memiliki sub-kategori. Hapus sub-kategori terlebih dahulu.'], 400);
+                }
+            }
+
+            // Hapus data kategori
+            $category->delete();
+
+            // Commit transaksi setelah penghapusan berhasil
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Kategori berhasil dihapus.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Kategori tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus kategori.'], 500);
+        }
     }
 
     public function activateCategory($uuid)

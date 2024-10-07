@@ -49,32 +49,7 @@
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" id="closeModalHeader" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Blog ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeModalFooter" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             var dataMaster = $('#blogTable').DataTable({
@@ -110,20 +85,14 @@
                         data: 'date_publish',
                         name: 'date_publish',
                         render: function(data) {
-                            if (data == null) {
-                                return '-';
-                            }
-                            return data;
+                            return data ? data : '-';
                         }
                     },
                     {
                         data: 'time_publish',
                         name: 'time_publish',
                         render: function(data) {
-                            if (data == null) {
-                                return '-';
-                            }
-                            return data;
+                            return data ? data : '-';
                         }
                     },
                     {
@@ -132,17 +101,10 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            let actionButtons = `<a href="/dashboard/blog/edit/${data}" class="btn icon btn-sm btn-warning">
-                        <i class="bi bi-pencil"></i>
-                      </a>
-                      <a href="/dashboard/blog/show/${data}" class="btn icon btn-sm btn-info">
-                <i class="bi bi-eye"></i>
-            </a>
-                      <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
-                        <i class="bi bi-trash"></i>
-                      </button>`;
-
-                            return actionButtons;
+                            return `
+                            <a href="/dashboard/blog/edit/${data}" class="btn icon btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="/dashboard/blog/show/${data}" class="btn icon btn-sm btn-info"><i class="bi bi-eye"></i></a>
+                            <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')"><i class="bi bi-trash"></i></button>`;
                         }
                     }
                 ],
@@ -158,8 +120,38 @@
         });
 
         function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/blog/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Apakah Anda yakin ingin menghapus Blog ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/blog/delete/${uuid}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                Swal.fire('Deleted!', response.message, 'success');
+                                $('#blogTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire('Error!', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error!', 'Failed to delete the blog. Please try again later.',
+                                'error');
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection

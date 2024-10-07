@@ -80,7 +80,7 @@
             @else
                 <div class="no-active-promo">
                     <i class="fas fa-exclamation-circle"></i>
-                    <p>Tidak ada Promos Yang Aktif Hari Ini</p>
+                    <p>Tidak ada Promo Yang Aktif Hari Ini</p>
                 </div>
             @endif
 
@@ -298,7 +298,7 @@
     <!-- Tracking Timeline Section (Modern & Fresh) -->
     <section id="tracking" class="tracking-section">
         <div class="container">
-            <h2>Lacak Pesanan Anda</h2>
+            <h2>Lacak Sepatu Anda</h2>
             <p>Masukkan kode pesanan Anda di bawah ini untuk melacak status layanan sepatu Anda:</p>
             <div class="tracking-form">
                 <form id="trackingForm">

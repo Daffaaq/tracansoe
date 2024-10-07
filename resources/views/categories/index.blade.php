@@ -30,8 +30,7 @@
             <div class="d-flex justify-content-end mb-3">
                 @if (auth()->user()->role == 'superadmin')
                     <a href="{{ url('/dashboard/kategori/create') }}" class="btn btn-primary"
-                        style="margin-right: 5px;">Tambah
-                        Kategori</a>
+                        style="margin-right: 5px;">Tambah Kategori</a>
                 @endif
             </div>
             <div class="table-responsive">
@@ -51,31 +50,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" id="closeModalHeader" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Promosi ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeModalFooter" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
             var dataMaster = $('#periodeTable').DataTable({
@@ -105,33 +80,18 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            console.log(data, type, row);
-                            if (type === 'display') {
-                                var addsubcategory = `
-                                    <a href="/dashboard/kategori/subkategori/${data}" class="btn icon btn-sm btn-info">
-                                        <i class="bi bi-plus"></i>
-                                    </a>
-                                `;
-                                var showsubcategory = `
-                                    <a href="/dashboard/kategori/showsub/${data}" class="btn icon btn-sm btn-info">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                `;
-                                var arrayData = {!! json_encode($data->toArray()) !!};
-                                console.log(arrayData);
-                                var hasSubKriteria = false;
-
-                                arrayData.forEach(function(item) {
-                                    if (item.parent_id === row.id) {
-                                        hasSubKriteria = true;
-                                    }
-                                });
-                                // console.log(hasSubKriteria);
-                                return addsubcategory + (hasSubKriteria ? ' ' + showsubcategory :
-                                    '');
-                            } else {
-                                return data;
-                            }
+                            var addsubcategory = `
+                            <a href="/dashboard/kategori/subkategori/${data}" class="btn icon btn-sm btn-info">
+                                <i class="bi bi-plus"></i>
+                            </a>
+                        `;
+                            var showsubcategory = `
+                            <a href="/dashboard/kategori/showsub/${data}" class="btn icon btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        `;
+                            var hasSubKriteria = {!! json_encode($data->pluck('parent_id')->toArray()) !!}.includes(row.id);
+                            return addsubcategory + (hasSubKriteria ? ' ' + showsubcategory : '');
                         }
                     },
                     {
@@ -141,19 +101,19 @@
                         searchable: false,
                         render: function(data, type, row) {
                             let actionButtons = `
-                                <a href="/dashboard/kategori/show/${data}" class="btn icon btn-sm btn-info">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                            `;
+                            <a href="/dashboard/kategori/show/${data}" class="btn icon btn-sm btn-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        `;
 
                             @if (auth()->user()->role == 'superadmin')
                                 actionButtons += `
-                                <a href="/dashboard/kategori/edit/${data}" class="btn icon btn-sm btn-warning">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
-                                    <i class="bi bi-trash"></i>
-                                </button>`;
+                            <a href="/dashboard/kategori/edit/${data}" class="btn icon btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
+                                <i class="bi bi-trash"></i>
+                            </button>`;
                             @endif
 
                             return actionButtons;
@@ -165,20 +125,56 @@
                     $('a').tooltip();
                 }
             });
-
-            console.log("DataTable loaded");
-
-            $('#closeModalHeader, #closeModalFooter').on('click', function() {
-                console.log('close');
-                $('#deleteConfirmationModal').modal('hide');
-            });
-
-            console.log("data masuk");
         });
 
         function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/kategori/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data kategori akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/kategori/delete/${uuid}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    'Dihapus!',
+                                    response.message,
+                                    'success'
+                                );
+                                $('#periodeTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function(xhr) {
+                            let message = 'Tidak dapat menghubungi server.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                message = xhr.responseJSON.message;
+                            }
+                            Swal.fire(
+                                'Gagal!',
+                                message,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection

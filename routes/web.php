@@ -85,12 +85,8 @@ Route::middleware(['auth'])->group(function () {
     });
     Route::prefix('dashboard')->group(function () {
         Route::get('/memberships', [MembershipController::class, 'index'])->name('memberships.index');
-        Route::get('/memberships/create', [MembershipController::class, 'create'])->name('memberships.create');
         Route::post('/memberships/store', [MembershipController::class, 'store'])->name('memberships.store');
         Route::get('/memberships/show/{uuid}', [MembershipController::class, 'show'])->name('memberships.show');
-        Route::get('/memberships/edit/{uuid}', [MembershipController::class, 'edit'])->name('memberships.edit');
-        Route::put('/memberships/update/{uuid}', [MembershipController::class, 'update'])->name('memberships.update');
-        Route::delete('/memberships/delete/{uuid}', [MembershipController::class, 'destroy'])->name('memberships.destroy');
         Route::post('/memberships/verify/{uuid}', [MembershipController::class, 'verify'])->name('memberships.verify');
         Route::post('/memberships/list', [MembershipController::class, 'list'])->name('memberships.list');
     });

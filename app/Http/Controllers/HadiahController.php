@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests\HadiahRequest;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\DB;
 use App\Models\Hadiah;
 
 class HadiahController extends Controller
@@ -79,8 +80,25 @@ class HadiahController extends Controller
      */
     public function destroy(string $uuid)
     {
-        $hadiah = Hadiah::where('uuid', $uuid)->firstOrFail();
-        $hadiah->delete();
-        return redirect()->route('hadiah.index')->with('success', 'Hadiah berhasil dihapus.');
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'You must be logged in to perform this action.'], 403);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $hadiah = Hadiah::where('uuid', $uuid)->firstOrFail();
+            $hadiah->delete();
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Hadiah berhasil dihapus.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Hadiah tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus hadiah.'], 500);
+        }
     }
 }

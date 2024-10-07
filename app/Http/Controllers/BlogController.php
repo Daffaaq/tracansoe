@@ -8,6 +8,7 @@ use App\Models\Blog;
 use App\Models\CategoryBlog;
 use App\Http\Requests\BlogRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class BlogController extends Controller
 {
@@ -37,7 +38,7 @@ class BlogController extends Controller
     {
         if (auth()->user()->role != 'karyawan') {
             return redirect()->route('blog.index')
-            ->with('error', 'Anda tidak memiliki akses untuk membuat Blog.');
+                ->with('error', 'Anda tidak memiliki akses untuk membuat Blog.');
         }
         $categoryBlog = CategoryBlog::all();
         return view('blogs.create', compact('categoryBlog'));
@@ -50,7 +51,7 @@ class BlogController extends Controller
     {
         if (auth()->user()->role != 'karyawan') {
             return redirect()->route('blog.index')
-            ->with('error', 'Anda tidak memiliki akses untuk membuat Blog.');
+                ->with('error', 'Anda tidak memiliki akses untuk membuat Blog.');
         }
         // Handle image upload
         $imagePath = null;
@@ -130,12 +131,39 @@ class BlogController extends Controller
      */
     public function destroy(string $uuid)
     {
-        // Find blog by UUID and delete it
-        $blog = Blog::where('uuid', $uuid)->firstOrFail();
-        $blog->delete();
+        // Mengecek apakah pengguna sudah login
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'You must be logged in to perform this action.'], 403);
+        }
 
-        return redirect()->route('blog.index')->with('success', 'Blog deleted successfully.');
+        try {
+            DB::beginTransaction();
+
+            $blog = Blog::where('uuid', $uuid)->firstOrFail();
+            $blog->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Blog deleted successfully.'
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Blog not found.'
+            ], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while deleting the blog.'
+            ], 500);
+        }
     }
+
+
 
     public function publishBlog(string $uuid)
     {

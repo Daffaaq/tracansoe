@@ -102,22 +102,22 @@
                             </a>
                         </li>
                         <li
-                            class="sidebar-item {{ request()->routeIs('memberships.index', 'memberships.create', 'memberships.edit', 'memberships.show') ? 'active' : '' }}">
+                            class="sidebar-item {{ request()->routeIs('memberships.index', 'memberships.show') ? 'active' : '' }}">
                             <a href="{{ route('memberships.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Memberships</span>
                             </a>
                         </li>
-                        <li class="sidebar-item has-sub {{ Request::routeIs('kategori-blog.index') ? 'active' : '' }}">
+                        <li class="sidebar-item has-sub {{ Request::routeIs('kategori-blog.index', 'kategori-blog.create', 'kategori-blog.edit', 'kategori-blog.show', 'blog.index', 'blog.create', 'blog.edit', 'blog.show') ? 'active' : '' }}">
                             <a href="#" class="sidebar-link">
                                 <i class="bi bi-stack"></i>
                                 <span>Blog</span>
                             </a>
                             <ul class="submenu">
-                                <li class="submenu-item {{ Request::routeIs('kategori-blog.index') ? 'active' : '' }}">
+                                <li class="submenu-item {{ Request::routeIs('kategori-blog.index', 'kategori-blog.create', 'kategori-blog.edit', 'kategori-blog.show') ? 'active' : '' }}">
                                     <a href="{{ route('kategori-blog.index') }}" class="submenu-link">Category Blog</a>
                                 </li>
-                                <li class="submenu-item {{ Request::routeIs('blog.index') ? 'active' : '' }}">
+                                <li class="submenu-item {{ Request::routeIs('blog.index', 'blog.create', 'blog.edit', 'blog.show') ? 'active' : '' }}">
                                     <a href="{{ route('blog.index') }}" class="submenu-link">Blog</a>
                                 </li>
                             </ul>

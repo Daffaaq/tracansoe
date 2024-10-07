@@ -3,11 +3,11 @@
 @section('content')
     <style>
         /* #wheelContainer {
-                                                            display: inline-block;
-                                                            position: relative;
-                                                            width: 300px;
-                                                            height: 300px;
-                                                        } */
+                                                                    display: inline-block;
+                                                                    position: relative;
+                                                                    width: 300px;
+                                                                    height: 300px;
+                                                                } */
 
         #wheelContainer {
             display: flex;
@@ -52,7 +52,7 @@
     </style>
 
     <div class="page-heading">
-        <h3>Transaction Statistics</h3>
+        <h3>Dashboard</h3>
     </div>
     <div class="page-content">
         <section class="row">
@@ -102,7 +102,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
-                                        <h6 class="text-muted font-semibold">Total Outstanding Payments</h6>
+                                        <h6 class="text-muted font-semibold">Total Pembayaran Tertunggak</h6>
                                         <h6 class="font-extrabold mb-0">{{ number_format($totalOutstanding) }}</h6>
                                     </div>
                                 </div>

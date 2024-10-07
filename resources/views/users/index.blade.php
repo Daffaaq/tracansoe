@@ -50,29 +50,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus pengguna ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
             var userTable = $('#userTable').DataTable({
@@ -111,8 +89,6 @@
                         searchable: false,
                         render: function(data) {
                             let actionButtons = '';
-
-                            // Cek apakah user memiliki role superadmin
                             @if (auth()->user()->role == 'superadmin')
                                 actionButtons += `<a href="/dashboard/user/edit/${data}" class="btn icon btn-sm btn-warning">
                                     <i class="bi bi-pencil"></i>
@@ -121,22 +97,58 @@
                                     <i class="bi bi-trash"></i>
                                   </button>`;
                             @endif
-
                             return actionButtons;
                         }
                     }
                 ],
                 autoWidth: false,
             });
-            $('#closeModalHeader, #closeModalFooter').on('click', function() {
-                console.log('close');
-                $('#deleteConfirmationModal').modal('hide');
-            });
         });
 
         function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/user/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data pengguna akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/user/delete/${uuid}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    'Dihapus!',
+                                    'Data pengguna berhasil dihapus.',
+                                    'success'
+                                );
+                                $('#userTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    'Terjadi kesalahan saat menghapus data pengguna.',
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function() {
+                            Swal.fire(
+                                'Gagal!',
+                                'Tidak dapat menghubungi server.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection

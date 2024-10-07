@@ -29,8 +29,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-end mb-3">
                 <a href="{{ url('/dashboard/kategori-blog/create') }}" class="btn btn-primary"
-                    style="margin-right: 5px;">Tambah
-                    Kategori Blog</a>
+                    style="margin-right: 5px;">Tambah Kategori Blog</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered" id="categoryBlogTable" width="100%" cellspacing="0">
@@ -49,31 +48,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" id="closeModalHeader" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Kategori Blog ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeModalFooter" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
             var dataMaster = $('#categoryBlogTable').DataTable({
@@ -106,15 +81,14 @@
                         name: 'uuid',
                         orderable: false,
                         searchable: false,
-                        render: function(data, type, row) {
-                            let actionButtons = `<a href="/dashboard/kategori-blog/edit/${data}" class="btn icon btn-sm btn-warning">
-                        <i class="bi bi-pencil"></i>
-                      </a>
-                      <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
-                        <i class="bi bi-trash"></i>
-                      </button>`;
-
-                            return actionButtons;
+                        render: function(data) {
+                            return `
+                                <a href="/dashboard/kategori-blog/edit/${data}" class="btn icon btn-sm btn-warning">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>`;
                         }
                     }
                 ],
@@ -123,15 +97,44 @@
                     $('a').tooltip();
                 }
             });
-
-            $('#closeModalHeader, #closeModalFooter').on('click', function() {
-                $('#deleteConfirmationModal').modal('hide');
-            });
         });
 
         function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/kategori-blog/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data kategori blog akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/kategori-blog/delete/${uuid}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Dihapus!', response.message, 'success')
+                                    .then(() => $('#categoryBlogTable').DataTable().ajax.reload());
+                            } else {
+                                Swal.fire('Gagal!', response.message, 'error');
+                            }
+                        },
+                        error: function(xhr) {
+                            let message = 'Tidak dapat menghubungi server.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                message = xhr.responseJSON.message;
+                            }
+                            Swal.fire('Gagal!', message, 'error');
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection

@@ -76,8 +76,9 @@
                 <div class="col-md-9">
                     {{-- Jika gambar ada, tampilkan, jika tidak tampilkan pesan default --}}
                     @if ($promosi->image)
-                        <img src="{{ asset('storage/' . $promosi->image) }}" alt="{{ $promosi->nama_promosi }}"
-                            class="img-fluid">
+                        <img src="{{ asset($promosi->image) }}" alt="{{ $promosi->nama_promosi }}" class="img-fluid">
+                        {{-- <img src="{{ asset('storage/' . $promosi->image) }}" alt="{{ $promosi->nama_promosi }}"
+                            class="img-fluid"> --}}
                     @else
                         <span class="text-muted">Tidak ada gambar tersedia</span>
                     @endif

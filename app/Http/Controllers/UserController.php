@@ -90,9 +90,25 @@ class UserController extends Controller
      */
     public function destroy(string $uuid)
     {
-        $user = User::where('uuid', $uuid)->firstOrFail();
-        $user->delete();
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'You must be logged in to perform this action.'], 403);
+        }
 
-        return redirect()->route('user.index')->with('success', 'User deleted successfully.');
+        DB::beginTransaction();
+
+        try {
+            $user = User::where('uuid', $uuid)->firstOrFail();
+            $user->delete();
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'User deleted successfully.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'An error occurred while deleting the user.'], 500);
+        }
     }
 }

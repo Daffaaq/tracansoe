@@ -270,20 +270,39 @@ class PromosiController extends Controller
      */
     public function destroy(string $uuid)
     {
+        // Periksa apakah pengguna memiliki peran superadmin
         if (auth()->user()->role != 'superadmin') {
-            // Redirect pengguna non-superadmin ke halaman lain, misalnya ke halaman daftar promosi
-            return redirect()->route('promosi.index')->with('error', 'Anda tidak memiliki akses untuk menghapus promosi.');
-        }
-        $promosi = promosi::where('uuid', $uuid)->firstOrFail();
-
-        // Hapus gambar dari folder jika ada
-        if ($promosi->image && file_exists(public_path('images/promosi/' . $promosi->image))) {
-            unlink(public_path('images/promosi/' . $promosi->image));
+            return response()->json(['success' => false, 'message' => 'Anda tidak memiliki akses untuk menghapus promosi.'], 403);
         }
 
-        // Hapus data promosi
-        $promosi->delete();
+        // Memulai transaksi database
+        DB::beginTransaction();
 
-        return redirect()->route('promosi.index')->with('success', 'Promosi berhasil dihapus.');
+        try {
+            // Temukan promosi berdasarkan UUID
+            $promosi = promosi::where('uuid', $uuid)->firstOrFail();
+
+            // Hapus gambar dari folder jika ada
+            if ($promosi->image && file_exists(public_path('images/promosi/' . $promosi->image))) {
+                unlink(public_path('images/promosi/' . $promosi->image));
+            }
+
+            // Hapus data promosi dari database
+            $promosi->delete();
+
+            // Commit transaksi setelah operasi berhasil
+            DB::commit();
+
+            // Kembalikan respons JSON yang berhasil
+            return response()->json(['success' => true, 'message' => 'Promosi berhasil dihapus.']);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Rollback transaksi jika data tidak ditemukan
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Promosi tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan lain
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus promosi.'], 500);
+        }
     }
 }

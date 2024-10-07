@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\CategoryBlogRequest;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\CategoryBlog;
+use Illuminate\Support\Facades\DB;
 
 class CategoryBlogController extends Controller
 {
@@ -86,10 +87,30 @@ class CategoryBlogController extends Controller
      */
     public function destroy(string $uuid)
     {
-        // Find category by UUID and delete it
-        $category_blog = CategoryBlog::where('uuid', $uuid)->firstOrFail();
-        $category_blog->delete();
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'You must be logged in to perform this action.'], 403);
+        }
 
-        return redirect()->route('kategori-blog.index')->with('success', 'Category deleted successfully.');
+        DB::beginTransaction();
+
+        try {
+            $category_blog = CategoryBlog::where('uuid', $uuid)->firstOrFail();
+            $nama_kategori = $category_blog->name_category_blog;
+
+            $category_blog->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Kategori Blog '{$nama_kategori}' berhasil dihapus."
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Kategori Blog tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus kategori blog.'], 500);
+        }
     }
 }

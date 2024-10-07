@@ -131,7 +131,6 @@
                         cancelButtonText: 'Batal'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // Menggunakan fetch API untuk mengirim AJAX request
                             fetch(`/dashboard/kategori/delete-subkategori/${uuid}`, {
                                     method: 'POST',
                                     headers: {
@@ -145,14 +144,15 @@
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.success) {
-                                        Swal.fire('Berhasil!', data.success, 'success')
+                                        Swal.fire('Berhasil!', `${data.message}`,
+                                                'success')
                                             .then(() => {
                                                 // Hapus baris dari DOM setelah sukses
                                                 document.getElementById(rowId)
                                                     .remove();
                                             });
-                                    } else if (data.error) {
-                                        Swal.fire('Error!', data.error, 'error');
+                                    } else {
+                                        Swal.fire('Error!', data.message, 'error');
                                     }
                                 })
                                 .catch(error => {
@@ -166,4 +166,5 @@
             });
         });
     </script>
+
 @endsection

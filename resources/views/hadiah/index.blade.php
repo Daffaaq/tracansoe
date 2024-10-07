@@ -51,30 +51,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
-                    <button type="button" id="closeModalHeader" class="btn-close" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Apakah Anda yakin ingin menghapus Hadiah ini?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="closeModalFooter" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <form id="deleteForm" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         $(document).ready(function() {
             var dataMaster = $('#hadiahTable').DataTable({
@@ -115,8 +92,8 @@
                         name: 'uuid',
                         orderable: false,
                         searchable: false,
-                        render: function(data, type, row) {
-                            let actionButtons = `
+                        render: function(data) {
+                            return `
                                 <a href="/dashboard/hadiah/show/${data}" class="btn icon btn-sm btn-info">
                                     <i class="bi bi-eye"></i>
                                 </a>
@@ -126,25 +103,64 @@
                                 <button class="btn icon btn-sm btn-danger" onclick="confirmDelete('${data}')">
                                     <i class="bi bi-trash"></i>
                                 </button>`;
-
-                            return actionButtons;
                         }
                     }
                 ],
                 autoWidth: false,
-                drawCallback: function(settings) {
+                drawCallback: function() {
                     $('a').tooltip();
                 }
-            });
-
-            $('#closeModalHeader, #closeModalFooter').on('click', function() {
-                $('#deleteConfirmationModal').modal('hide');
             });
         });
 
         function confirmDelete(uuid) {
-            $('#deleteForm').attr('action', `/dashboard/hadiah/delete/${uuid}`);
-            $('#deleteConfirmationModal').modal('show');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data hadiah akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/dashboard/hadiah/delete/${uuid}`,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire(
+                                    'Dihapus!',
+                                    response.message,
+                                    'success'
+                                );
+                                $('#hadiahTable').DataTable().ajax.reload();
+                            } else {
+                                Swal.fire(
+                                    'Gagal!',
+                                    response.message,
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function(xhr) {
+                            let message = 'Tidak dapat menghubungi server.';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                message = xhr.responseJSON.message;
+                            }
+                            Swal.fire(
+                                'Gagal!',
+                                message,
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
         }
     </script>
 @endsection

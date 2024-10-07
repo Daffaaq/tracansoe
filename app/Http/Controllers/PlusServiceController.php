@@ -7,6 +7,7 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Str;
 use App\Http\Requests\PlusServiceRequest;
 use App\Models\plus_service;
+use Illuminate\Support\Facades\DB;
 
 class PlusServiceController extends Controller
 {
@@ -107,12 +108,27 @@ class PlusServiceController extends Controller
             return response()->json(['error' => 'Anda tidak memiliki akses untuk menghapus plus service.'], 403);
         }
 
-        $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
+        DB::beginTransaction();
 
-        // Hapus data plus service
-        $plusService->delete();
+        try {
+            $plusService = plus_service::where('uuid', $uuid)->firstOrFail();
 
-        return response()->json(['success' => 'Plus service berhasil dihapus.'], 200);
+            // Hapus data plus service
+            $plusService->delete();
+
+            // Commit transaksi setelah penghapusan berhasil
+            DB::commit();
+
+            return response()->json(['success' => 'Plus service berhasil dihapus.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Rollback transaksi jika data tidak ditemukan
+            DB::rollBack();
+            return response()->json(['error' => 'Plus service tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan lain
+            DB::rollBack();
+            return response()->json(['error' => 'Terjadi kesalahan saat menghapus plus service.'], 500);
+        }
     }
 
     public function activate(string $uuid)
