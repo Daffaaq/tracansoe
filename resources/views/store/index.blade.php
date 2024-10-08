@@ -18,13 +18,6 @@
         padding: 20px;
     }
 
-    .card img {
-        border-radius: 50%;
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-    }
-
     .form-control-plaintext {
         font-size: 16px;
         margin-bottom: 10px;
@@ -73,7 +66,7 @@
         margin-right: 8px;
     }
 
-    .bi-twitter-x {
+    .bi-twitter {
         color: #1DA1F2;
     }
 
@@ -83,6 +76,10 @@
 
     .bi-instagram {
         color: #E1306C;
+    }
+
+    .bi-tiktok {
+        color: #000000;
     }
 </style>
 
@@ -102,15 +99,11 @@
         <div class="card shadow-sm">
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <img src="{{ Storage::url($dataStore->logo_url) }}" alt="Profile Avatar" class="rounded-circle">
                     <div class="ms-3">
                         <h4 class="mb-0">{{ $dataStore->name ?? '' }}</h4>
                         <p class="text-muted">{{ $dataStore->address ?? '' }}</p>
                     </div>
                 </div>
-                <a href="{{ route('store.edit-logo', $dataStore->uuid) }}" class="btn btn-outline-secondary">
-                    <i class="fas fa-edit"></i> Edit Logo
-                </a>
             </div>
         </div>
 
@@ -154,48 +147,67 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    @if ($dataStore->twitter_url)
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Twitter</label>
-                            <p class="form-control-plaintext">
-                                <a href="{{ $dataStore->twitter_url }}" target="_blank">
-                                    <i class="bi bi-twitter-x"></i> Twitter
-                                </a>
-                            </p>
-                        </div>
-                    @endif
-                    @if ($dataStore->facebook_url)
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Facebook</label>
-                            <p class="form-control-plaintext">
-                                <a href="{{ $dataStore->facebook_url }}" target="_blank">
-                                    <i class="bi bi-facebook"></i> Facebook
-                                </a>
-                            </p>
-                        </div>
-                    @endif
-                    @if ($dataStore->instagram_url)
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Instagram</label>
-                            <p class="form-control-plaintext">
-                                <a href="{{ $dataStore->instagram_url }}" target="_blank">
-                                    <i class="bi bi-instagram"></i> Instagram
-                                </a>
-                            </p>
-                        </div>
-                    @endif
-                    @if ($dataStore->tiktok_url)
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Tiktok</label>
-                            <p class="form-control-plaintext">
-                                <a href="{{ $dataStore->tiktok_url }}" target="_blank">
-                                    <i class="bi bi-tiktok"></i> Tiktok
-                                </a>
-                            </p>
-                        </div>
-                    @endif
+                    <!-- Twitter -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Twitter</label>
+                        <p class="form-control-plaintext">
+                            <a href="{{ $dataStore->twitter_url ?? '#' }}"
+                                target="{{ $dataStore->twitter_url ? '_blank' : '' }}"
+                                onclick="{{ $dataStore->twitter_url ? '' : 'showAlert(event)' }}">
+                                <i class="bi bi-twitter"></i> Twitter
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Facebook -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Facebook</label>
+                        <p class="form-control-plaintext">
+                            <a href="{{ $dataStore->facebook_url ?? '#' }}"
+                                target="{{ $dataStore->facebook_url ? '_blank' : '' }}"
+                                onclick="{{ $dataStore->facebook_url ? '' : 'showAlert(event)' }}">
+                                <i class="bi bi-facebook"></i> Facebook
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Instagram -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Instagram</label>
+                        <p class="form-control-plaintext">
+                            <a href="{{ $dataStore->instagram_url ?? '#' }}"
+                                target="{{ $dataStore->instagram_url ? '_blank' : '' }}"
+                                onclick="{{ $dataStore->instagram_url ? '' : 'showAlert(event)' }}">
+                                <i class="bi bi-instagram"></i> Instagram
+                            </a>
+                        </p>
+                    </div>
+
+                    <!-- Tiktok -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Tiktok</label>
+                        <p class="form-control-plaintext">
+                            <a href="{{ $dataStore->tiktok_url ?? '#' }}"
+                                target="{{ $dataStore->tiktok_url ? '_blank' : '' }}"
+                                onclick="{{ $dataStore->tiktok_url ? '' : 'showAlert(event)' }}">
+                                <i class="bi bi-tiktok"></i> Tiktok
+                            </a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    function showAlert(event) {
+        event.preventDefault(); // Mencegah tautan default
+        Swal.fire({
+            icon: 'warning',
+            title: 'URL Tidak Tersedia',
+            text: 'Link untuk media sosial ini belum tersedia.',
+            confirmButtonText: 'OK'
+        });
+    }
+</script>
 @endsection

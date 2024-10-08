@@ -21,7 +21,6 @@ return new class extends Migration
             $table->decimal('latitude', 10, 7);
             $table->string('phone');
             $table->string('email')->nullable();
-            $table->string('logo_url')->nullable();
             $table->time('opening_time')->nullable();
             $table->time('closing_time')->nullable();
             $table->string('facebook_url')->nullable();

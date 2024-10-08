@@ -345,7 +345,7 @@
                 <div class="step">
                     <i class="fas fa-map-marker-alt"></i>
                     <h3>Kunjungi CuciSepatu</h3>
-                    <p>Datang ke <strong>{{ $store->address }}</strong> dan sampaikan layanan yang Anda
+                    <p>Datang ke <strong>{{ $desiredAddress }}</strong> dan sampaikan layanan yang Anda
                         butuhkan.</p>
                 </div>
                 <div class="step">
@@ -662,7 +662,7 @@
                 <!-- Informasi Kontak -->
                 <div class="contact-info">
                     <div id="map" class="maplp" style="height: 200px;"></div>
-                    <p><i class="fas fa-map-marker-alt"></i>{{ $store->address }}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> {{ $desiredAddress }}</p>
                     <p><i class="fas fa-phone-alt"></i>{{ $store->phone }}</p>
                     <p><i class="fas fa-envelope"></i>{{ $store->email }}</p>
                 </div>
@@ -678,16 +678,27 @@
                 <h3 class="footer-logo">{{ $store->name }}</h3>
                 <p class="footer-description">{{ $store->description }}</p>
                 <div class="social-icons">
-                    <a href="{{ $store->facebook_url }}" aria-label="Facebook">
+                    <a href="{{ $store->facebook_url ? $store->facebook_url : '#' }}"
+                        target="{{ $store->facebook_url ? '_blank' : '' }}" aria-label="Facebook"
+                        onclick="{{ $store->facebook_url ? '' : 'showAlert(event)' }}">
                         <i class="fab fa-facebook-f"></i>
                     </a>
-                    <a href="{{ $store->twitter_url }}" aria-label="Twitter">
+
+                    <a href="{{ $store->twitter_url ? $store->twitter_url : '#' }}"
+                        target="{{ $store->twitter_url ? '_blank' : '' }}" aria-label="Twitter"
+                        onclick="{{ $store->twitter_url ? '' : 'showAlert(event)' }}">
                         <i class="fab fa-twitter"></i>
                     </a>
-                    <a href="{{ $store->instagram_url }}" aria-label="Instagram">
+
+                    <a href="{{ $store->instagram_url ? $store->instagram_url : '#' }}"
+                        target="{{ $store->instagram_url ? '_blank' : '' }}" aria-label="Instagram"
+                        onclick="{{ $store->instagram_url ? '' : 'showAlert(event)' }}">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="{{ $store->tiktok_url }}" aria-label="Tiktok">
+
+                    <a href="{{ $store->tiktok_url ? $store->tiktok_url : '#' }}"
+                        target="{{ $store->tiktok_url ? '_blank' : '' }}" aria-label="Tiktok"
+                        onclick="{{ $store->tiktok_url ? '' : 'showAlert(event)' }}">
                         <i class="fab fa-tiktok"></i>
                     </a>
                 </div>
@@ -707,9 +718,21 @@
     <script src="{{ asset('/LandingPage/js/scroll-to-top.js') }}"></script>
     <script src="{{ asset('/LandingPage/js/aos.js') }}"></script>
     <script>
+        function showAlert(event) {
+            event.preventDefault(); // Prevent the default link behavior
+            Swal.fire({
+                icon: 'info',
+                title: 'Oops!',
+                text: 'The social media link is not available at the moment.',
+                confirmButtonText: 'Okay'
+            });
+        }
+    </script>
+    <script>
         window.storeLocation = {
             latitude: {!! json_encode($store->latitude) !!},
-            longitude: {!! json_encode($store->longitude) !!}
+            longitude: {!! json_encode($store->longitude) !!},
+            nama:{!! json_encode($store->name) !!}
         };
     </script>
     <script src="{{ asset('/LandingPage/js/map.js') }}"></script>

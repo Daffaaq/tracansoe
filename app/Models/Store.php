@@ -19,7 +19,6 @@ class Store extends Model
         'latitude',
         'phone',
         'email',
-        'logo_url',
         'opening_time',
         'closing_time',
         'facebook_url',

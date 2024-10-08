@@ -64,7 +64,13 @@ class LandingPageController extends Controller
             ->get();
         $store = Store::first();
 
-        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService', 'datadoorprize', 'winners', 'store'));
+        // Memotong alamat menjadi array berdasarkan tanda koma
+        $addressParts = explode(',', $store->address);
+
+        // Menentukan elemen yang ingin ditampilkan
+        $desiredAddress = $addressParts[0] . ', ' . $addressParts[1] . ', ' . $addressParts[3] . ', ' . $addressParts[6];
+
+        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService', 'datadoorprize', 'winners', 'store', 'desiredAddress'));
     }
 
     public function index(Request $request)

@@ -38,24 +38,17 @@ class StoreController extends Controller
     public function index()
     {
         $this->authorizeSuperAdmin();
-        $dataStore = Store::select("uuid", "name", "description", "address", "longitude", "latitude", "logo_url", "phone", "email", "opening_time", "closing_time", "facebook_url", "instagram_url", "twitter_url", "tiktok_url")->first();
+        $dataStore = Store::select("uuid", "name", "description", "address", "longitude", "latitude", "phone", "email", "opening_time", "closing_time", "facebook_url", "instagram_url", "twitter_url", "tiktok_url")->first();
         return view('store.index', compact('dataStore'));
     }
 
-    public function viewEditLogo($uuid)
-    {
-        $this->authorizeSuperAdmin();
-
-        $dataStore = $this->findStoreByUuid($uuid);
-        return view('stores.edit-logo', compact('dataStore'));
-    }
 
     public function viewEditInformation($uuid)
     {
         $this->authorizeSuperAdmin();
 
         $dataStore = $this->findStoreByUuid($uuid);
-        return view('stores.edit-informasi', compact('dataStore'));
+        return view('store.edit-informasi', compact('dataStore'));
     }
 
     public function viewEditSocialMedia($uuid)
@@ -63,28 +56,9 @@ class StoreController extends Controller
         $this->authorizeSuperAdmin();
 
         $dataStore = $this->findStoreByUuid($uuid);
-        return view('stores.edit-social-media', compact('dataStore'));
+        return view('store.edit-social-media', compact('dataStore'));
     }
 
-    public function updateLogo(Request $request, $uuid)
-    {
-        $this->authorizeSuperAdmin();
-
-        try {
-            $store = $this->findStoreByUuid($uuid);
-
-            $request->validate([
-                'logo' => 'required|url',
-            ]);
-
-            $store->update(['logo' => $request->input('logo')]);
-
-            return redirect()->route('store.index')->with('success', 'Logo updated successfully.');
-        } catch (Exception $e) {
-            Log::error('Error updating store logo: ' . $e->getMessage());
-            return back()->with('error', 'An error occurred while updating the logo.');
-        }
-    }
 
     public function updateStoreInformation(Request $request, $uuid)
     {

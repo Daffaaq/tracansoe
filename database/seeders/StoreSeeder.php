@@ -25,11 +25,7 @@ class StoreSeeder extends Seeder
                 'phone' => '+62 812 3456 7890',
                 'email' => 'info@cucisepatu.com',
                 'opening_time' => '08:00:00',
-                'closing_time' => '21:00:00',
-                'facebook_url' => 'https://facebook.com/cucisepatu',
-                'instagram_url' => 'https://instagram.com/cucisepatu',
-                'twitter_url' => 'https://twitter.com/cucisepatu',
-                'tiktok_url' => 'https://tiktok.com/@cucisepatu',  // Replace with the actual Tiktok URL
+                'closing_time' => '21:00:00', // Replace with the actual Tiktok URL
             ]);
         }
     }
