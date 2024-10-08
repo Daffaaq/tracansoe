@@ -1694,6 +1694,27 @@ label {
 .maplp {
     margin-top: 5px; /* Kurangi margin-top agar peta lebih ke atas */
 }
+
+/* Styling for the Google Maps icon */
+/* Custom Leaflet marker with Font Awesome */
+.custom-marker i {
+    color: #4285f4; /* Google blue */
+    font-size: 24px;
+}
+
+/* Styling for the popup to make it look cleaner */
+.leaflet-popup-content {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.leaflet-popup-content-wrapper {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
 #map {
     height: 200px;
     width: 100%;

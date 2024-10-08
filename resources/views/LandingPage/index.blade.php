@@ -662,7 +662,9 @@
                 <!-- Informasi Kontak -->
                 <div class="contact-info">
                     <div id="map" class="maplp" style="height: 200px;"></div>
-                    <p><i class="fas fa-map-marker-alt"></i> {{ $desiredAddress }}</p>
+                    <p style="text-align: justify;">
+                        <i class="fas fa-map-marker-alt"></i> {{ $store->address }}
+                    </p>
                     <p><i class="fas fa-phone-alt"></i>{{ $store->phone }}</p>
                     <p><i class="fas fa-envelope"></i>{{ $store->email }}</p>
                 </div>
@@ -732,7 +734,7 @@
         window.storeLocation = {
             latitude: {!! json_encode($store->latitude) !!},
             longitude: {!! json_encode($store->longitude) !!},
-            nama:{!! json_encode($store->name) !!}
+            nama: {!! json_encode($store->name) !!}
         };
     </script>
     <script src="{{ asset('/LandingPage/js/map.js') }}"></script>
