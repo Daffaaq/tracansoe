@@ -147,6 +147,11 @@ Silahkan kalau mau pakai no problem asalkan jangan diganti footernya landing pag
 5. Dashboard
    ![Screenshot 2024-10-08 at 16-54-05 Dashboard - Mazer Admin Dashboard](https://github.com/user-attachments/assets/308089d4-3e22-4c99-9b41-7c33802e6e41)
 
+
+https://github.com/user-attachments/assets/4c143d77-9e92-4844-9640-2d7dee3bec88
+
+
+
 7. Manajemen Store
 ![Screenshot 2024-10-08 at 16-59-52 Dashboard - Mazer Admin Dashboard](https://github.com/user-attachments/assets/2d09ff5a-d102-467a-9aab-f02e48132321)
 ![Screenshot 2024-10-08 at 17-00-00 Dashboard - Mazer Admin Dashboard](https://github.com/user-attachments/assets/8625031d-7965-45f7-bcea-61503d45285c)
