@@ -21,6 +21,9 @@ use App\Http\Requests\ValidateMembershipRequest;
 use App\Http\Requests\PelunasanRequest;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
+use App\Mail\TransaksiEmail;
+use Illuminate\Support\Facades\Mail;
+use App\Models\CategorySepatu;
 
 class TransaksiController extends Controller
 {
@@ -51,7 +54,8 @@ class TransaksiController extends Controller
     {
         $categories = category::where('status_kategori', 'active')->get();
         $plus_services = plus_service::where('status_plus_service', 'active')->get();
-        return view('transaksi.create', compact('categories', 'plus_services'));
+        $kategori_sepatu = CategorySepatu::all();
+        return view('transaksi.create', compact('categories', 'plus_services','kategori_sepatu'));
     }
 
     public function validatePromosi(ValidatePromosiRequest $request)
@@ -84,6 +88,31 @@ class TransaksiController extends Controller
             ]);
         }
     }
+
+    public function destroy(string $uuid)
+    {
+        if (!auth()->check()) {
+            return response()->json(['success' => false, 'message' => 'You must be logged in to perform this action.'], 403);
+        }
+
+        DB::beginTransaction();
+        try {
+            $transaksi = Transaksi::where('uuid', $uuid)->firstOrFail();
+            $transaksi->delete();
+
+            DB::commit();
+
+            return back();
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Transaksi tidak ditemukan.'], 404);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menghapus transaksi.'], 500);
+        }
+    }
+
+    
 
     public function validateMembership(ValidateMembershipRequest $request)
     {
@@ -363,6 +392,8 @@ class TransaksiController extends Controller
 
             // dd($transaksi);
             DB::commit(); // Commit transaksi jika semuanya sukses
+            // Kirim email dengan PDF sebagai lampiran
+            Mail::to($transaksi->email_customer)->send(new TransaksiEmail($transaksi));
 
             return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
         } catch (\Exception $e) {
@@ -633,28 +664,5 @@ class TransaksiController extends Controller
         }
     }
 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
+    
 }

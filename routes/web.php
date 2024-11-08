@@ -16,17 +16,21 @@ use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+
+
+Route::get('/send-test-email', function () {
+    $details = [
+        'title' => 'Testing Email dari Laravel',
+        'body' => 'Ini adalah email percobaan dari aplikasi Laravel Anda menggunakan SMTP Gmail.'
+    ];
+
+    Mail::to('agustinakurniawati46@gmail.com')->send(new \App\Mail\TestEmail($details));
+
+    return 'Email telah dikirim!';
+});
+
 
 
 Route::get('/', [LandingPageController::class, 'landingPage'])->name('landingPage');
@@ -157,6 +161,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
         Route::get('/transaksi/create', [TransaksiController::class, 'create'])->name('transaksi.create');
+        Route::delete('transaksi/delete/{uuid}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy');
         Route::post('/transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
         Route::get('/transaksi/show/{uuid}', [TransaksiController::class, 'show'])->name('transaksi.show');
         Route::get('/transaksi/{uuid}/proses', [TransaksiController::class, 'proses'])->name('transaksi.proses');
@@ -169,4 +174,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/validate-membership', [TransaksiController::class, 'validateMembership']);
         Route::post('/transaksi/list', [TransaksiController::class, 'list'])->name('transaksi.list');
     });
+
+
 });

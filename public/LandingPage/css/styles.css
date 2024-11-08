@@ -66,35 +66,42 @@ body {
 /* Hero Section Styling */
 .hero {
     position: relative;
-    height: 100vh; /* Ubah dari 80vh ke 100vh untuk full height */
+    height: 100vh; /* Mengisi layar secara penuh */
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden; /* Untuk memastikan gambar penuh */
 }
 
-.hero .hero-image img {
+.slideshow-container {
+    position: relative;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+}
+
+.slide {
     position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Gambar ada di bawah teks */
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    animation: slideAnimation 16s infinite;
+}
+
+.slide img {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
 }
 
 .hero-content {
-    position: relative;
-    z-index: 2; /* Teks ada di atas gambar */
+    position: absolute;
+    z-index: 2;
     text-align: center;
     color: white;
-    background-color: rgba(
-        0,
-        0,
-        0,
-        0.5
-    ); /* Latar belakang transparan untuk teks */
+    background-color: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border-radius: 10px;
+    max-width: 80%; /* Agar teks tidak terlalu lebar */
 }
 
 .hero-content h1 {
@@ -105,6 +112,21 @@ body {
 .hero-content p {
     font-size: 18px;
 }
+
+/* Animasi slideshow */
+@keyframes slideAnimation {
+    0% { opacity: 0; }
+    5% { opacity: 1; }
+    20% { opacity: 1; }
+    25% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.slide:nth-child(1) { animation-delay: 0s; }
+.slide:nth-child(2) { animation-delay: 4s; }
+.slide:nth-child(3) { animation-delay: 8s; }
+.slide:nth-child(4) { animation-delay: 12s; }
+
 
 /* Promo Section Styling */
 .promo-section {
@@ -426,6 +448,25 @@ body {
     margin-bottom: 20px;
     line-height: 1.6;
 }
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px;
+}
+
+.social-icon img {
+    width: 40px; /* Adjust size as needed */
+    height: 40px;
+    border-radius: 50%; /* Optional: make them circular */
+    transition: transform 0.2s; /* Add a hover effect */
+}
+
+.social-icon img:hover {
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+
 
 /* Services Section Styling */
 .services-section {
@@ -1203,6 +1244,38 @@ body {
     transform: scale(1.2);
     margin-right: 10px;
 }
+
+/* Gallery Section Styles */
+.gallery-section {
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.gallery-section h2 {
+    font-size: 36px;
+    color: #001f3f;
+    margin-bottom: 20px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Adjusts to keep consistent sizes */
+    gap: 10px; /* Slightly tighter gap for a cleaner look */
+}
+
+.gallery-grid img {
+    width: 100%;
+    height: 180px; /* Sets a fixed height to keep images uniform */
+    border-radius: 8px;
+    object-fit: cover; /* Ensures images cover the entire space */
+    transition: transform 0.3s ease;
+}
+
+.gallery-grid img:hover {
+    transform: scale(1.05);
+}
+
 
 /* Styling untuk Form Membership */
 #membershipForm {

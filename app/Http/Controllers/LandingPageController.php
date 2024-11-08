@@ -67,10 +67,10 @@ class LandingPageController extends Controller
         // Memotong alamat menjadi array berdasarkan tanda koma
         $addressParts = explode(',', $store->address);
 
-        // Menentukan elemen yang ingin ditampilkan
-        $desiredAddress = $addressParts[0] . ', ' . $addressParts[1] . ', ' . $addressParts[3] . ', ' . $addressParts[6];
+        // // Menentukan elemen yang ingin ditampilkan
+        // $desiredAddress = $addressParts[0] . ', ' . $addressParts[1] . ', ' . $addressParts[3] . ', ' . $addressParts[4];
 
-        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService', 'datadoorprize', 'winners', 'store', 'desiredAddress'));
+        return view('LandingPage.index', compact('activePromo', 'upcomingPromos', 'expiredPromos', 'categories', 'blog', 'plusService', 'datadoorprize', 'winners', 'store'));
     }
 
     public function index(Request $request)

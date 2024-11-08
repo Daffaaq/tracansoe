@@ -15,6 +15,14 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         // Kategori Induk
+        $category_sepatus = DB::table('category_sepatus')->insert([
+            'category_sepatu' => 'Berwarna'
+             
+        ]);
+        $category_sepatus2 = DB::table('category_sepatus')->insert([
+            'category_sepatu' => 'Putih'
+             
+        ]);
         $fastCleaningId = DB::table('categories')->insertGetId([
             'uuid' => Str::uuid(),
             'nama_kategori' => 'Fast Cleaning',
