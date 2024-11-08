@@ -51,6 +51,30 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus transaksi ini?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="closeModalFooter">Batal</button>
+                    <form id="deleteForm" method="POST" action="">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         $(document).ready(function() {
@@ -93,10 +117,14 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, row) {
-                            let actionButtons = `<a href="/dashboard/transaksi/show/${data}" class="btn icon btn-sm btn-info">
-                                <i class="bi bi-eye"></i>
-                             </a>`;
-
+                            let actionButtons = `
+                                <a href="/dashboard/transaksi/show/${data}" class="btn icon btn-sm btn-info" title="Detail">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <button class="btn icon btn-sm btn-danger delete-btn" title="Hapus" data-id="${data}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            `;
                             return actionButtons;
                         }
                     },
@@ -104,7 +132,6 @@
                         data: 'status',
                         name: 'status',
                         render: function(data, type, row) {
-                            console.log(data);
                             if (data === 'downpayment') {
                                 return '<span class="badge bg-warning"><i class="fas fa-clock fa-sm"></i></span>';
                             } else if (data === 'paid') {
@@ -114,7 +141,6 @@
                             }
                         }
                     }
-
                 ],
                 autoWidth: false,
                 drawCallback: function(settings) {
@@ -122,14 +148,17 @@
                 }
             });
 
-            console.log("DataTable loaded");
-
-            $('#closeModalHeader, #closeModalFooter').on('click', function() {
-                console.log('close');
-                $('#deleteConfirmationModal').modal('hide');
+            // Handle delete button click
+            $('#periodeTable').on('click', '.delete-btn', function() {
+                var uuid = $(this).data('id');
+                $('#deleteForm').attr('action', `/dashboard/transaksi/delete/${uuid}`);
+                $('#deleteConfirmationModal').modal('show');
             });
 
-            console.log("data masuk");
+            // Handle modal close
+            $('#closeModalHeader, #closeModalFooter, .close').on('click', function() {
+                $('#deleteConfirmationModal').modal('hide');
+            });
         });
     </script>
 @endsection

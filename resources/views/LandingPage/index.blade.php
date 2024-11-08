@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Cuci Sepatu Modern</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Cleds</title>
     <link rel="stylesheet" href="{{ asset('/LandingPage/css/styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <!-- Leaflet CSS -->
@@ -35,16 +37,55 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1>Cuci Sepatu Modern, Bersih dan Profesional</h1>
-            <p>Percayakan kebersihan sepatu Anda kepada ahli kami. Layanan cuci sepatu cepat dan terpercaya.</p>
+ <!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-content">
+        <h1>Cuci Sepatu Modern, Bersih dan Profesional</h1>
+        <p>Percayakan kebersihan sepatu Anda kepada ahli kami. Layanan cuci sepatu cepat dan terpercaya.</p>
+    </div>
+    <div class="hero-image slideshow-container">
+        <!-- Slides -->
+        <div class="slide fade">
+            <img src="{{ asset('/LandingPage/image/cucisepatu1.jpg') }}" alt="Sepatu Bersih 1">
         </div>
-        <div class="hero-image">
-            <img src="{{ asset('/LandingPage/image/Hero-Section.jpg') }}" alt="Sepatu Bersih">
+        <div class="slide fade">
+            <img src="{{ asset('/LandingPage/image/cucisepatu2.jpg') }}" alt="Sepatu Bersih 2">
         </div>
-    </section>
+        <div class="slide fade">
+            <img src="{{ asset('/LandingPage/image/cucisepatu3.jpg') }}" alt="Sepatu Bersih 3">
+        </div>
+        <div class="slide fade">
+            <img src="{{ asset('/LandingPage/image/cucisepatu4.jpg') }}" alt="Sepatu Bersih 4">
+        </div>
+    </div>
+</section>
+
+
+   <!-- Hero Section -->
+   <!-- <section id="home" class="hero">
+    <div id="carouselExample" class="carousel slide">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="{{ asset('LandingPage/image/cucisepatu1.jpg') }}" class="d-block w-100" alt="sepatu">
+    </div>
+    <div class="carousel-item">
+      <img src="{{ asset('LandingPage/image/cucisepatu2.jpg') }}" class="d-block w-100" alt="sepatu">
+    </div>
+    <div class="carousel-item">
+      <img src="{{ asset('LandingPage/image/cucisepatu3.jpg') }}" class="d-block w-100" alt="sepatu">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+</section> -->
+
 
     <!-- Promo Section -->
     <section id="promo" class="promo-section">
@@ -124,6 +165,25 @@
             <p>Jangan biarkan sepatu kotor merusak gaya Anda. Percayakan kebersihan sepatu Anda kepada kami dan rasakan
                 perbedaannya!</p>
         </div>
+
+    <!-- Social Media Icons with Custom Images
+<div class="social-icons">
+    <a href="https://facebook.com" target="_blank" class="social-icon">
+    <i class="bi bi-facebook" style="color: red;"></i>
+
+    </a>
+    <a href="https://instagram.com" target="_blank" class="social-icon">
+        <img src="path/to/instagram-icon.png" alt="Instagram Icon">
+    </a>
+    <a href="https://play.google.com" target="_blank" class="social-icon">
+        <img src="path/to/android-icon.png" alt="Android Icon">
+    </a>
+    <a href="https://line.me" target="_blank" class="social-icon">
+        <img src="path/to/line-icon.png" alt="Line Icon">
+    </a>
+</div> -->
+
+
     </section>
 
     <!-- Services Section -->
@@ -171,7 +231,42 @@
         </div>
     </section>
 
-
+     <!-- How to Transact Section -->
+     <section id="how-to-transact" class="how-to-transact-section">
+        <div class="container">
+            <h2>Cara Transaksi di CuciSepatu</h2>
+            <p>Kami menawarkan proses transaksi yang mudah dan cepat untuk semua layanan cuci sepatu, dari pembersihan
+                hingga restorasi. Ikuti langkah-langkah berikut untuk mendapatkan layanan kami:</p>
+            <div class="transaction-steps">
+                <div class="step">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Kunjungi CuciSepatu</h3>
+                    <p>Datang ke <strong>{{ $store->address }}</strong> dan sampaikan layanan yang Anda
+                        butuhkan.</p>
+                </div>
+                <div class="step">
+                    <i class="fas fa-list-alt"></i>
+                    <h3>Pilih Layanan</h3>
+                    <p>Diskusikan layanan yang Anda butuhkan, seperti <strong>cuci sepatu</strong>,
+                        <strong>repaint</strong>, atau <strong>deep cleaning</strong>.
+                    </p>
+                </div>
+                <div class="step">
+                    <i class="fas fa-tags"></i>
+                    <h3>Gunakan Promo (Jika Ada)</h3>
+                    <p>Jika Anda memiliki kode promo, jangan lupa untuk menyebutkannya kepada karyawan kami di kasir.
+                    </p>
+                </div>
+                <div class="step">
+                    <i class="fas fa-receipt"></i>
+                    <h3>Lakukan Pembayaran</h3>
+                    <p>Selesaikan pembayaran Anda, dan kami akan segera memproses layanan yang Anda pilih.</p>
+                </div>
+            </div>
+            <p class="note"><strong>Catatan:</strong> Pastikan Anda mengecek promo terbaru sebelum berkunjung ke toko
+                kami untuk menikmati diskon spesial!</p>
+        </div>
+    </section>
 
     <!-- Blog Section -->
     <section id="blog" class="blog-section">
@@ -335,42 +430,7 @@
 
 
 
-    <!-- How to Transact Section -->
-    <section id="how-to-transact" class="how-to-transact-section">
-        <div class="container">
-            <h2>Cara Transaksi di CuciSepatu</h2>
-            <p>Kami menawarkan proses transaksi yang mudah dan cepat untuk semua layanan cuci sepatu, dari pembersihan
-                hingga restorasi. Ikuti langkah-langkah berikut untuk mendapatkan layanan kami:</p>
-            <div class="transaction-steps">
-                <div class="step">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <h3>Kunjungi CuciSepatu</h3>
-                    <p>Datang ke <strong>{{ $desiredAddress }}</strong> dan sampaikan layanan yang Anda
-                        butuhkan.</p>
-                </div>
-                <div class="step">
-                    <i class="fas fa-list-alt"></i>
-                    <h3>Pilih Layanan</h3>
-                    <p>Diskusikan layanan yang Anda butuhkan, seperti <strong>cuci sepatu</strong>,
-                        <strong>repaint</strong>, atau <strong>deep cleaning</strong>.
-                    </p>
-                </div>
-                <div class="step">
-                    <i class="fas fa-tags"></i>
-                    <h3>Gunakan Promo (Jika Ada)</h3>
-                    <p>Jika Anda memiliki kode promo, jangan lupa untuk menyebutkannya kepada karyawan kami di kasir.
-                    </p>
-                </div>
-                <div class="step">
-                    <i class="fas fa-receipt"></i>
-                    <h3>Lakukan Pembayaran</h3>
-                    <p>Selesaikan pembayaran Anda, dan kami akan segera memproses layanan yang Anda pilih.</p>
-                </div>
-            </div>
-            <p class="note"><strong>Catatan:</strong> Pastikan Anda mengecek promo terbaru sebelum berkunjung ke toko
-                kami untuk menikmati diskon spesial!</p>
-        </div>
-    </section>
+   
 
     <!-- Membership Campaign Section -->
     <section id="membership" class="membership-section" style="padding: 40px 0;">
@@ -411,6 +471,27 @@
                     </ul>
                 </div>
             </div>
+
+            <!-- Gallery Section -->
+<section id="gallery" class="gallery-section">
+    <div class="container">
+        <h2>Gallery</h2>
+        <hr style="width: 80px; height: 4px; border-radius: 10px; color: red;">
+        <div class="gallery-grid">
+            <img src="{{ asset('/LandingPage/image/gsp1.jpg') }}" alt="Gallery Image 1">
+            <img src="{{ asset('/LandingPage/image/gsp2.jpg') }}">
+            <img src="{{ asset('/LandingPage/image/gsp3.jpg') }}">
+            <img src="{{ asset('/LandingPage/image/gsp4.jpg') }}" alt="Gallery Image 4">
+            <img src="{{ asset('/LandingPage/image/gsp5.jpg') }}"alt="Gallery Image 5">
+            <img src="{{ asset('/LandingPage/image/gsp6.jpg') }}" alt="Gallery Image 6">
+            <img src="{{ asset('/LandingPage/image/gsp7.jpg') }}" alt="Gallery Image 7">
+            <img src="{{ asset('/LandingPage/image/cucisepatu3.jpg') }}" alt="Gallery Image 8">
+            <img src="{{ asset('/LandingPage/image/gsp9.jpg') }}" alt="Gallery Image 9">
+            <img src="{{ asset('/LandingPage/image/cucisepatu2.jpg') }}" alt="Gallery Image 8">
+        </div>
+    </div>
+</section>
+
 
             <div class="membership-call-to-action" style="text-align: center; margin-top: 30px;">
                 <p>Jangan lewatkan kesempatan ini! Daftar sekarang dan nikmati keuntungan eksklusif hanya untuk member.
@@ -709,6 +790,7 @@
                 <p>© 2024 achedev. All rights reserved.</p>
             </div>
         </div>
+        
     </footer>
     <button id="backToTop"><i class="fas fa-arrow-up"></i></button>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
