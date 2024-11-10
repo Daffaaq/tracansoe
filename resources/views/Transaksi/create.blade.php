@@ -143,67 +143,85 @@
                                     </div>
                                 </div>
 
-                                <!-- Pilih Kategori dan Jumlah -->
                                 @foreach ($kategori_sepatu as $sepatu)
-    <!-- Checkbox untuk Kategori Sepatu -->
-    <div class="col-md-12">
-        <div class="form-group">
-            <div class="form-check">
-                <input class="form-check-input sepatu-checkbox" type="checkbox" 
-                       id="sepatu_checkbox_{{ $sepatu->id }}" 
-                       data-sepatu-id="{{ $sepatu->id }}">
-                <label class="form-check-label" for="sepatu_checkbox_{{ $sepatu->id }}">
-                    {{ $sepatu->category_sepatu }}
-                </label>
-            </div>
-        </div>
-    </div>
+                                    <!-- Checkbox for Main Category (Sepatu) -->
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <input class="form-check-input sepatu-checkbox" type="checkbox"
+                                                    id="sepatu_checkbox_{{ $sepatu->id }}" name="category_sepatu[{{ $sepatu->id }}][id]"
+                                                    data-sepatu-id="{{ $sepatu->id }}">
+                                                <label class="form-check-label" for="sepatu_checkbox_{{ $sepatu->id }}">
+                                                    {{ $sepatu->category_sepatu }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
 
-    <!-- Bagian untuk Sub-kategori (Categories) yang Akan Muncul -->
-    <div class="col-md-12 subkategori-sepatu-section" id="subkategori_{{ $sepatu->id }}" 
-         style="display: none; background-color: white; padding: 10px; border-radius: 5px;">
-        <h5>Pilih Sub-kategori untuk {{ $sepatu->nama_kategori }}</h5>
-        <div class="border p-3 rounded">
-            @foreach ($categories as $subCategory)
-                @if ($subCategory->parent_id == $sepatu->id)
-                    <div class="form-check d-flex align-items-center mb-2">
-                        <input class="form-check-input me-2 category-checkbox" type="checkbox" 
-                               name="category_hargas[{{ $subCategory->id }}][id]" 
-                               value="{{ $subCategory->id }}" 
-                               data-sepatu-id="{{ $sepatu->id }}"
-                               id="category_{{ $subCategory->id }}">
-                        <label class="form-check-label me-auto" for="category_{{ $subCategory->id }}">
-                            {{ $subCategory->nama_kategori }} - Rp{{ $subCategory->price }}
-                        </label>
-                        <input type="number" name="category_hargas[{{ $subCategory->id }}][qty]" 
-                               class="form-control w-25" placeholder="Qty" 
-                               style="max-width: 80px;">
-                    </div>
-                @endif
-            @endforeach
-        </div>
-    </div>
-@endforeach
-
-                                <!-- Pilih Plus Services -->
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="plus_services" class="form-label">Layanan Tambahan</label>
+                                    <!-- Sub-category Section: Display all sub-categories when main category is selected -->
+                                    <div class="col-md-12 subkategori-sepatu-section" id="subkategori_{{ $sepatu->id }}"
+                                        style="display: none; background-color: white; padding: 10px; border-radius: 5px;">
+                                        <h5>Pilih Sub-kategori untuk {{ $sepatu->category_sepatu }}</h5>
                                         <div class="border p-3 rounded">
-                                            @foreach ($plus_services as $service)
-                                                <div class="form-check mb-2">
-                                                    <input class="form-check-input me-2 plus-service-checkbox"
-                                                        type="checkbox" data-price="{{ $service->price }}"
-                                                        name="plus_services[]" value="{{ $service->id }}"
-                                                        id="plus_service_{{ $service->id }}">
-                                                    <label class="form-check-label"
-                                                        for="plus_service_{{ $service->id }}">{{ $service->name }} -
-                                                        Rp{{ $service->price }}</label>
-                                                </div>
+                                            @foreach ($categories as $category)
+                                                <!-- Kategori Induk -->
+                                                @if ($category->parent_id === null)
+                                                    <div class="service-category">
+                                                        <h3>{{ $category->nama_kategori }}</h3>
+                                                        <div class="subcategory-container">
+                                                            @foreach ($category->subKriteria as $subcategory)
+                                                                <div
+                                                                    class="subcategory-item d-flex justify-content-between align-items-center mb-2">
+                                                                    <div>
+                                                                        <strong>{{ $subcategory->nama_kategori }}</strong>
+                                                                    </div>
+                                                                    <span class="price">
+                                                                        Rp
+                                                                        {{ number_format($subcategory->price, 0, ',', '.') }}
+                                                                    </span>
+                                                                    <div>
+                                                                        <input type="checkbox"
+                                                                            name="category_hargas[{{ $subcategory->id }}][id]"
+                                                                            value="{{ $subcategory->id }}"
+                                                                            class="form-check-input me-2">
+                                                                        <input type="number"
+                                                                            name="category_hargas[{{ $subcategory->id }}][qty]"
+                                                                            class="form-control w-25" placeholder="Qty"
+                                                                            style="max-width: 80px;">
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
-                                </div>
+
+                                    <!-- Plus Services Section -->
+                                    <div class="col-md-12 plus-services-section" id="plus_services_{{ $sepatu->id }}"
+                                        style="display: none; background-color: white; padding: 10px; border-radius: 5px;">
+                                        <div class="form-group">
+                                            <label for="plus_services" class="form-label">Layanan Tambahan</label>
+                                            <div class="border p-3 rounded">
+                                                @foreach ($plus_services as $service)
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input me-2 plus-service-checkbox"
+                                                            type="checkbox" data-price="{{ $service->price }}"
+                                                            name="plus_services[]" value="{{ $service->id }}"
+                                                            id="plus_service_{{ $service->id }}">
+                                                        <label class="form-check-label"
+                                                            for="plus_service_{{ $service->id }}">
+                                                            {{ $service->name }} -
+                                                            Rp{{ number_format($service->price, 0, ',', '.') }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+
 
                                 <!-- Total Harga -->
                                 <div class="row">
@@ -293,34 +311,45 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <script>
-
-
         document.addEventListener('DOMContentLoaded', function() {
             const sepatuCheckboxes = document.querySelectorAll('.sepatu-checkbox');
 
-    sepatuCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', function () {
-            const sepatuId = checkbox.getAttribute('data-sepatu-id');
-            const subKategoriSection = document.getElementById(subkategori_${sepatuId});
+            sepatuCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const sepatuId = checkbox.getAttribute('data-sepatu-id');
+                    const subKategoriSection = document.getElementById(`subkategori_${sepatuId}`);
+                    const plusServicesSection = document.getElementById(
+                        `plus_services_${sepatuId}`);
 
-            if (!subKategoriSection) {
-                console.error(Elemen dengan ID subkategori_${sepatuId} tidak ditemukan);
-                return;
-            }
+                    if (!subKategoriSection || !plusServicesSection) {
+                        console.error(`Element with ID subkategori_${sepatuId} not found`);
+                        return;
+                    }
 
-            // Tampilkan atau sembunyikan sub-kategori berdasarkan checkbox sepatu
-            if (checkbox.checked) {
-                subKategoriSection.style.display = 'block';
-            } else {
-                subKategoriSection.style.display = 'none';
+                    // Show or hide the sub-category section based on the checkbox state
+                    if (checkbox.checked) {
+                        subKategoriSection.style.display = 'block';
+                        plusServicesSection.style.display = 'block';
+                    } else {
+                        subKategoriSection.style.display = 'none';
+                        plusServicesSection.style.display = 'none';
 
-                // Jika checkbox utama di-uncheck, uncheck semua sub-kategori di bawahnya
-                subKategoriSection.querySelectorAll('.category-checkbox').forEach(subCheckbox => {
-                    subCheckbox.checked = false;
+                        // Uncheck all sub-category checkboxes if the main category is unchecked
+                        subKategoriSection.querySelectorAll('.category-checkbox').forEach(
+                            subCheckbox => {
+                                subCheckbox.checked = false;
+                            });
+
+                        // Uncheck all plus service checkboxes if the main category is unchecked
+                        plusServicesSection.querySelectorAll('.plus-service-checkbox').forEach(
+                            plusServiceCheckbox => {
+                                plusServiceCheckbox.checked = false;
+                            });
+                    }
                 });
-            }
-        });
-    });
+            });
+
+
             function resetForm() {
                 // Bersihkan semua input teks
                 document.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
@@ -490,7 +519,7 @@
                                 document.getElementById('nama_customer').value = data.nama_membership;
                                 document.getElementById('email_customer').value = data.email_membership;
                                 document.getElementById('notelp_customer').value = data
-                                .phone_membership;
+                                    .phone_membership;
                                 document.getElementById('alamat_customer').value = data
                                     .alamat_membership;
 
