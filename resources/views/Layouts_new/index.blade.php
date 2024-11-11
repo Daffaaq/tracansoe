@@ -94,18 +94,12 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
+                        @if (auth()->user()->role == 'superadmin')
                         <li
                             class="sidebar-item {{ request()->routeIs('promosi.index', 'promosi.create', 'promosi.edit', 'promosi.show') ? 'active' : '' }}">
                             <a href="{{ route('promosi.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Promosi</span>
-                            </a>
-                        </li>
-                        <li
-                            class="sidebar-item {{ request()->routeIs('memberships.index', 'memberships.show') ? 'active' : '' }}">
-                            <a href="{{ route('memberships.index') }}" class="sidebar-link">
-                                <i class="bi bi-grid-fill"></i>
-                                <span>Memberships</span>
                             </a>
                         </li>
                         <li
@@ -140,6 +134,14 @@
                             </a>
                         </li>
                         <li
+                            class="sidebar-item {{ request()->routeIs('hadiah.index', 'hadiah.create', 'hadiah.edit') ? 'active' : '' }}">
+                            <a href="{{ route('hadiah.index') }}" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Hadiah</span>
+                            </a>
+                        </li>
+                        @endif
+                        <li
                             class="sidebar-item {{ request()->routeIs('transaksi.index', 'transaksi.create', 'transaksi.edit') ? 'active' : '' }}">
                             <a href="{{ route('transaksi.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
@@ -147,12 +149,13 @@
                             </a>
                         </li>
                         <li
-                            class="sidebar-item {{ request()->routeIs('hadiah.index', 'hadiah.create', 'hadiah.edit') ? 'active' : '' }}">
-                            <a href="{{ route('hadiah.index') }}" class="sidebar-link">
+                            class="sidebar-item {{ request()->routeIs('memberships.index', 'memberships.show') ? 'active' : '' }}">
+                            <a href="{{ route('memberships.index') }}" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
-                                <span>Hadiah</span>
+                                <span>Memberships</span>
                             </a>
                         </li>
+                        
                         {{-- @dd(auth()->user()->role) --}}
                         @if (auth()->user()->role == 'superadmin')
                             <li
