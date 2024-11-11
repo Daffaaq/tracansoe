@@ -16,10 +16,12 @@ class CategorySeeder extends Seeder
     {
         // Kategori Induk
         $category_sepatus = DB::table('category_sepatus')->insert([
+            'uuid' => Str::uuid(),
             'category_sepatu' => 'Berwarna'
              
         ]);
         $category_sepatus2 = DB::table('category_sepatus')->insert([
+            'uuid' => Str::uuid(),
             'category_sepatu' => 'Putih'
              
         ]);

@@ -359,6 +359,12 @@ class TransaksiController extends Controller
                 'tanggal_transaksi' => Carbon::now()->toDateString(), // Tanggal saat ini
                 'jam_transaksi' => Carbon::now()->toTimeString(), // Jam saat ini
             ]);
+
+            foreach ($request->category_sepatu as $category_sepatu) {
+                $transaksi->categorySepatu()->attach($category_sepatu, [
+                    'uuid' => (string) Str::uuid()
+                ]);
+            }
             // dd($request->category_hargas);
             // Simpan kategori harga yang dipilih dalam transaksi
             foreach ($request->category_hargas as $category_harga) {

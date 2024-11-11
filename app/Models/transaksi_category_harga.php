@@ -35,4 +35,9 @@ class transaksi_category_harga extends Model
     {
         return $this->belongsTo(category::class);
     }
+
+    public function categorySepatu()
+    {
+        return $this->belongsTo(CategorySepatu::class, 'category_sepatus_id');
+    }
 }

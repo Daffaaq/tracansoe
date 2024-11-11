@@ -75,4 +75,8 @@ class transaksi extends Model
     {
         return $this->belongsToMany(plus_service::class, 'transaksi_plus_services')->withPivot('uuid');
     }
+    public function categorySepatu()
+    {
+        return $this->belongsToMany(CategorySepatu::class, 'transaksi_category_hargas')->withPivot('uuid');
+    }
 }

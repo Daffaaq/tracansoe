@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('category_sepatus', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->enum('category_sepatu', ['Berwarna', 'Putih'])->nullable();
             $table->timestamps();
         });
