@@ -432,9 +432,11 @@
                 checkbox.addEventListener('change', function() {
                     const sepatuId = checkbox.getAttribute('data-sepatu-id');
                     const subKategoriSection = document.getElementById(`subkategori_${sepatuId}`);
+                    const plusServiceCheckbox = document.getElementById(`plus_services_${sepatuId}`);
 
                     if (checkbox.checked) {
                         subKategoriSection.style.display = 'block';
+                        plusServiceCheckbox.style.display = 'block';
 
                         subKategoriSection.querySelectorAll('.form-check-input').forEach(
                             subCheckbox => {
@@ -456,6 +458,7 @@
                             });
                     } else {
                         subKategoriSection.style.display = 'none';
+                        plusServiceCheckbox.style.display = 'none';
 
                         subKategoriSection.querySelectorAll('.form-check-input').forEach(
                             subCheckbox => {
