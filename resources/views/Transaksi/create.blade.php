@@ -10,6 +10,31 @@
         top: 0.5rem;
         right: 0.5rem;
     }
+
+    .subcategory-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .subcategory-item {
+        flex: 1 1 300px;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .subcategory-item .price {
+        font-weight: bold;
+        color: #007bff;
+        margin-right: 10px;
+    }
+
+    .subcategory-item .form-check-input {
+        margin-right: 5px;
+    }
 </style>
 
 @section('breadcrumbs')
@@ -149,7 +174,8 @@
                                         <div class="form-group">
                                             <div class="form-check">
                                                 <input class="form-check-input sepatu-checkbox" type="checkbox"
-                                                    id="sepatu_checkbox_{{ $sepatu->id }}" name="category_sepatu[{{ $sepatu->id }}][id]"
+                                                    id="sepatu_checkbox_{{ $sepatu->id }}"
+                                                    name="category_sepatu[{{ $sepatu->id }}][id]"
                                                     data-sepatu-id="{{ $sepatu->id }}">
                                                 <label class="form-check-label" for="sepatu_checkbox_{{ $sepatu->id }}">
                                                     {{ $sepatu->category_sepatu }}
@@ -170,23 +196,21 @@
                                                         <h3>{{ $category->nama_kategori }}</h3>
                                                         <div class="subcategory-container">
                                                             @foreach ($category->subKriteria as $subcategory)
-                                                                <div
-                                                                    class="subcategory-item d-flex justify-content-between align-items-center mb-2">
-                                                                    <div>
-                                                                        <strong>{{ $subcategory->nama_kategori }}</strong>
-                                                                    </div>
-                                                                    <span class="price">
-                                                                        Rp
-                                                                        {{ number_format($subcategory->price, 0, ',', '.') }}
-                                                                    </span>
+                                                                <div class="subcategory-item d-flex align-items-center">
                                                                     <div>
                                                                         <input type="checkbox"
                                                                             name="category_hargas[{{ $subcategory->id }}][id]"
                                                                             value="{{ $subcategory->id }}"
-                                                                            class="form-check-input me-2">
+                                                                            class="form-check-input me-2"
+                                                                            data-price="{{ $subcategory->price }}">
+                                                                        <strong>{{ $subcategory->nama_kategori }}</strong>
+                                                                    </div>
+                                                                    <span class="price">Rp
+                                                                        {{ number_format($subcategory->price, 0, ',', '.') }}</span>
+                                                                    <div>
                                                                         <input type="number"
                                                                             name="category_hargas[{{ $subcategory->id }}][qty]"
-                                                                            class="form-control w-25" placeholder="Qty"
+                                                                            class="form-control w-100" placeholder="Qty"
                                                                             style="max-width: 80px;">
                                                                     </div>
                                                                 </div>
@@ -309,308 +333,89 @@
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const sepatuCheckboxes = document.querySelectorAll('.sepatu-checkbox');
-
-            sepatuCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const sepatuId = checkbox.getAttribute('data-sepatu-id');
-                    const subKategoriSection = document.getElementById(`subkategori_${sepatuId}`);
-                    const plusServicesSection = document.getElementById(
-                        `plus_services_${sepatuId}`);
-
-                    if (!subKategoriSection || !plusServicesSection) {
-                        console.error(`Element with ID subkategori_${sepatuId} not found`);
-                        return;
-                    }
-
-                    // Show or hide the sub-category section based on the checkbox state
-                    if (checkbox.checked) {
-                        subKategoriSection.style.display = 'block';
-                        plusServicesSection.style.display = 'block';
-                    } else {
-                        subKategoriSection.style.display = 'none';
-                        plusServicesSection.style.display = 'none';
-
-                        // Uncheck all sub-category checkboxes if the main category is unchecked
-                        subKategoriSection.querySelectorAll('.category-checkbox').forEach(
-                            subCheckbox => {
-                                subCheckbox.checked = false;
-                            });
-
-                        // Uncheck all plus service checkboxes if the main category is unchecked
-                        plusServicesSection.querySelectorAll('.plus-service-checkbox').forEach(
-                            plusServiceCheckbox => {
-                                plusServiceCheckbox.checked = false;
-                            });
-                    }
-                });
-            });
-
-
-            function resetForm() {
-                // Bersihkan semua input teks
-                document.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
-                document.querySelectorAll('input[type="email"]').forEach(input => input.value = '');
-                document.querySelectorAll('input[type="number"]').forEach(input => input.value = '');
-
-                // Reset dropdown
-                document.getElementById('status').selectedIndex = 0;
-
-                // Sembunyikan bagian promosi dan membership
-                document.getElementById('promosi-section').style.display = 'none';
-                document.getElementById('discount-section').style.display = 'none';
-                document.getElementById('memberships-section').style.display = 'none';
-                document.getElementById('discountMemberships-section').style.display = 'none';
-
-                // Set nilai default harga total
-                document.getElementById('total_harga').value = '';
-
-                // Nonaktifkan downpayment section
-                toggleDownpaymentSection();
-
-                // Reset checkbox dan jumlah
-                document.querySelectorAll('.category-checkbox').forEach(checkbox => {
-                    checkbox.checked = false;
-                    const qtyInput = document.querySelector(`input[data-id="${checkbox.value}"]`);
-                    qtyInput.disabled = true;
-                    qtyInput.value = '';
-                });
-
-                // Reset layanan tambahan
-                document.querySelectorAll('.plus-service-checkbox').forEach(service => {
-                    service.checked = false;
-                });
-            }
-            var numericInputs = document.querySelectorAll('.numeric-only');
-            var confirmDpBtn = document.getElementById('confirm_dp_btn');
-            var editDpBtn = document.getElementById('edit_dp_btn');
-
-            numericInputs.forEach(function(input) {
-                input.addEventListener('input', function(e) {
-                    this.value = this.value.replace(/[^0-9]/g, ''); // Hanya menerima angka
-                });
-            });
-
-            const membershipKodeInput = document.getElementById('membership_kode');
-            const validateMembershipBtn = document.getElementById('validate_membership_btn');
-            const promosiKodeInput = document.getElementById('promosi_kode');
+            // Initialize elements and functions
+            const numericInputs = document.querySelectorAll('.numeric-only');
+            const confirmDpBtn = document.getElementById('confirm_dp_btn');
+            const editDpBtn = document.getElementById('edit_dp_btn');
             const applyPromoBtn = document.getElementById('apply_promo_btn');
-            const namaPromosiInput = document.getElementById('nama_promosi');
-            const discountInput = document.getElementById('discount');
-            const membershipsSection = document.getElementById('memberships-section');
-            const discountMembershipsSection = document.getElementById('discountMemberships-section');
-            const promosiSection = document.getElementById('promosi-section');
-            const discountSection = document.getElementById('discount-section');
-            const kelasMembershipInput = document.getElementById('kelas_membership');
-            const discountMembershipInput = document.getElementById('discountMembership');
+            const validateMembershipBtn = document.getElementById('validate_membership_btn');
             const statusSelect = document.getElementById('status');
             const downpaymentSection = document.getElementById('downpayment-section');
             const remainingPaymentSection = document.getElementById('remaining-payment-section');
             const downpaymentAmountInput = document.getElementById('downpayment_amount');
             const remainingPaymentInput = document.getElementById('remaining_payment');
             const totalHargaInput = document.getElementById('total_harga');
-
+            const discountMembershipInput = document.getElementById('discountMembership');
+            const discountInput = document.getElementById('discount');
+            const sepatuCheckboxes = document.querySelectorAll('.sepatu-checkbox');
             let totalHarga = 0;
 
-            // Apply promo button
-            applyPromoBtn.addEventListener('click', function() {
-                const kodePromosi = promosiKodeInput.value;
-                const kodeMembership = membershipKodeInput.value;
-
-                if (kodePromosi) {
-                    // Kirim AJAX request untuk validasi kode promo
-                    fetch(`/dashboard/validate-promosi?kode=${kodePromosi}`, {
-                            method: 'GET',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                            },
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                const totalHarga = parseFloat(totalHargaInput.value.replace(
-                                    /[^0-9.-]+/g, "")) || 0;
-
-                                // Jika tidak ada kode membership, lakukan pengecekan minimum payment
-                                if (!kodeMembership && totalHarga < data.minimum_payment) {
-                                    Swal.fire({
-                                        title: 'Tidak Memenuhi Syarat!',
-                                        text: `Total harga harus minimal Rp${data.minimum_payment} untuk menggunakan kode promosi ini.`,
-                                        icon: 'warning',
-                                        confirmButtonText: 'OK'
-                                    });
-
-                                    return; // Jika tidak memenuhi syarat, hentikan eksekusi
-                                }
-
-                                // Tampilkan SweetAlert jika kode promosi valid
-                                Swal.fire({
-                                    title: 'Kode Promosi Valid!',
-                                    text: `Nama Promosi: ${data.nama_promosi}\nDiskon: ${(data.discount * 100)}%`,
-                                    icon: 'success',
-                                    confirmButtonText: 'OK'
-                                });
-
-                                // Tampilkan nama promosi dan diskon yang diambil dari server
-                                promosiSection.style.display = 'block';
-                                discountSection.style.display = 'block';
-                                namaPromosiInput.value = data.nama_promosi;
-                                discountInput.value = (data.discount * 100) + '%';
-
-                                // Hitung total dengan diskon
-                                calculateTotal(data.discount);
-
-                            } else {
-                                Swal.fire({
-                                    title: 'Kode Promosi Tidak Valid',
-                                    text: data.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'Coba Lagi'
-                                });
-
-                                promosiSection.style.display = 'none';
-                                discountSection.style.display = 'none';
-                                calculateTotal(0); // Tanpa diskon
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: 'Terjadi kesalahan dalam validasi promosi.',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                        });
-                } else {
-                    Swal.fire({
-                        title: 'Kode Promosi Kosong',
-                        text: 'Silakan masukkan kode promosi terlebih dahulu.',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
+            // Reset Form
+            function resetForm() {
+                document.querySelectorAll('input[type="text"], input[type="email"], input[type="number"]').forEach(
+                    input => {
+                        input.value = '';
+                        input.disabled = true;
                     });
-                }
+                document.querySelectorAll('.form-check-input').forEach(checkbox => checkbox.checked = false);
+                document.getElementById('status').selectedIndex = 0;
+                document.getElementById('promosi-section').style.display = 'none';
+                document.getElementById('discount-section').style.display = 'none';
+                document.getElementById('memberships-section').style.display = 'none';
+                document.getElementById('discountMemberships-section').style.display = 'none';
+                document.getElementById('total_harga').value = '';
+                toggleDownpaymentSection();
+            }
+
+            // Numeric Input Restriction
+            numericInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
             });
 
-            // Validate membership button
-            validateMembershipBtn.addEventListener('click', function() {
-                const kodeMembership = membershipKodeInput.value;
-
-                if (kodeMembership) {
-                    // Kirim AJAX request untuk validasi kode membership
-                    fetch(`/dashboard/validate-membership?kode=${kodeMembership}`, {
-                            method: 'GET',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                            },
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire({
-                                    title: 'Kode Membership Valid!',
-                                    text: `Kelas Membership: ${data.kelas_membership}\nDiskon: ${data.discount * 100}%`,
-                                    icon: 'success',
-                                    confirmButtonText: 'OK'
-                                });
-
-                                document.getElementById('nama_customer').value = data.nama_membership;
-                                document.getElementById('email_customer').value = data.email_membership;
-                                document.getElementById('notelp_customer').value = data
-                                    .phone_membership;
-                                document.getElementById('alamat_customer').value = data
-                                    .alamat_membership;
-
-                                membershipsSection.style.display = 'block';
-                                discountMembershipsSection.style.display = 'block';
-                                kelasMembershipInput.value = data.kelas_membership;
-                                discountMembershipInput.value = (data.discount * 100) + '%';
-
-                                // Terapkan diskon ke total harga
-                                calculateTotal(data.discount);
-
-                            } else {
-                                Swal.fire({
-                                    title: 'Kode Membership Tidak Valid',
-                                    text: data.message,
-                                    icon: 'error',
-                                    confirmButtonText: 'Coba Lagi'
-                                });
-
-                                membershipsSection.style.display = 'none';
-                                discountMembershipsSection.style.display = 'none';
-                            }
-                        })
-                        .catch(error => {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: 'Terjadi kesalahan dalam validasi membership.',
-                                icon: 'error',
-                                confirmButtonText: 'OK'
-                            });
-                            membershipsSection.style.display = 'none';
-                            discountMembershipsSection.style.display = 'none';
-                        });
-                } else {
-                    Swal.fire({
-                        title: 'Kode Membership Kosong',
-                        text: 'Silakan masukkan kode membership terlebih dahulu.',
-                        icon: 'warning',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-
-
-
+            // Fungsi untuk menghitung total harga
             function calculateTotal() {
                 let totalHarga = 0;
 
-                // Hitung harga kategori yang dipilih
-                document.querySelectorAll('.category-checkbox:checked').forEach(function(category) {
-                    const qtyInput = document.querySelector(`input[data-id="${category.value}"]`);
+                document.querySelectorAll('.subcategory-item .form-check-input:checked').forEach(subCheckbox => {
+                    const qtyInput = subCheckbox.closest('.subcategory-item').querySelector(
+                        'input[type="number"]');
                     const qty = parseInt(qtyInput.value) || 1;
-                    totalHarga += parseFloat(category.getAttribute('data-price')) * qty;
+                    const price = parseFloat(subCheckbox.getAttribute('data-price')) || 0;
+                    totalHarga += price * qty;
+
+                    console.log(`Qty: ${qty}, Price: ${price}, Total: ${totalHarga}`);
                 });
 
-                // Hitung harga layanan tambahan
-                document.querySelectorAll('.plus-service-checkbox:checked').forEach(function(service) {
-                    totalHarga += parseFloat(service.getAttribute('data-price'));
+                document.querySelectorAll('.plus-service-checkbox:checked').forEach(service => {
+                    totalHarga += parseFloat(service.getAttribute('data-price')) || 0;
                 });
 
-                // Ambil nilai diskon membership dari input form (nilai diambil dari input #discountMembership)
-                const membershipDiscount = parseFloat(document.getElementById('discountMembership').value || 0) /
-                    100;
-                if (membershipDiscount > 0) {
-                    totalHarga -= totalHarga * membershipDiscount; // Terapkan diskon membership terlebih dahulu
-                }
+                const membershipDiscount = parseFloat(discountMembershipInput.value || 0) / 100;
+                if (membershipDiscount > 0) totalHarga -= totalHarga * membershipDiscount;
 
-                // Setelah diskon membership, terapkan diskon promosi pada harga yang sudah didiskon
-                const promoDiscount = parseFloat(document.getElementById('discount').value || 0) / 100;
-                if (promoDiscount > 0) {
-                    totalHarga -= totalHarga * promoDiscount; // Terapkan diskon promosi setelah diskon membership
-                }
+                const promoDiscount = parseFloat(discountInput.value || 0) / 100;
+                if (promoDiscount > 0) totalHarga -= totalHarga * promoDiscount;
 
-                // Tampilkan hasil akhir ke input total harga
                 totalHargaInput.value = formatPrice(totalHarga);
 
-                console.log(membershipDiscount, promoDiscount, totalHarga);
-
-                // Hitung remaining payment jika downpayment
                 if (statusSelect.value === 'downpayment') {
-                    const downpayment = parseFloat(downpaymentAmountInput.value || 0);
-                    remainingPaymentInput.value = formatPrice(totalHarga - downpayment);
+                    remainingPaymentInput.value = formatPrice(totalHarga - parseFloat(downpaymentAmountInput
+                        .value || 0));
                 }
             }
 
-
             function formatPrice(value) {
-                // Jika harga bulat, tampilkan tanpa desimal
-                return (value % 1 === 0) ? value : value;
+                return value.toLocaleString('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR'
+                });
             }
 
+            // Toggle Downpayment Section
             function toggleDownpaymentSection() {
                 if (statusSelect.value === 'downpayment') {
                     downpaymentSection.style.display = 'block';
@@ -623,43 +428,174 @@
                 }
             }
 
-            // Event listener untuk kategori checkbox dan qty
-            document.querySelectorAll('.category-checkbox').forEach(function(checkbox) {
-                const qtyInput = document.querySelector(`input[data-id="${checkbox.value}"]`);
-
-                // Awalnya, qty input harus dinonaktifkan
-                qtyInput.disabled = !checkbox.checked;
-
+            sepatuCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
+                    const sepatuId = checkbox.getAttribute('data-sepatu-id');
+                    const subKategoriSection = document.getElementById(`subkategori_${sepatuId}`);
+
                     if (checkbox.checked) {
-                        qtyInput.value = 1; // Set qty ke 1 ketika dicentang
-                        qtyInput.disabled = false; // Pastikan qty bisa diubah setelah dicentang
+                        subKategoriSection.style.display = 'block';
+
+                        subKategoriSection.querySelectorAll('.form-check-input').forEach(
+                            subCheckbox => {
+                                subCheckbox.disabled = false;
+
+                                subCheckbox.addEventListener('change', function() {
+                                    const qtyInput = subCheckbox.closest(
+                                        '.subcategory-item').querySelector(
+                                        'input[type="number"]');
+                                    if (subCheckbox.checked) {
+                                        qtyInput.value = qtyInput.value || 1;
+                                        qtyInput.disabled = false;
+                                    } else {
+                                        qtyInput.value = '';
+                                        qtyInput.disabled = true;
+                                    }
+                                    calculateTotal();
+                                });
+                            });
                     } else {
-                        qtyInput.value = ''; // Kosongkan qty ketika tidak dicentang
-                        qtyInput.disabled =
-                            true; // Nonaktifkan input qty jika checkbox tidak dicentang
+                        subKategoriSection.style.display = 'none';
+
+                        subKategoriSection.querySelectorAll('.form-check-input').forEach(
+                            subCheckbox => {
+                                subCheckbox.checked = false;
+                                subCheckbox.disabled = true;
+                            });
+
+                        subKategoriSection.querySelectorAll('input[type="number"]').forEach(
+                            qtyInput => {
+                                qtyInput.value = '';
+                                qtyInput.disabled = true;
+                            });
+                        calculateTotal();
                     }
-                    calculateTotal(); // Hitung total setelah perubahan
                 });
             });
 
-            // Event listener untuk perubahan qty
-            document.querySelectorAll('.category-qty').forEach(function(qtyInput) {
+            // Event listeners
+            statusSelect.addEventListener('change', () => {
+                toggleDownpaymentSection();
+                calculateTotal();
+            });
+            downpaymentAmountInput.addEventListener('input', calculateTotal);
+            document.querySelectorAll('.plus-service-checkbox').forEach(checkbox => checkbox.addEventListener(
+                'change', calculateTotal));
+
+            // Tambahkan event listener pada input qty
+            document.querySelectorAll('.subcategory-item input[type="number"]').forEach(qtyInput => {
                 qtyInput.addEventListener('input', calculateTotal);
             });
 
-            // Event listener untuk layanan tambahan
-            document.querySelectorAll('.plus-service-checkbox').forEach(function(checkbox) {
-                checkbox.addEventListener('change', calculateTotal);
+            // Apply Promo
+            applyPromoBtn.addEventListener('click', function() {
+                const kodePromosi = document.getElementById('promosi_kode').value;
+                if (!kodePromosi) {
+                    Swal.fire({
+                        title: 'Kode Promosi Kosong',
+                        text: 'Silakan masukkan kode promosi terlebih dahulu.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                fetch(`/dashboard/validate-promosi?kode=${kodePromosi}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Kode Promosi Valid!',
+                                text: `Nama Promosi: ${data.nama_promosi}\nDiskon: ${(data.discount * 100)}%`,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                            document.getElementById('promosi-section').style.display = 'block';
+                            document.getElementById('discount-section').style.display = 'block';
+                            document.getElementById('nama_promosi').value = data.nama_promosi;
+                            discountInput.value = (data.discount * 100) + '%';
+                            calculateTotal(data.discount);
+                        } else {
+                            Swal.fire({
+                                title: 'Kode Promosi Tidak Valid',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Coba Lagi'
+                            });
+                            document.getElementById('promosi-section').style.display = 'none';
+                            document.getElementById('discount-section').style.display = 'none';
+                            calculateTotal(0);
+                        }
+                    })
+                    .catch(() => Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan dalam validasi promosi.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    }));
             });
 
-            // Hitung ulang remaining payment saat downpayment amount berubah
-            downpaymentAmountInput.addEventListener('input', calculateTotal);
+            // Validate Membership
+            validateMembershipBtn.addEventListener('click', function() {
+                const kodeMembership = document.getElementById('membership_kode').value;
+                if (!kodeMembership) {
+                    Swal.fire({
+                        title: 'Kode Membership Kosong',
+                        text: 'Silakan masukkan kode membership terlebih dahulu.',
+                        icon: 'warning',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
 
-            // Tampilkan atau sembunyikan input DP dan sisa pembayaran berdasarkan status
-            statusSelect.addEventListener('change', function() {
-                toggleDownpaymentSection();
-                calculateTotal();
+                fetch(`/dashboard/validate-membership?kode=${kodeMembership}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Kode Membership Valid!',
+                                text: `Kelas Membership: ${data.kelas_membership}\nDiskon: ${data.discount * 100}%`,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                            document.getElementById('nama_customer').value = data.nama_membership;
+                            document.getElementById('email_customer').value = data.email_membership;
+                            document.getElementById('notelp_customer').value = data.phone_membership;
+                            document.getElementById('alamat_customer').value = data.alamat_membership;
+                            document.getElementById('memberships-section').style.display = 'block';
+                            document.getElementById('discountMemberships-section').style.display =
+                                'block';
+                            document.getElementById('kelas_membership').value = data.kelas_membership;
+                            discountMembershipInput.value = (data.discount * 100) + '%';
+                            calculateTotal(data.discount);
+                        } else {
+                            Swal.fire({
+                                title: 'Kode Membership Tidak Valid',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Coba Lagi'
+                            });
+                            document.getElementById('memberships-section').style.display = 'none';
+                            document.getElementById('discountMemberships-section').style.display =
+                                'none';
+                        }
+                    })
+                    .catch(() => Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan dalam validasi membership.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    }));
             });
 
             // Fungsi untuk konfirmasi downpayment
@@ -725,8 +661,7 @@
                     }
                 });
             });
-
-            // Inisialisasi pada load halaman
+            // Initialize
             toggleDownpaymentSection();
             calculateTotal();
         });
