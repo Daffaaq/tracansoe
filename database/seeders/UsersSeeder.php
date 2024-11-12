@@ -25,7 +25,7 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        // Insert a karyawan user
+        // Insert a karyawan 1
         DB::table('users')->insert([
             'uuid' => Str::uuid(),
             'name' => 'Ache',
@@ -40,7 +40,43 @@ class UsersSeeder extends Seeder
             'name' => 'Melati',
             'email' => 'melati@gmail.com',
             'password' => Hash::make('password123'), // Make sure to hash the password
-            'role' => 'karyawan',
+            'role' => 'karyawan2',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('users')->insert([
+            'uuid' => Str::uuid(),
+            'name' => 'Bela',
+            'email' => 'bela@gmail.com',
+            'password' => Hash::make('password123'), // Make sure to hash the password
+            'role' => 'karyawan3',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('users')->insert([
+            'uuid' => Str::uuid(),
+            'name' => 'Rista',
+            'email' => 'rista@gmail.com',
+            'password' => Hash::make('password123'), // Make sure to hash the password
+            'role' => 'karyawan4',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('users')->insert([
+            'uuid' => Str::uuid(),
+            'name' => 'Amel',
+            'email' => 'amel@gmail.com',
+            'password' => Hash::make('password123'), // Make sure to hash the password
+            'role' => 'karyawan5',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('users')->insert([
+            'uuid' => Str::uuid(),
+            'name' => 'Putri',
+            'email' => 'putri@gmail.com',
+            'password' => Hash::make('password123'), // Make sure to hash the password
+            'role' => 'karyawan6',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

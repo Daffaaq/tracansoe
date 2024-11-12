@@ -141,20 +141,24 @@
                             </a>
                         </li>
                         @endif
+                        @if (in_array(auth()->user()->role, ['karyawan', 'karyawan1', 'Karyawan2','karyawan3','karyawan4','karyawan5','karyawan6']));
                         <li
-                            class="sidebar-item {{ request()->routeIs('transaksi.index', 'transaksi.create', 'transaksi.edit') ? 'active' : '' }}">
-                            <a href="{{ route('transaksi.index') }}" class="sidebar-link">
+                            class="sidebar-item">
+                            <a href="#" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Transaksi</span>
                             </a>
                         </li>
                         <li
-                            class="sidebar-item {{ request()->routeIs('memberships.index', 'memberships.show') ? 'active' : '' }}">
-                            <a href="{{ route('memberships.index') }}" class="sidebar-link">
+                            class="sidebar-item ">
+                            <a href="#" class="sidebar-link">
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Memberships</span>
                             </a>
                         </li>
+                        @endif
+
+                        
                         
                         {{-- @dd(auth()->user()->role) --}}
                         @if (auth()->user()->role == 'superadmin')
