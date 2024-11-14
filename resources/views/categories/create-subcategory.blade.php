@@ -15,7 +15,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Tambah Sub-Kategori untuk: {{ $category->nama_kategori }}</h4>
+                        <h4 class="card-title">Tambah Sub-Kategori untuk: {{ $category->treatment_type }}</h4>
                     </div>
 
                     @if (session('error'))

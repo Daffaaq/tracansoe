@@ -47,9 +47,9 @@
                                     <div class="form-group row align-items-center">
                                         <label class="col-lg-3 col-form-label" for="nama_kategori">Nama Kategori</label>
                                         <div class="col-lg-9">
-                                            <input type="text" id="nama_kategori" class="form-control"
-                                                name="nama_kategori"
-                                                value="{{ old('nama_kategori', $category->nama_kategori) }}"
+                                            <input type="text" id="treatment_type" class="form-control"
+                                                name="treatment_type"
+                                                value="{{ old('treatment_type', $category->treatment_type) }}"
                                                 placeholder="Nama Kategori">
                                         </div>
                                     </div>
@@ -80,9 +80,9 @@
                             </div>
 
                             <!-- Subkategori jika ada -->
-                            @if ($category->subKriteria->isNotEmpty())
+                            @if ($category->category->isNotEmpty())
                                 <h5 class="font-weight-bold text-secondary mb-3 mt-4">Sub-Kategori</h5>
-                                @foreach ($category->subKriteria as $subCategory)
+                                @foreach ($category->category as $subCategory)
                                     <div class="sub-category-container">
                                         <div class="row mb-2">
                                             <input type="hidden" name="subKriteria[{{ $subCategory->id }}][id]"
@@ -95,7 +95,7 @@
                                                     <div class="col-lg-9">
                                                         <input type="text" id="sub_nama_kategori_{{ $subCategory->id }}"
                                                             class="form-control"
-                                                            name="subKriteria[{{ $subCategory->id }}][nama_kategori]"
+                                                            name="nama_kategori"
                                                             value="{{ $subCategory->nama_kategori }}">
                                                     </div>
                                                 </div>
@@ -108,7 +108,7 @@
                                                     <div class="col-lg-9">
                                                         <input type="text" id="sub_price_{{ $subCategory->id }}"
                                                             class="form-control numeric-only"
-                                                            name="subKriteria[{{ $subCategory->id }}][price]"
+                                                            name="price"
                                                             value="{{ $subCategory->price }}" inputmode="numeric">
                                                     </div>
                                                 </div>

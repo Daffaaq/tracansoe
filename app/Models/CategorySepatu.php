@@ -23,6 +23,22 @@ class CategorySepatu extends Model
 
     public function transaksis()
     {
-        return $this->belongsToMany(Transaksi::class, 'transaksi_category_hargas', 'category_sepatus_id', 'transaksi_id');
+        return $this->belongsToMany(transaksi::class, 'transaksi_category_hargas')
+        ->withPivot('category_id', 'qty', 'uuid')
+        ->withTimestamps();
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(category::class, 'transaksi_category_hargas')
+        ->withPivot('transaksi_id', 'qty', 'uuid')
+        ->withTimestamps();
+    }
+
+    public function plusServices()
+    {
+        return $this->belongsToMany(plus_service::class, 'transaksi_plus_services')
+        ->withPivot('transaksi_id', 'uuid')
+        ->withTimestamps();
     }
 }

@@ -67,16 +67,22 @@ class transaksi extends Model
 
     public function categoryHargas()
     {
-        return $this->belongsToMany(category::class, 'transaksi_category_hargas')->withPivot('qty');
+        return $this->belongsToMany(category::class, 'transaksi_category_hargas')
+            ->withPivot('category_sepatu_id', 'qty', 'uuid')
+            ->withTimestamps();
     }
 
 
     public function plusServices()
     {
-        return $this->belongsToMany(plus_service::class, 'transaksi_plus_services')->withPivot('uuid');
+        return $this->belongsToMany(plus_service::class, 'transaksi_plus_services')
+            ->withPivot('category_sepatu_id', 'uuid')
+            ->withTimestamps();
     }
-    public function categorySepatu()
+    public function categorySepatus()
     {
-        return $this->belongsToMany(CategorySepatu::class, 'transaksi_category_hargas')->withPivot('uuid');
+        return $this->belongsToMany(CategorySepatu::class, 'transaksi_category_hargas')
+            ->withPivot('category_id', 'qty', 'uuid')
+            ->withTimestamps();
     }
 }

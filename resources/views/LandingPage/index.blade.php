@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>Cleds</title>
     <link rel="stylesheet" href="{{ asset('/LandingPage/css/styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -37,32 +38,32 @@
         </div>
     </nav>
 
- <!-- Hero Section -->
-<section id="home" class="hero">
-    <div class="hero-content">
-        <h1>Cuci Sepatu Modern, Bersih dan Profesional</h1>
-        <p>Percayakan kebersihan sepatu Anda kepada ahli kami. Layanan cuci sepatu cepat dan terpercaya.</p>
-    </div>
-    <div class="hero-image slideshow-container">
-        <!-- Slides -->
-        <div class="slide fade">
-            <img src="{{ asset('/LandingPage/image/cucisepatu1.jpg') }}" alt="Sepatu Bersih 1">
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Cuci Sepatu Modern, Bersih dan Profesional</h1>
+            <p>Percayakan kebersihan sepatu Anda kepada ahli kami. Layanan cuci sepatu cepat dan terpercaya.</p>
         </div>
-        <div class="slide fade">
-            <img src="{{ asset('/LandingPage/image/cucisepatu2.jpg') }}" alt="Sepatu Bersih 2">
+        <div class="hero-image slideshow-container">
+            <!-- Slides -->
+            <div class="slide fade">
+                <img src="{{ asset('/LandingPage/image/cucisepatu1.jpg') }}" alt="Sepatu Bersih 1">
+            </div>
+            <div class="slide fade">
+                <img src="{{ asset('/LandingPage/image/cucisepatu2.jpg') }}" alt="Sepatu Bersih 2">
+            </div>
+            <div class="slide fade">
+                <img src="{{ asset('/LandingPage/image/cucisepatu3.jpg') }}" alt="Sepatu Bersih 3">
+            </div>
+            <div class="slide fade">
+                <img src="{{ asset('/LandingPage/image/cucisepatu4.jpg') }}" alt="Sepatu Bersih 4">
+            </div>
         </div>
-        <div class="slide fade">
-            <img src="{{ asset('/LandingPage/image/cucisepatu3.jpg') }}" alt="Sepatu Bersih 3">
-        </div>
-        <div class="slide fade">
-            <img src="{{ asset('/LandingPage/image/cucisepatu4.jpg') }}" alt="Sepatu Bersih 4">
-        </div>
-    </div>
-</section>
+    </section>
 
 
-   <!-- Hero Section -->
-   <!-- <section id="home" class="hero">
+    <!-- Hero Section -->
+    <!-- <section id="home" class="hero">
     <div id="carouselExample" class="carousel slide">
   <div class="carousel-inner">
     <div class="carousel-item active">
@@ -166,7 +167,7 @@
                 perbedaannya!</p>
         </div>
 
-    <!-- Social Media Icons with Custom Images
+        <!-- Social Media Icons with Custom Images
 <div class="social-icons">
     <a href="https://facebook.com" target="_blank" class="social-icon">
     <i class="bi bi-facebook" style="color: red;"></i>
@@ -193,22 +194,29 @@
             <p class="description-first">Kami menawarkan layanan perawatan dan pembersihan sepatu terbaik untuk menjaga
                 penampilan dan kualitas sepatu Anda. Setiap layanan dirancang untuk memenuhi kebutuhan spesifik Anda dan
                 memastikan kepuasan maksimal.</p>
-            @foreach ($categories as $category)
+            @foreach ($categories as $categoryLayanan)
                 <!-- Kategori Induk -->
                 <div class="service-category">
-                    <h3>{{ $category->nama_kategori }}</h3>
-                    <p>{{ $category->description }}</p>
+                    <h3>{{ $categoryLayanan->treatment_type }}</h3>
+                    <p>{{ $categoryLayanan->description }}</p>
                     <div class="subcategory-container">
-                        @foreach ($category->subKriteria as $subcategory)
-                            <div class="subcategory-item">
-                                <strong>{{ $subcategory->nama_kategori }}</strong>
-                                <p>{{ $subcategory->description }}</p>
-                                <span class="price">Rp {{ number_format($subcategory->price, 0, ',', '.') }}</span>
-                            </div>
-                        @endforeach
+                        @if ($categoryLayanan->category)
+                            <!-- Pastikan categories tidak null -->
+                            @foreach ($categoryLayanan->category as $subcategory)
+                                <div class="subcategory-item">
+                                    <strong>{{ $subcategory->nama_kategori }}</strong>
+                                    <p>{{ $subcategory->description }}</p>
+                                    <span class="price">Rp
+                                        {{ number_format($subcategory->price, 0, ',', '.') }}</span>
+                                </div>
+                            @endforeach
+                        @else
+                            <p>No subcategories available.</p>
+                        @endif
                     </div>
                 </div>
             @endforeach
+
         </div>
     </section>
 
@@ -231,8 +239,8 @@
         </div>
     </section>
 
-     <!-- How to Transact Section -->
-     <section id="how-to-transact" class="how-to-transact-section">
+    <!-- How to Transact Section -->
+    <section id="how-to-transact" class="how-to-transact-section">
         <div class="container">
             <h2>Cara Transaksi di CuciSepatu</h2>
             <p>Kami menawarkan proses transaksi yang mudah dan cepat untuk semua layanan cuci sepatu, dari pembersihan
@@ -430,7 +438,7 @@
 
 
 
-   
+
 
     <!-- Membership Campaign Section -->
     <section id="membership" class="membership-section" style="padding: 40px 0;">
@@ -473,24 +481,24 @@
             </div>
 
             <!-- Gallery Section -->
-<section id="gallery" class="gallery-section">
-    <div class="container">
-        <h2>Gallery</h2>
-        <hr style="width: 80px; height: 4px; border-radius: 10px; color: red;">
-        <div class="gallery-grid">
-            <img src="{{ asset('/LandingPage/image/gsp1.jpg') }}" alt="Gallery Image 1">
-            <img src="{{ asset('/LandingPage/image/gsp2.jpg') }}">
-            <img src="{{ asset('/LandingPage/image/gsp3.jpg') }}">
-            <img src="{{ asset('/LandingPage/image/gsp4.jpg') }}" alt="Gallery Image 4">
-            <img src="{{ asset('/LandingPage/image/gsp5.jpg') }}"alt="Gallery Image 5">
-            <img src="{{ asset('/LandingPage/image/gsp6.jpg') }}" alt="Gallery Image 6">
-            <img src="{{ asset('/LandingPage/image/gsp7.jpg') }}" alt="Gallery Image 7">
-            <img src="{{ asset('/LandingPage/image/cucisepatu3.jpg') }}" alt="Gallery Image 8">
-            <img src="{{ asset('/LandingPage/image/gsp9.jpg') }}" alt="Gallery Image 9">
-            <img src="{{ asset('/LandingPage/image/cucisepatu2.jpg') }}" alt="Gallery Image 8">
-        </div>
-    </div>
-</section>
+            <section id="gallery" class="gallery-section">
+                <div class="container">
+                    <h2>Gallery</h2>
+                    <hr style="width: 80px; height: 4px; border-radius: 10px; color: red;">
+                    <div class="gallery-grid">
+                        <img src="{{ asset('/LandingPage/image/gsp1.jpg') }}" alt="Gallery Image 1">
+                        <img src="{{ asset('/LandingPage/image/gsp2.jpg') }}">
+                        <img src="{{ asset('/LandingPage/image/gsp3.jpg') }}">
+                        <img src="{{ asset('/LandingPage/image/gsp4.jpg') }}" alt="Gallery Image 4">
+                        <img src="{{ asset('/LandingPage/image/gsp5.jpg') }}"alt="Gallery Image 5">
+                        <img src="{{ asset('/LandingPage/image/gsp6.jpg') }}" alt="Gallery Image 6">
+                        <img src="{{ asset('/LandingPage/image/gsp7.jpg') }}" alt="Gallery Image 7">
+                        <img src="{{ asset('/LandingPage/image/cucisepatu3.jpg') }}" alt="Gallery Image 8">
+                        <img src="{{ asset('/LandingPage/image/gsp9.jpg') }}" alt="Gallery Image 9">
+                        <img src="{{ asset('/LandingPage/image/cucisepatu2.jpg') }}" alt="Gallery Image 8">
+                    </div>
+                </div>
+            </section>
 
 
             <div class="membership-call-to-action" style="text-align: center; margin-top: 30px;">
@@ -790,7 +798,7 @@
                 <p>© 2024 achedev. All rights reserved.</p>
             </div>
         </div>
-        
+
     </footer>
     <button id="backToTop"><i class="fas fa-arrow-up"></i></button>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->string('nama_kategori');
-            $table->double('price')->nullable();
+            $table->double('price');
             $table->longText('description');
-            $table->integer('estimation')->nullable();
-            $table->unsignedBigInteger('parent_id')->nullable(); // Nullable parent_id for subcategories
-            $table->foreign('parent_id')->references('id')->on('categories')->onDelete('cascade'); // Self-referencing foreign key
+            $table->integer('estimation');
             $table->enum('status_kategori', ['active', 'nonactive'])->default('active');
+            $table->foreignId('layanan_kategori_id')->nullable()->constrained('category_layanans')->onDelete('cascade');
             $table->timestamps();
         });
     }

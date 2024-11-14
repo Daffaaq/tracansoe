@@ -18,48 +18,37 @@ class CategorySeeder extends Seeder
         $category_sepatus = DB::table('category_sepatus')->insert([
             'uuid' => Str::uuid(),
             'category_sepatu' => 'Berwarna'
-             
+
         ]);
-        $category_sepatus2 = DB::table('category_sepatus')->insert([
+        $category_sepatus = DB::table('category_sepatus')->insert([
             'uuid' => Str::uuid(),
             'category_sepatu' => 'Putih'
-             
+
         ]);
-        $fastCleaningId = DB::table('categories')->insertGetId([
+        $fastCleaningId = DB::table('category_layanans')->insertGetId([
             'uuid' => Str::uuid(),
-            'nama_kategori' => 'Fast Cleaning',
-            'price' => null,
+            'treatment_type' => 'Fast Cleaning',
             'description' => 'Kategori untuk layanan pembersihan cepat',
-            'estimation' => null,
-            'parent_id' => null,
-            'status_kategori' => 'active', // Status active
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        $deepCleaningId = DB::table('categories')->insertGetId([
+        $deepCleaningId = DB::table('category_layanans')->insertGetId([
             'uuid' => Str::uuid(),
-            'nama_kategori' => 'Deep Cleaning',
-            'price' => null,
+            'treatment_type' => 'Deep Cleaning',
             'description' => 'Kategori untuk layanan pembersihan mendalam',
-            'estimation' => null,
-            'parent_id' => null,
-            'status_kategori' => 'active', // Status active
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        $repaintId = DB::table('categories')->insertGetId([
+        $repaintId = DB::table('category_layanans')->insertGetId([
             'uuid' => Str::uuid(),
-            'nama_kategori' => 'Repaint',
-            'price' => null,
+            'treatment_type' => 'Repaint',
             'description' => 'Kategori untuk layanan restorasi warna sepatu',
-            'estimation' => null,
-            'parent_id' => null,
-            'status_kategori' => 'active', // Status active
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
 
         // Sub-kategori untuk Fast Cleaning
         DB::table('categories')->insert([
@@ -69,7 +58,7 @@ class CategorySeeder extends Seeder
                 'price' => 30000,
                 'description' => 'Pencucian instant pada bagian Upper dan Midsole',
                 'estimation' => 1,
-                'parent_id' => $fastCleaningId,
+                'layanan_kategori_id' => $fastCleaningId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -80,7 +69,7 @@ class CategorySeeder extends Seeder
                 'price' => 50000,
                 'description' => 'Pencucian instant pada bagian Upper, Midsole, dan Outsole',
                 'estimation' => 1,
-                'parent_id' => $fastCleaningId,
+                'layanan_kategori_id' => $fastCleaningId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -95,7 +84,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Perawatan pembersihan secara detail dan menyeluruh pada tingkat menengah.',
                 'price' => 60000,
                 'estimation' => 3,
-                'parent_id' => $deepCleaningId,
+                'layanan_kategori_id' => $deepCleaningId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -106,7 +95,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Perawatan pembersihan secara detail dan menyeluruh.',
                 'price' => 80000,
                 'estimation' => 3,
-                'parent_id' => $deepCleaningId,
+                'layanan_kategori_id' => $deepCleaningId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -117,7 +106,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Perawatan pembersihan secara mendalam.',
                 'price' => 160000,
                 'estimation' => 4,
-                'parent_id' => $deepCleaningId,
+                'layanan_kategori_id' => $deepCleaningId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -132,7 +121,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Perawatan restorasi warna ringan.',
                 'price' => 200000,
                 'estimation' => 5,
-                'parent_id' => $repaintId,
+                'layanan_kategori_id' => $repaintId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -143,7 +132,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Perawatan restorasi warna tingkat menengah.',
                 'price' => 250000,
                 'estimation' => 6,
-                'parent_id' => $repaintId,
+                'layanan_kategori_id' => $repaintId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -154,7 +143,7 @@ class CategorySeeder extends Seeder
                 'description' => 'Perawatan restorasi warna intensif.',
                 'price' => 300000,
                 'estimation' => 7,
-                'parent_id' => $repaintId,
+                'layanan_kategori_id' => $repaintId,
                 'status_kategori' => 'active', // Status active
                 'created_at' => now(),
                 'updated_at' => now(),

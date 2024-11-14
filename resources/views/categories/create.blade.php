@@ -63,11 +63,10 @@
                                 }
                             </style>
                             <div class="form-group">
-                                <label class="form-label" for="nama_kategori">Nama Kategori</label>
-                                <input type="text" id="nama_kategori" class="form-control" name="nama_kategori"
-                                    value="{{ old('nama_kategori') }}" placeholder="Nama Kategori">
+                                <label class="form-label" for="treatment_type">Nama Kategori</label>
+                                <input type="text" id="treatment_type" class="form-control" name="treatment_type"
+                                    value="{{ old('treatment_type') }}" placeholder="Nama Kategori">
                             </div>
-
 
                             <div class="form-group">
                                 <label class="form-label" for="description">Deskripsi</label>

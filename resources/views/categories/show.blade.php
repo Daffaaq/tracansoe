@@ -29,16 +29,8 @@
 
         <div class="card-body">
             <div class="row mb-3">
-                <div class="col-md-3 font-weight-bold">Nama Kategori:</div>
-                <div class="col-md-9">{{ $category->nama_kategori }}</div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-3 font-weight-bold">Harga:</div>
-                <div class="col-md-9">{{ $category->price }}</div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-3 font-weight-bold">Estimasi Selesai:</div>
-                <div class="col-md-9">{{ $category->estimation }} Hari</div>
+                <div class="col-md-3 font-weight-bold">Nama Treatment:</div>
+                <div class="col-md-9">{{ $category->treatment_type }}</div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Deskripsi:</div>

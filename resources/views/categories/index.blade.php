@@ -71,27 +71,23 @@
                         searchable: false
                     },
                     {
-                        data: 'nama_kategori',
-                        name: 'nama_kategori'
+                        data: 'treatment_type',
+                        name: 'treatment_type'
                     },
                     {
                         data: 'uuid',
                         name: 'uuid',
                         orderable: false,
                         searchable: false,
-                        render: function(data, type, row) {
-                            var addsubcategory = `
-                            <a href="/dashboard/kategori/subkategori/${data}" class="btn icon btn-sm btn-info">
-                                <i class="bi bi-plus"></i>
-                            </a>
-                        `;
-                            var showsubcategory = `
-                            <a href="/dashboard/kategori/showsub/${data}" class="btn icon btn-sm btn-info">
-                                <i class="bi bi-eye"></i>
-                            </a>
-                        `;
-                            var hasSubKriteria = {!! json_encode($data->pluck('parent_id')->toArray()) !!}.includes(row.id);
-                            return addsubcategory + (hasSubKriteria ? ' ' + showsubcategory : '');
+                        render: function(data) {
+                            return `
+                    <a href="/dashboard/kategori/subkategori/${data}" class="btn icon btn-sm btn-info">
+                        <i class="bi bi-plus"></i>
+                    </a>
+                    <a href="/dashboard/kategori/showsub/${data}" class="btn icon btn-sm btn-info">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                `;
                         }
                     },
                     {

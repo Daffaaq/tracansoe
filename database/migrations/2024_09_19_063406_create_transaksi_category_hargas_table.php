@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('qty');
             $table->foreignId('transaksi_id')->constrained('transaksis')->onDelete('cascade');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->foreignId('category_sepatus_id')->constrained('category_sepatus')->onDelete('cascade');
+            $table->foreignId('category_sepatu_id')->constrained('category_sepatus')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -10,6 +10,8 @@ use App\Http\Requests\StoreMainCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use Illuminate\Support\Facades\DB;
 use App\Models\category;
+use App\Models\category_layanan;
+use Illuminate\Support\Facades\Log;
 
 class CategoryController extends Controller
 {
@@ -23,7 +25,7 @@ class CategoryController extends Controller
     public function list(Request $request)
     {
         if ($request->ajax()) {
-            $dataCategory = category::select("id", "uuid", "nama_kategori")->whereNull('parent_id')->get();
+            $dataCategory = category_layanan::select("id", "uuid", "treatment_type")->get();
             return DataTables::of($dataCategory)
                 ->addIndexColumn()
                 ->make(true);
@@ -52,14 +54,10 @@ class CategoryController extends Controller
             return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk menyimpan kategori.');
         }
 
-        // Simpan Kategori Induk (parent_id = null)
-        category::create([
+        category_layanan::create([
             'uuid' => Str::uuid(),
-            'nama_kategori' => $request->nama_kategori,
-            'price' => null, // Price is null for category induk
             'description' => $request->description,
-            'estimation' => null,
-            'parent_id' => null, // Kategori induk
+            'treatment_type' => $request->treatment_type,
         ]);
 
         return redirect()->route('kategori.index')->with('success', 'Kategori Induk berhasil ditambahkan.');
@@ -71,7 +69,7 @@ class CategoryController extends Controller
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk mengedit kategori.');
         }
-        $category = category::where('uuid', $uuid)->firstOrFail();
+        $category = category_layanan::where('uuid', $uuid)->firstOrFail();
         return view('categories.create-subcategory', compact('category'));
     }
     public function storeSubCategory(StoreCategoryRequest $request, $uuid)
@@ -82,7 +80,7 @@ class CategoryController extends Controller
         }
 
         // Cari kategori induk berdasarkan UUID
-        $category = category::where('uuid', $uuid)->firstOrFail();
+        $category = category_layanan::where('uuid', $uuid)->firstOrFail();
 
         // Simpan Sub-Kategori (parent_id mengacu ke Kategori Induk)
         $subCategory = category::create([
@@ -90,7 +88,7 @@ class CategoryController extends Controller
             'price' => $request->price, // Harga untuk sub-kategori
             'description' => $request->description,
             'estimation' => $request->estimation,
-            'parent_id' => $category->id, // Mengacu ke Kategori Induk
+            'layanan_kategori_id' => $category->id, // Mengacu ke Kategori Induk
         ]);
 
         return redirect()->route('kategori.index')->with('success', 'Sub-Kategori berhasil ditambahkan.');
@@ -100,8 +98,9 @@ class CategoryController extends Controller
     public function showSubCategory($uuid)
     {
 
-        $category = category::where('uuid', $uuid)->with('subKriteria')->firstOrFail();
-        return view('categories.show-subcategory', compact('category'));
+        $category1 = category_layanan::where('uuid', $uuid)->firstOrFail();
+        $category = category::where('layanan_kategori_id', $category1->id)->get();
+        return view('categories.show-subcategory', compact('category', 'category1'));
     }
 
     public function deleteSubCategory(string $uuid)
@@ -117,6 +116,7 @@ class CategoryController extends Controller
 
         try {
             $category = category::where('uuid', $uuid)->firstOrFail();
+
             $nama_kategori = $category->nama_kategori; // Simpan nama kategori untuk respon
 
             // Hapus data sub-kategori
@@ -140,12 +140,14 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan lain
             DB::rollBack();
+            Log::error('Error deleting sub-category: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan saat menghapus sub-kategori.'
+                'message' => 'Terjadi kesalahan saat menghapus sub-kategori. Error: ' . $e->getMessage()
             ], 500);
         }
     }
+
 
 
     /**
@@ -153,7 +155,7 @@ class CategoryController extends Controller
      */
     public function show(string $uuid)
     {
-        $category = category::where('uuid', $uuid)->firstOrFail();
+        $category = category_layanan::where('uuid', $uuid)->firstOrFail();
         return view('categories.show', compact('category'));
     }
 
@@ -165,7 +167,7 @@ class CategoryController extends Controller
         if (auth()->user()->role != 'superadmin') {
             return redirect()->route('kategori.index')->with('error', 'Anda tidak memiliki akses untuk mengedit kategori.');
         }
-        $category = category::where('uuid', $uuid)->firstOrFail();
+        $category = category_layanan::where('uuid', $uuid)->firstOrFail();
         return view('categories.edit', compact('category'));
     }
 
@@ -174,17 +176,17 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, string $uuid)
     {
-        $category = category::where('uuid', $uuid)->firstOrFail();
+        $category = category_layanan::where('uuid', $uuid)->firstOrFail();
 
-        if ($category->parent_id === null) {
+        if ($category) {
             $category->update([
-                'nama_kategori' => $request->nama_kategori,
+                'treatment_type' => $request->treatment_type,
                 'description' => $request->description,
             ]);
         }
 
-        if ($request->has('subKriteria')) {
-            foreach ($request->subKriteria as $subKategoriData) {
+        if ($request->has('category')) {
+            foreach ($request->category as $subKategoriData) {
                 if (isset($subKategoriData['id'])) {
                     $subKategori = category::findOrFail($subKategoriData['id']);
                     $subKategori->update([
@@ -211,11 +213,13 @@ class CategoryController extends Controller
         DB::beginTransaction();
 
         try {
-            $category = category::where('uuid', $uuid)->firstOrFail();
+            $category1 = category_layanan::where('uuid', $uuid)->firstOrFail();
+
+            $category = category::where('layanan_kategori_id', $category1->id)->first();
 
             // Cek apakah kategori ini merupakan kategori utama dengan sub-kategori
-            if ($category->parent_id === null) {
-                $hasChildCategories = category::where('parent_id', $category->id)->exists();
+            if ($category != null) {
+                $hasChildCategories = category::where('layanan_kategori_id', $category1->id)->exists();
 
                 if ($hasChildCategories) {
                     return response()->json(['success' => false, 'message' => 'Kategori ini memiliki sub-kategori. Hapus sub-kategori terlebih dahulu.'], 400);
@@ -223,7 +227,7 @@ class CategoryController extends Controller
             }
 
             // Hapus data kategori
-            $category->delete();
+            $category1->delete();
 
             // Commit transaksi setelah penghapusan berhasil
             DB::commit();

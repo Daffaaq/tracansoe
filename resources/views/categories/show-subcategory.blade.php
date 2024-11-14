@@ -32,14 +32,14 @@
             <h5 class="font-weight-bold text-secondary mb-3">Informasi Kategori</h5>
             <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Nama Kategori:</div>
-                <div class="col-md-9">{{ $category->nama_kategori }}</div>
+                <div class="col-md-9">{{ $category1->treatment_type }}</div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-3 font-weight-bold">Deskripsi:</div>
                 <div class="col-md-9">
-                    @if (!empty($category->description))
-                        {{ $category->description }}
+                    @if (!empty($category1->description))
+                        {{ $category1->description }}
                     @else
                         <span class="text-muted">Tidak ada deskripsi tersedia</span>
                     @endif
@@ -47,7 +47,7 @@
             </div>
 
             <!-- Informasi Sub-Kategori (Jika Ada) -->
-            @if ($category->subKriteria->isNotEmpty())
+            @if ($category->isNotEmpty())
                 <h5 class="font-weight-bold text-secondary mb-3">Sub-Kategori</h5>
                 <div class="row mb-3">
                     <div class="col-md-12">
@@ -63,7 +63,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($category->subKriteria as $subKriteria)
+                                @foreach ($category as $subKriteria)
                                     <tr id="row-{{ $subKriteria->uuid }}">
                                         <td>{{ $subKriteria->nama_kategori }}</td>
                                         <td>{{ $subKriteria->description }}</td>
@@ -100,8 +100,8 @@
             <!-- Tombol Aksi -->
             <div class="d-flex justify-content-end mt-4">
                 <a href="{{ route('kategori.index') }}" class="btn btn-secondary mr-2">Kembali</a>
-                <a href="{{ route('kategori.edit', $category->uuid) }}" class="btn btn-primary mr-2">Edit</a>
-                <form action="{{ route('kategori.destroy', $category->uuid) }}" method="POST"
+                <a href="{{ route('kategori.edit', $category1->uuid) }}" class="btn btn-primary mr-2">Edit</a>
+                <form action="{{ route('kategori.destroy', $category1->uuid) }}" method="POST"
                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus Kategori ini?');">
                     @csrf
                     @method('DELETE')

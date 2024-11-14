@@ -21,11 +21,11 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'treatment_type' => 'required|string|max:255',
             'nama_kategori' => 'required|string|max:255',
             'description' => 'required|string|max:500',
             'price' => 'nullable|numeric',
             'estimation' => 'nullable|integer',
-            'parent_id' => 'nullable|exists:categories,id',
         ];
     }
 

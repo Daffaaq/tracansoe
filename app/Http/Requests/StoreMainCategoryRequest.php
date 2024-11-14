@@ -22,7 +22,7 @@ class StoreMainCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_kategori' => 'required|string|max:255',
+            'treatment_type' => 'required|string|max:255',
             'description' => 'required|string|max:500',
         ];
     }

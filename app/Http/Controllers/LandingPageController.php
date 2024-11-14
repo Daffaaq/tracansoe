@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Blog;
 use App\Models\category;
+use App\Models\category_layanan;
 use App\Models\CategoryBlog;
 use App\Models\DoorprizeWinner;
 use App\Models\Hadiah;
@@ -36,13 +37,12 @@ class LandingPageController extends Controller
             ->where('status', 'expired')
             ->get();
 
-        // Query categories including their subcategories
-        $categories = category::with(['subKriteria' => function ($query) {
-            $query->where('status_kategori', 'active'); // Filter subkategori yang aktif
+        $categories = category_layanan::with(['category' => function ($query) {
+            $query->where('status_kategori', 'active');
         }])
-            ->whereNull('parent_id') // Hanya ambil kategori induk
-            ->where('status_kategori', 'active') // Hanya ambil kategori induk yang aktif
             ->get();
+
+        // dd($categories);
 
 
         $plusService = plus_service::where('status_plus_service', 'active')->get();

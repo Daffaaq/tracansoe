@@ -140,6 +140,13 @@
                                 <span>Hadiah</span>
                             </a>
                         </li>
+                         <li
+                            class="sidebar-item {{ request()->routeIs('transaksi.index', 'transaksi.create', 'transaksi.edit', 'transaksi.show') ? 'active' : '' }}">
+                            <a href="{{route('transaksi.index')}}" class="sidebar-link">
+                                <i class="bi bi-grid-fill"></i>
+                                <span>Transaksi</span>
+                            </a>
+                        </li>
                         @endif
                         @if (in_array(auth()->user()->role, ['karyawan', 'karyawan1', 'Karyawan2','karyawan3','karyawan4','karyawan5','karyawan6']));
                         <li
