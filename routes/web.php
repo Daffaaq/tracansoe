@@ -19,35 +19,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 
 
-
-Route::get('/send-test-email', function () {
-    $details = [
-        'title' => 'Testing Email dari Laravel',
-        'body' => 'Ini adalah email percobaan dari aplikasi Laravel Anda menggunakan SMTP Gmail.'
-    ];
-
-    Mail::to('agustinakurniawati46@gmail.com')->send(new \App\Mail\TestEmail($details));
-
-    return 'Email telah dikirim!';
-});
-
-
-
 Route::get('/', [LandingPageController::class, 'landingPage'])->name('landingPage');
 Route::post('/register-memberships', [MembershipController::class, 'register'])->name('membership.register');
 Route::post('/memberships/extend', [MembershipController::class, 'extend'])->name('memberships.extend');
 Route::get('/list-blog', [LandingPageController::class, 'index'])->name('blog-landingPage');
 Route::get('/list-blog/{slug}', [LandingPageController::class, 'showBlog'])->name('listBlog-detail');
-// Route::get('/list-blog', function () {
-//     return view('LandingPage.blog');
-// })->name('blog-landingPage');
-
-// Route::prefix('/list-blog')->group(function () {
-//     Route::get('/detail-blog', function () {
-//         return view('LandingPage.detail-blog');
-//     })->name('listBlog-detail');
-// });
-
 
 Route::post('/track-order', [TrackController::class, 'tracking'])->name('tracking');
 Route::post('/advice', [AdviceController::class, 'postAdvice'])->name('advice');

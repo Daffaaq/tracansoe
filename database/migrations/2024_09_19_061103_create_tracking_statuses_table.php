@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique();
             $table->foreignId('transaksi_id')->constrained('transaksis')->onDelete('cascade'); // Hubungkan ke transaksi
-            $table->string('role')->comment('karyawan','karyawan2','karyawan3','karyawan4','karyawan5','karyawan6');
             $table->foreignId('status_id')->constrained('statuses')->onDelete('cascade');     // Hubungkan ke status
             $table->longText('description')->nullable();
             $table->date('tanggal_status');

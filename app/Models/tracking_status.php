@@ -16,7 +16,8 @@ class tracking_status extends Model
         'status_id',
         'description',
         'tanggal_status',
-        'jam_status'
+        'jam_status',
+        'role'
     ];
 
     protected static function boot()

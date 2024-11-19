@@ -22,7 +22,11 @@ use App\Http\Requests\PelunasanRequest;
 use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use App\Mail\TransaksiEmail;
+use App\Models\category_layanan;
 use Illuminate\Support\Facades\Mail;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\qrcodes;
+use Illuminate\Support\Facades\Storage;
 use App\Models\CategorySepatu;
 
 class TransaksiController extends Controller
@@ -52,10 +56,14 @@ class TransaksiController extends Controller
      */
     public function create()
     {
-        $categories = category::where('status_kategori', 'active')->get();
+        $categories =
+            category_layanan::with(['category' => function ($query) {
+                $query->where('status_kategori', 'active');
+            }])
+            ->get();
         $plus_services = plus_service::where('status_plus_service', 'active')->get();
         $kategori_sepatu = CategorySepatu::all();
-        return view('transaksi.create', compact('categories', 'plus_services','kategori_sepatu'));
+        return view('transaksi.create', compact('categories', 'plus_services', 'kategori_sepatu'));
     }
 
     public function validatePromosi(ValidatePromosiRequest $request)
@@ -112,7 +120,7 @@ class TransaksiController extends Controller
         }
     }
 
-    
+
 
     public function validateMembership(ValidateMembershipRequest $request)
     {
@@ -236,179 +244,175 @@ class TransaksiController extends Controller
      */
     public function store(TransaksiRequest $request)
     {
+        // Debug awal untuk memeriksa input
         // dd($request->all());
-        DB::beginTransaction(); // Mulai transaksi database
+
+        // Mulai transaksi database
+        DB::beginTransaction();
 
         try {
-            // Inisialisasi total harga
             $totalHarga = 0;
 
-            // Ambil dan hitung total harga dari kategori
-            foreach ($request->category_hargas as $category_harga) {
-                // Ambil data category berdasarkan ID
-                $category = category::find($category_harga['id']);
+            // Ambil dan filter `category_sepatu` untuk hanya menyimpan elemen `plus_services` yang memiliki 'id'
+            $categorySepatu = $request->input('category_sepatu', []);
 
-                if ($category) {
-                    // Hitung total harga menggunakan qty dari request
-                    $totalHarga += $category->price * $category_harga['qty'];
+            foreach ($categorySepatu as &$sepatuData) {
+                if (isset($sepatuData['plus_services'])) {
+                    // Filter `plus_services` agar hanya menyimpan yang memiliki 'id'
+                    $sepatuData['plus_services'] = array_filter($sepatuData['plus_services'], function ($service) {
+                        return isset($service['id']);
+                    });
                 }
             }
 
-            // Hitung total harga dari plus services
-            if ($request->has('plus_services')) {
-                foreach ($request->plus_services as $plus_service_id) {
-                    $plusService = plus_service::find($plus_service_id);
+            // Hitung total harga berdasarkan `category_hargas` dan `plus_services`
+            foreach ($categorySepatu as $sepatu) {
+                foreach ($sepatu['category_hargas'] as $category_harga) {
+                    $category = Category::find($category_harga['id']);
+                    if ($category) {
+                        $totalHarga += $category->price * $category_harga['qty'];
+                    }
+                }
+
+                // Hitung harga dari `plus_services` yang sudah difilter
+                foreach ($sepatu['plus_services'] ?? [] as $plus_service) {
+                    $plusService = Plus_Service::find($plus_service['id']);
                     if ($plusService) {
                         $totalHarga += $plusService->price;
                     }
                 }
             }
 
-            // Cek apakah ada kode promosi yang dimasukkan
-            // Cek apakah ada kode promosi yang dimasukkan
+            // Penanganan promosi
             if ($request->promosi_kode) {
                 $promosi = Promosi::where('kode', $request->promosi_kode)->first();
-
                 if (!$promosi) {
                     return redirect()->route('transaksi.index')->with('error', 'Kode promosi tidak valid.');
                 }
 
-                // Cek status promosi
                 if ($promosi->status === 'upcoming') {
-                    return redirect()->route('transaksi.index')->with('error', 'Kode belum bisa digunakan untuk tanggal sekarang.');
+                    return redirect()->route('transaksi.index')->with('error', 'Kode belum berlaku.');
                 } elseif ($promosi->status === 'expired') {
                     return redirect()->route('transaksi.index')->with('error', 'Kode promosi sudah expired.');
                 } elseif ($promosi->isActive()) {
-                    // Cek apakah user memiliki kode membership
-                    if (!$request->membership_kode) {
-                        // Jika tidak ada kode membership, cek minimum payment dari promosi
-                        if ($totalHarga < $promosi->minimum_payment) {
-                            return redirect()->route('transaksi.index')->with('error', 'Total harga tidak memenuhi syarat minimum pembayaran untuk menggunakan kode promosi ini.');
-                        }
+                    if (!$request->membership_kode && $totalHarga < $promosi->minimum_payment) {
+                        return redirect()->route('transaksi.index')->with('error', 'Total harga tidak memenuhi minimum promosi.');
                     }
-
-                    // Terapkan diskon jika promosi aktif (tanpa cek minimum payment jika ada membership)
-                    $totalHarga -= ($totalHarga * ($promosi->discount)); // Terapkan diskon
+                    $totalHarga -= $totalHarga * $promosi->discount;
                 }
             }
 
-            // Cek apakah ada kode membership yang dimasukkan
+            // Penanganan membership
             if ($request->membership_kode) {
                 $member = Members::where('kode', $request->membership_kode)->first();
-
                 if (!$member) {
                     return redirect()->route('transaksi.create')->with('error', 'Kode membership tidak valid.');
                 }
 
                 $membersTrack = MembersTrack::where('membership_id', $member->id)
-                    ->orderBy('created_at', 'desc')->first();
+                    ->orderBy('created_at', 'desc')
+                    ->first();
 
-                if (!$membersTrack) {
-                    return redirect()->route('transaksi.create')->with('error', 'Tidak ada track untuk anggota ini.');
+                if (!$membersTrack || $membersTrack->status !== 'active') {
+                    return redirect()->route('transaksi.create')->with('error', 'Kode membership tidak aktif.');
                 }
 
-                if ($membersTrack->status === 'active') {
-                    // Terapkan diskon membership tanpa batasan minimum pembayaran
-                    $totalHarga -= ($totalHarga * ($membersTrack->discount));
-                } elseif ($membersTrack->status === 'expired') {
-                    return redirect()->route('transaksi.create')->with('error', 'Kode membership sudah expired.');
-                } elseif ($membersTrack->status === 'waiting') {
-                    return redirect()->route('transaksi.create')->with('error', 'Kode membership belum aktif.');
-                } else {
-                    return redirect()->route('transaksi.create')->with('error', 'Kode membership tidak valid.');
-                }
+                $totalHarga -= $totalHarga * $membersTrack->discount;
             }
 
-            $minimalDownpaymentPercentage = 0.40;
-            $minimalDownpayment = $totalHarga * $minimalDownpaymentPercentage;
-            $downpaymentAmount = round($request->downpayment_amount, 0); // Hapus desimal
-            // dd($downpaymentAmount);
-            // dd($minimalDownpayment, $downpaymentAmount);
+            // Validasi dan penghitungan downpayment
+            $minimalDownpayment = $totalHarga * 0.40;
+            $downpaymentAmount = round($request->downpayment_amount, 0);
+            $remainingPayment = ($request->status === 'downpayment' && $downpaymentAmount < $minimalDownpayment)
+                ? redirect()->route('transaksi.create')->with('error', 'Minimal downpayment adalah 40% dari total harga.')
+                : $totalHarga - $downpaymentAmount;
 
-
-            // Hitung remaining_payment jika statusnya adalah downpayment
-            $remainingPayment = 0;
-            if ($request->status === 'downpayment') {
-                if ($downpaymentAmount < $minimalDownpayment) {
-                    return redirect()->route('transaksi.create')->with('error', 'Minimal downpayment adalah 35% dari total harga.');
-                }
-                $remainingPayment = $totalHarga - $request->downpayment_amount; // Sisa pembayaran
-                $statusDownpayment = 'pending';
-                $pelunasanAmount = 0;
-            }
-
-
-            $remainingPayment = round($remainingPayment, 0); // Hapus desimal
-            // Simpan transaksi utama
+            // Simpan data transaksi
             $transaksi = Transaksi::create([
                 'nama_customer' => $request->nama_customer,
                 'email_customer' => $request->email_customer,
                 'notelp_customer' => $request->notelp_customer,
                 'alamat_customer' => $request->alamat_customer,
-                'status' => $request->status, // downpayment, paid
-                'promosi_id' => $promosi->id ?? null, // Simpan ID promosi jika ada
-                'user_id' => auth()->id(), // ID pegawai yang login
-                'total_harga' => $totalHarga, // Total harga hasil perhitungan
-                'downpayment_amount' => $downpaymentAmount ?? 0, // Jumlah DP (jika ada)
-                'remaining_payment' => $remainingPayment ?? 0, // Sisa pembayaran otomatis dihitung
-                'status_downpayment' => $statusDownpayment ?? null,
-                'pelunasan_amount' => $pelunasanAmount ?? 0,
-                'status_pickup' => 'not_picked_up',
+                'status' => $request->status,
+                'promosi_id' => $promosi->id ?? null,
+                'user_id' => auth()->id(),
+                'total_harga' => $totalHarga,
+                'downpayment_amount' => $downpaymentAmount ?? 0,
+                'remaining_payment' => $remainingPayment ?? 0,
                 'membership_id' => $member->id ?? null,
                 'tracking_number' => $this->generateTrackingNumber(),
-                'tanggal_transaksi' => Carbon::now()->toDateString(), // Tanggal saat ini
-                'jam_transaksi' => Carbon::now()->toTimeString(), // Jam saat ini
+                'tanggal_transaksi' => Carbon::now()->toDateString(),
+                'jam_transaksi' => Carbon::now()->toTimeString(),
             ]);
 
-            foreach ($request->category_sepatu as $category_sepatu) {
-                $transaksi->categorySepatu()->attach($category_sepatu, [
-                    'uuid' => (string) Str::uuid()
-                ]);
-            }
-            // dd($request->category_hargas);
-            // Simpan kategori harga yang dipilih dalam transaksi
-            foreach ($request->category_hargas as $category_harga) {
-                $transaksi->categoryHargas()->attach($category_harga['id'], [
-                    'uuid' => (string) Str::uuid(),
-                    'qty' => $category_harga['qty']
-                ]);
-            }
-
-            // Simpan plus services yang dipilih
-            if ($request->has('plus_services')) {
-                foreach ($request->plus_services as $plus_service_id) {
-                    $transaksi->plusServices()->attach($plus_service_id, [
-                        'uuid' => (string) Str::uuid()
-                    ]);
+            // Simpan kategori sepatu dan harga
+            foreach ($categorySepatu as $category_sepatu) {
+                if (isset($category_sepatu['category_hargas'])) {
+                    foreach ($category_sepatu['category_hargas'] as $category_harga) {
+                        if (isset($category_harga['qty']) && $category_harga['qty'] > 0) {
+                            $transaksi->categoryHargas()->attach($category_harga['id'], [
+                                'uuid' => (string) Str::uuid(),
+                                'qty' => $category_harga['qty'],
+                                'category_sepatu_id' => $category_sepatu['id'],
+                            ]);
+                        } else {
+                            return redirect()->route('transaksi.create')->with('error', 'Qty tidak valid untuk salah satu kategori.');
+                        }
+                    }
                 }
+
+                // Simpan layanan tambahan plus_services untuk setiap category_sepatu
+                if (isset($category_sepatu['plus_services'])) {
+                    foreach ($category_sepatu['plus_services'] as $plus_service) {
+                        $transaksi->plusServices()->attach($plus_service['id'], [
+                            'uuid' => (string) Str::uuid(),
+                            'category_sepatu_id' => $plus_service['category_sepatu_id'],
+                        ]);
+                    }
+                }
+
+                // Generate QR code, save as PNG, and store the file
+                $qrCodeData = 'Transaksi ID: ' . $transaksi->id . ', Kategori: ' . $category_sepatu['id'];
+                $fileName = 'qrcode_' . time() . '_' . $category_sepatu['id'] . '.png';
+                $filePath = 'qrcodes/' . $fileName;
+                // dd($qrCodeData, $fileName, $filePath);
+                // Simpan QR code sebagai file di storage
+                Storage::disk('public')->put($filePath, QrCode::format('png')->size(200)->generate($qrCodeData));
+
+                $Qrcode = qrcodes::create([
+                    'transaksi_id' => $transaksi->id,
+                    'category_sepatu' => $category_sepatu['id'],
+                    'role' => 'karyawan',
+                    'qrcode' => $filePath,
+                    'code' => $qrCodeData,
+                    'create_code_date' => Carbon::now()->toDateString(),
+                    'create_code_time' => Carbon::now()->toTimeString(),
+                ]);
+                // dd($Qrcode);
             }
 
-            // Cek apakah status "Pending" sudah ada
-            $status = Status::firstOrCreate([
-                'name' => 'Pending'
-            ]);
-
-            // Simpan status tracking yang pertama kali
+            // Simpan status pertama kali
+            $status = Status::firstOrCreate(['name' => 'Pending']);
             $transaksi->trackingStatuses()->create([
                 'status_id' => $status->id,
-                'description' => 'Sudah diterima, belum diproses', // Deskripsi default
+                'description' => 'Sudah diterima, belum diproses',
                 'tanggal_status' => Carbon::now()->toDateString(),
-                'jam_status' => Carbon::now()->toTimeString()
+                'jam_status' => Carbon::now()->toTimeString(),
             ]);
 
-            // dd($transaksi);
-            DB::commit(); // Commit transaksi jika semuanya sukses
-            // Kirim email dengan PDF sebagai lampiran
-            Mail::to($transaksi->email_customer)->send(new TransaksiEmail($transaksi));
+            DB::commit();
 
+            // Mail::to($transaksi->email_customer)->send(new TransaksiEmail($transaksi));
             return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan transaksi jika ada error
-
-            // Ganti response JSON dengan redirect dan pesan error
+            DB::rollBack();
             return redirect()->route('transaksi.index')->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
+
+
+
 
     public function updateStatusPickup(Request $request, $id)
     {
@@ -669,6 +673,4 @@ class TransaksiController extends Controller
             return redirect()->route('transaksi.index')->with('error', 'Transaksi tidak ditemukan.');
         }
     }
-
-    
 }

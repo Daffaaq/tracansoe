@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\API\ApiCategoryLayananController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\ApiLoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +16,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::post('/login', [ApiLoginController::class, 'login']);
+Route::post('/logout', [ApiLoginController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->prefix('category-layanan')->group(function () {
+    Route::get('/', [ApiCategoryLayananController::class, 'index']);  // Menampilkan semua category
+    Route::get('{uuid}', [ApiCategoryLayananController::class, 'show']);  // Menampilkan kategori berdasarkan UUID
+    Route::post('/', [ApiCategoryLayananController::class, 'store']);  // Membuat kategori baru
+    Route::put('{uuid}', [ApiCategoryLayananController::class, 'update']);  // Mengupdate kategori berdasarkan UUID
+    Route::delete('{uuid}', [ApiCategoryLayananController::class, 'destroy']);  // Menghapus kategori berdasarkan UUID
 });
+

@@ -79,10 +79,4 @@ class transaksi extends Model
             ->withPivot('category_sepatu_id', 'uuid')
             ->withTimestamps();
     }
-    public function categorySepatus()
-    {
-        return $this->belongsToMany(CategorySepatu::class, 'transaksi_category_hargas')
-            ->withPivot('category_id', 'qty', 'uuid')
-            ->withTimestamps();
-    }
 }
