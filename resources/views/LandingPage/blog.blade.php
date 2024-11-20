@@ -49,6 +49,40 @@
                     </div>
                 </form>
             </div>
+            <!-- Search Form -->
+            <section class="search-section">
+                <form action="{{ route('blog-landingPage') }}" method="GET" class="search-form" id="search-form">
+                    <label for="search-input" class="search-label">Cari Blog:</label>
+                    <div class="search-input-container">
+                        <input type="text" name="search" id="search-input" class="search-input"
+                            placeholder="Cari artikel..." value="{{ request()->search }}">
+                        <span id="clear-search" class="clear-icon">&times;</span> <!-- Ikon X untuk menghapus input -->
+                        <button type="submit" class="search-btn">Cari</button>
+                    </div>
+                </form>
+
+                <!-- Badge Section for Multiple Suggestions -->
+                @if (!empty($suggestions) && $suggestions->isNotEmpty())
+                    <div class="suggestion-badge-container">
+                        <span class="suggestion-badge">Mungkin yang Anda maksud:</span>
+                        <ul class="suggestion-list">
+                            @foreach ($suggestions as $suggestion)
+                                <li class="suggestion-item">
+                                    <a href="{{ route('blog-landingPage', ['search' => $suggestion['value']]) }}"
+                                        class="suggestion-link" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="{{ $suggestion['value'] }}">
+                                        <span class="suggestion-value">{{ $suggestion['value'] }}</span>
+                                        <span class="suggestion-source">{{ $suggestion['source'] }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </section>
+
+
+
 
             <div class="blog-content-wrapper">
                 <!-- Blog Grid -->
@@ -140,161 +174,6 @@
         </div>
     </section>
 
-    {{-- <section id="blog-list" class="blog-list-section">
-        <div class="container">
-            <h2 class="section-title">Semua Blog Kami</h2>
-            <p class="section-description">Temukan artikel terbaru tentang tips merawat sepatu, gaya hidup, dan lainnya
-                di sini.</p>
-
-            <div class="filter-section">
-                <label for="filter-date" class="filter-label">Filter by Tanggal:</label>
-                <div class="filter-wrapper">
-                    <input type="date" id="filter-date" class="filter-input">
-                    <button class="filter-btn">Filter</button>
-                </div>
-            </div>
-
-            <div class="blog-content-wrapper">
-                <div class="blog-grid">
-                    <!-- Blog Card Example -->
-                    <div class="blog-card" data-aos="fade-up">
-                        <div class="blog-image">
-                            <img src="https://via.placeholder.com/400x250" alt="Judul Blog">
-                        </div>
-                        <div class="blog-content">
-                            <span class="blog-category">Kategori</span>
-                            <span class="blog-date">Dipublikasikan: 24 September 2023</span>
-                            <h3>Judul Blog</h3>
-                            <p>Deskripsi singkat tentang isi blog ini. Ini adalah ringkasan menarik yang membuat pembaca
-                                ingin tahu lebih lanjut.</p>
-                            <a href="#" class="read-more-btn">Baca Selengkapnya</a>
-                        </div>
-                    </div>
-
-                    <!-- Duplicate above block for more blog cards -->
-                    <div class="blog-card" data-aos="fade-up">
-                        <div class="blog-image">
-                            <img src="https://via.placeholder.com/400x250" alt="Judul Blog">
-                        </div>
-                        <div class="blog-content">
-                            <span class="blog-category">Kategori</span>
-                            <span class="blog-date">Dipublikasikan: 24 September 2023</span>
-                            <h3>Judul Blog</h3>
-                            <p>Deskripsi singkat tentang isi blog ini. Ini adalah ringkasan menarik yang membuat pembaca
-                                ingin tahu lebih lanjut.</p>
-                            <a href="{{route('listBlog-detail')}}" class="read-more-btn">Baca Selengkapnya</a>
-                        </div>
-                    </div>
-                    <div class="blog-card" data-aos="fade-up">
-                        <div class="blog-image">
-                            <img src="https://via.placeholder.com/400x250" alt="Judul Blog">
-                        </div>
-                        <div class="blog-content">
-                            <span class="blog-category">Kategori</span>
-                            <span class="blog-date">Dipublikasikan: 24 September 2023</span>
-                            <h3>Judul Blog</h3>
-                            <p>Deskripsi singkat tentang isi blog ini. Ini adalah ringkasan menarik yang membuat pembaca
-                                ingin tahu lebih lanjut.</p>
-                            <a href="#" class="read-more-btn">Baca Selengkapnya</a>
-                        </div>
-                    </div>
-                    <div class="blog-card" data-aos="fade-up">
-                        <div class="blog-image">
-                            <img src="https://via.placeholder.com/400x250" alt="Judul Blog">
-                        </div>
-                        <div class="blog-content">
-                            <span class="blog-category">Kategori</span>
-                            <span class="blog-date">Dipublikasikan: 24 September 2023</span>
-                            <h3>Judul Blog</h3>
-                            <p>Deskripsi singkat tentang isi blog ini. Ini adalah ringkasan menarik yang membuat pembaca
-                                ingin tahu lebih lanjut.</p>
-                            <a href="#" class="read-more-btn">Baca Selengkapnya</a>
-                        </div>
-                    </div>
-                    <div class="blog-card" data-aos="fade-up">
-                        <div class="blog-image">
-                            <img src="https://via.placeholder.com/400x250" alt="Judul Blog">
-                        </div>
-                        <div class="blog-content">
-                            <span class="blog-category">Kategori</span>
-                            <span class="blog-date">Dipublikasikan: 24 September 2023</span>
-                            <h3>Judul Blog</h3>
-                            <p>Deskripsi singkat tentang isi blog ini. Ini adalah ringkasan menarik yang membuat pembaca
-                                ingin tahu lebih lanjut.</p>
-                            <a href="#" class="read-more-btn">Baca Selengkapnya</a>
-                        </div>
-                    </div>
-
-                    <!-- Add more blog cards as needed -->
-                </div>
-                <!-- Sidebar for Categories and Popular Posts -->
-                <div class="sidebar">
-                    <!-- Categories Section -->
-                    <div class="categories-section">
-                        <h3>Kategori</h3>
-                        <ul class="category-list">
-                            <li><a href="#">Lifestyle</a></li>
-                            <li><a href="#">Tips Merawat Sepatu</a></li>
-                            <li><a href="#">Fashion</a></li>
-                            <li><a href="#">Gaya Hidup Sehat</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- Popular Posts Section -->
-                    <div class="popular-posts-section">
-                        <h3>Popular Posts</h3>
-                        <div class="popular-post-card">
-                            <div class="popular-post-image">
-                                <img src="https://via.placeholder.com/100x100" alt="Popular Post 1">
-                            </div>
-                            <div class="popular-post-content">
-                                <span class="popular-post-category">Life Tips</span>
-                                <span class="popular-post-date">Mar 24, 2018</span>
-                                <h4>Laziness Does Not Exist in Life</h4>
-                            </div>
-                        </div>
-                        <div class="popular-post-card">
-                            <div class="popular-post-image">
-                                <img src="https://via.placeholder.com/100x100" alt="Popular Post 2">
-                            </div>
-                            <div class="popular-post-content">
-                                <span class="popular-post-category">Technology</span>
-                                <span class="popular-post-date">April 24, 2024</span>
-                                <h4>The Figma Plugins I Actually Use</h4>
-                            </div>
-                        </div>
-                        <div class="popular-post-card">
-                            <div class="popular-post-image">
-                                <img src="https://via.placeholder.com/100x100" alt="Popular Post 3">
-                            </div>
-                            <div class="popular-post-content">
-                                <span class="popular-post-category">Design</span>
-                                <span class="popular-post-date">Apr 15, 2024</span>
-                                <h4>Every Photographer Needs Photoshop</h4>
-                            </div>
-                        </div>
-                        <div class="popular-post-card">
-                            <div class="popular-post-image">
-                                <img src="https://via.placeholder.com/100x100" alt="Popular Post 4">
-                            </div>
-                            <div class="popular-post-content">
-                                <span class="popular-post-category">Technology</span>
-                                <span class="popular-post-date">Apr 5, 2024</span>
-                                <h4>I Start My YouTube Channel!</h4>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pagination">
-                <a href="#" class="pagination-link">1</a>
-                <a href="#" class="pagination-link">2</a>
-                <a href="#" class="pagination-link">3</a>
-                <a href="#" class="pagination-link">Selanjutnya</a>
-            </div>
-        </div>
-    </section> --}}
 
     <!-- Footer Section -->
     <footer class="footer">
@@ -322,6 +201,35 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search-input');
+            const clearIcon = document.getElementById('clear-search');
+            const searchForm = document.getElementById('search-form');
+
+            if (clearIcon) {
+                clearIcon.addEventListener('click', () => {
+                    event.preventDefault();
+                    searchInput.value = '';
+                    searchInput.focus();
+                    clearIcon.style.display = 'none'; // Sembunyikan ikon setelah menghapus
+                    searchForm.submit();
+                });
+
+                searchInput.addEventListener('input', () => {
+                    clearIcon.style.display = searchInput.value ? 'inline' : 'none';
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>
