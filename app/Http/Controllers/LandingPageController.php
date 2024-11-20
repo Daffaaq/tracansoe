@@ -84,14 +84,7 @@ class LandingPageController extends Controller
             ->where('status_publish', 'published');
 
         // Filter berdasarkan kategori jika ada input category
-        if ($request->has('category') && $request->category) {
-            $blogsQuery->where('category_blog_id', $request->category);
-        }
 
-        // Filter berdasarkan tanggal jika ada input filter tanggal
-        if ($request->has('filter_date') && $request->filter_date) {
-            $blogsQuery->whereDate('date_publish', $request->filter_date);
-        }
 
         $suggestions = [];
         $suggestedSearch = null;
@@ -157,8 +150,17 @@ class LandingPageController extends Controller
                 ->where('status_publish', 'published');
         }
 
+        if ($request->has('category') && $request->category) {
+            $blogsQuery->where('category_blog_id', $request->category);
+        }
+
+        // Filter berdasarkan tanggal jika ada input filter tanggal
+        if ($request->has('filter_date') && $request->filter_date) {
+            $blogsQuery->whereDate('date_publish', $request->filter_date);
+        }
         // Pagination dengan 6 blog per halaman
         $blogs = $blogsQuery->orderBy('date_publish', 'desc')->paginate(6);
+        // dd($blogs);
 
         // Mengambil 4 popular posts terbaru berdasarkan tanggal publikasi
         $popularPosts = Blog::with('category')
